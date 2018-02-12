@@ -1,0 +1,165 @@
+<MainScreen>:
+    name: 'main'
+    FloatLayout:
+        size_hint: None, None
+
+# SLIDERS
+        Slider: #BLUE SPEED
+            id: blueSlider
+            orientation: 'vertical'
+            min: 0
+            max: 600
+            value: 0
+            step: 1
+            x: root.width *0.153
+            y: root.height * 0.3
+            size_hint_y: 5.5
+            on_value: root.sliderAction('B', self.value)
+        Slider: #RED SPEED
+            id: redSlider
+            orientation: 'vertical'
+            min: 0
+            max: 600
+            value: 0
+            step: 1
+            x: root.width * 0.48
+            y: root.height * 0.3
+            size_hint_y: 5.5
+            on_value: root.sliderAction('R', self.value)
+
+# BUTTONS
+        ToggleButton: # BLUE TOGGLE BUTTON
+            size_hint: None,None
+            font_size: 25
+            size: root.width * 0.1, root.height * 0.14
+            x: root.width *0.06
+            y: root.height * 0.1
+            text: root.blueToggleText(self.state)
+            state: 'normal'
+            on_release: root.offOnButtonAction('B')
+        ToggleButton: # RED TOGGLE BUTTON
+            size_hint: None,None
+            font_size: 25
+            size: root.width * 0.1, root.height * 0.14
+            x: root.width *0.39
+            y: root.height * 0.1
+            text: root.redToggleText(self.state)
+            state: 'normal'
+            on_release: root.offOnButtonAction('R')
+        ToggleButton: # WHITE TOGGLE BUTTON
+            size_hint: None, None
+            font_size: 25
+            size: root.width * 0.147, root.height * 0.1
+            x: root.width *0.752
+            y: root.height * 0.72
+            text: root.whiteToggleText(self.state)
+            state: 'normal'
+            on_release: root.offOnButtonAction('W')
+        Button: # CHANGE BLUE DIRECTION
+            text: 'CHANGE DIRECTION'
+            font_size: 25
+            size_hint: None, None
+            size: root.width * 0.147, root.height * 0.14
+            x: root.width * 0.166
+            y: root.height * 0.1
+            background_color: 0, 0, 1, 1
+            on_release: root.directionButtonAction('B')
+        Button: # CHANGE RED DIRECTION
+            text: 'CHANGE DIRECTION'
+            font_size: 25
+            size_hint: None, None
+            size: root.width * 0.147, root.height * 0.14
+            x: root.width * 0.497
+            y: root.height * 0.1
+            background_color: 1, 0, 0, 1
+            on_release: root.directionButtonAction('R')
+        Button: # CHANGE WHITE DIRECTION
+            text: 'CHANGE DIRECTION'
+            font_size: 25
+            size_hint: None, None
+            size: root.width * 0.147, root.height * 0.14
+            x: root.width *0.752
+            y: root.height * 0.567
+            background_color: 1, 1, 1, 1
+            on_release: root.directionButtonAction('W')
+
+
+# LABELS
+        Label: #BLUE SPEED
+            text: 'BLUE SPEED: %s %%' % int(blueSlider.value * 100.0/600.0)
+            font_size: 40
+            x: root.width * 0.16
+            y: root.height * 0.83
+            color: 0.8, 0.8, 0.8, 1
+        Label: #RED SPEED
+            text: 'RED SPEED: %s %%' % int(redSlider.value * 100.0/600.0)
+            font_size: 40
+            x: root.width * 0.48
+            y: root.height * 0.83
+            color: 0.8, 0.8, 0.8, 1
+        Label: #TURNTABLE
+            text: 'TURNTABLE'
+            font_size: 40
+            x: root.width * 0.799
+            y: root.height * 0.83
+            color: 0.8, 0.8, 0.8, 1
+
+
+# BUTTONS
+        Button: # X BUTTON
+            text: 'X'
+            font_size: 23
+            size_hint: None,None
+            size: root.width * 0.015,root.width * 0.015
+            x: root.width * 0.965
+            y: root.height * 0.945
+            background_color: 0.7, 0.7, 0.7, 1
+            on_release: root.callPopup()
+        ToggleButton: # PAUSE TOGGLE BUTTON
+            font_size: 25
+            size_hint: None,None
+            size: root.width * 0.147, root.height * 0.14
+            x: root.width *0.752
+            y: root.height * 0.1
+            text: root.pauseToggleText(self.state)
+            state: 'normal'
+            background_color: 1, 0.8, 0, 1
+            on_release: root.pauseUnpauseButtonAction()
+
+# IMAGE
+        Screen:
+            Image:
+                source: 'DPEA Logo Transparent.png'
+                keep_ratio: False
+                allow_stretch: True
+                opacity: 1
+                size_hint: 2.7, 2.7
+                x: root.width * 0.753
+                y: root.height*0.283
+
+# POPUP
+#        Popup:
+#            id: popup
+#            title: 'DO YOU WANT TO QUIT?'
+#            title_align: 'center'
+#            title_size: 27
+#            size_hint: None, None
+#            size: root.width * 0.27, root.height * 0.175
+#            x: root.width * 0.375
+#            y: root.height * 0.45
+#            auto_dismiss: True
+#            FloatLayout:
+#                Button:
+#                    x: root.width * 0.39
+#                    y: root.height * 0.485
+#                    size_hint: 0.45, 0.5
+#                    font_size: 25
+#                    text: 'Yes'
+#                    on_release: root.exitProgram()
+#                Button:
+#                    x: root.width * 0.5125
+#                    y: root.height *0.485
+#                    size_hint: 0.45, 0.5
+#                    font_size: 25
+#                    text: 'No'
+#                    on_release: popup.dismiss()
