@@ -13,6 +13,7 @@ from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.graphics import *
@@ -25,6 +26,17 @@ from kivy.graphics import *
 
 
 sm = ScreenManager()
+
+bearIcon = Image(source = 'ICON_Bear.png',
+                 keep_ratio = True,
+                 size_hint = (1, 1))
+gearIcon = Image(source = 'ICON_Gear.png')
+
+board = GridLayout(cols = 2, row_force_default = True, row_default_height = 40)
+board.add_widget(Button(text = 'mems', size_hint_x = None, width = 100))
+board.add_widget(Button(text = 'hmm'))
+board.add_widget(bearIcon)
+board.add_widget(gearIcon)
 
 class MyApp(App):
     def build(self):
@@ -89,87 +101,6 @@ class MainScreen(Screen):
         quitLay.add_widget(confirmationLabel)
 
         quitPop.open()
-        
-    def leftPopup (self): # LEFT POPUP
-        leftLay = FloatLayout(size_hint = (0.5, 0.5))
-        leftPop = Popup(title = 'IN PROGRESS...',
-            size_hint = (0.240, 0.73),
-            auto_dismiss = False,
-            title_size = 30,
-            title_align = 'center',
-            pos_hint = { 'x' : 19.5 / Window.width,
-                         'y' : 157 / Window.height},
-            content = leftLay)
-
-        leftImage = Image(source = 'CARD_Left.png',
-                          keep_ratio = True,
-                          size_hint = (1.5, 1.945),
-                          pos = (-78.95, 174.75))
-        leftLay.add_widget(leftImage)
-
-        leftPop.open()
-        Clock.schedule_once(leftPop.dismiss, 1.5)
-        
-
-    def upPopup (self): # UP POPUP
-        upLay = FloatLayout(size_hint = (0.5, 0.5))
-        upPop = Popup(title = 'IN PROGRESS...',
-            size_hint = (0.240, 0.73),
-            auto_dismiss = False,
-            title_size = 30,
-            title_align = 'center',
-            pos_hint = { 'x' : 480 / Window.width,
-                         'y' : 157.5 / Window.height},
-            content = upLay)
-
-        upImage = Image(source = 'CARD_Up.png',
-                          keep_ratio = True,
-                          size_hint = (1.5, 1.945),
-                          pos = (381.75, 174.75))
-        upLay.add_widget(upImage)
-
-        upPop.open()
-        Clock.schedule_once(upPop.dismiss, 1.5)
-
-    def downPopup (self): # DOWN POPUP
-        downLay = FloatLayout(size_hint = (0.5, 0.5))
-        downPop = Popup(title = 'IN PROGRESS...',
-            size_hint = (0.240, 0.73),
-            auto_dismiss = False,
-            title_size = 30,
-            title_align = 'center',
-            pos_hint = { 'x' : 940.5 / Window.width,
-                         'y' : 157.5 / Window.height},
-            content = downLay)
-
-        downImage = Image(source = 'CARD_Down.png',
-                          keep_ratio = True,
-                          size_hint = (1.5, 1.945),
-                          pos = (842.5, 174.75))
-        downLay.add_widget(downImage)
-
-        downPop.open()
-        Clock.schedule_once(downPop.dismiss, 1.5)
-
-    def rightPopup (self): # RIGHT POPUP
-        rightLay = FloatLayout(size_hint = (0.5, 0.5))
-        rightPop = Popup(title = 'IN PROGRESS...',
-            size_hint = (0.240, 0.73),
-            auto_dismiss = False,
-            title_size = 30,
-            title_align = 'center',
-            pos_hint = { 'x' : 1401.5 / Window.width,
-                         'y' : 157 / Window.height},
-            content = rightLay)
-
-        rightImage = Image(source = 'CARD_Right.png',
-                          keep_ratio = True,
-                          size_hint = (1.5, 1.945),
-                          pos = (1303.5, 174.75))
-        rightLay.add_widget(rightImage)
-
-        rightPop.open()
-        Clock.schedule_once(rightPop.dismiss, 1.5)
 
 sm.add_widget(MainScreen(name = 'main'))
 
