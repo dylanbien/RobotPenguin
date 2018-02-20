@@ -42,6 +42,7 @@ def quitAll():
 # //                     LOAD KIVY FILE                         //
 # ////////////////////////////////////////////////////////////////
 
+
 class MyApp(App):
     def build(self):
         return sm
@@ -60,6 +61,7 @@ class MainScreen(Screen):
 # //                          POPUPS                            //
 # //                                                            //
 # ////////////////////////////////////////////////////////////////
+
 
     def quitPopup (self): # QUIT POPUP
         quitLay = FloatLayout(size_hint = (0.5, 0.5))

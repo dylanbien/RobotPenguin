@@ -27,22 +27,11 @@ from kivy.graphics import *
 
 sm = ScreenManager()
 
-bearIcon = Image(source = 'ICON_Bear.png',
-                 keep_ratio = True,
-                 size_hint = (1, 1))
-gearIcon = Image(source = 'ICON_Gear.png')
-
-board = GridLayout(cols = 2, row_force_default = True, row_default_height = 40)
-board.add_widget(Button(text = 'mems', size_hint_x = None, width = 100))
-board.add_widget(Button(text = 'hmm'))
-board.add_widget(bearIcon)
-board.add_widget(gearIcon)
-
 class MyApp(App):
     def build(self):
         return sm
 
-Builder.load_file('main.kv')
+Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 
 def quitAll():
@@ -58,7 +47,7 @@ class MyApp(App):
     def build(self):
         return sm
 
-Builder.load_file('main.kv')
+Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 
 class MainScreen(Screen):
@@ -73,7 +62,7 @@ class MainScreen(Screen):
 # //                                                            //
 # ////////////////////////////////////////////////////////////////
 
-    def quitPopup (self): # QUIT POPUP
+    def quitPop (self): # QUIT POPUP
         quitLay = FloatLayout(size_hint = (0.5, 0.5))
         quitPop = Popup(title = 'QUIT GAME',
             size_hint = (0.3, 0.23),
