@@ -37,13 +37,10 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 
 class ImageButton(ButtonBehavior, Image):
 	def on_press(self):
-		move()
 		print ('moved')
 		
 def quitAll():
     quit()
-
-def move():
 	
 
 # ////////////////////////////////////////////////////////////////
