@@ -1,45 +1,56 @@
 <MainScreen>:
     name: 'main'
     GridLayout:
-        cols: 8
-        rows: 7
+        cols: 3
+        rows: 3
         minimum_size: 300, 300
         padding: 10
         spacing: 1
 
-# BUTTONS
-        Button:
-            size_hint: None, None
+# THINGS
+        ImageButton:
+			id: button1
+			source: 'ICON_Bear.png'
+			size_hint: None, None
+			on_press: temp = self.source; self.source = button2.source; button2.source = temp
+			
+        ImageButton:
+			id: button2
+			source: ''
+			size_hint: None, None
+			on_press: temp = self.source; self.source = 'ICON_Bear.png'
 
         Button:
+			id: button3
             size_hint: None, None
+			text: "button3"
 
         Button:
+			id: button4
             size_hint: None, None
+			text: "button4"
 
         Button:
+			id: button5
             size_hint: None, None
+			text: "button5"
 
         Button:
+			id: button6
             size_hint: None, None
+			text: "button6"
 
         Button:
+			id: button7
             size_hint: None, None
-
-        Button:
-            size_hint: None, None
+			text: "button7"
             
         Button:
+			id: button8
             size_hint: None, None
+			text: "button8"
 
         Button:
+			id: button9
             size_hint: None, None
-
-        Button:
-            size_hint: None, None
-
-        Button:
-            size_hint: None, None
-
-        Button:
-            size_hint: None, None
+			text: "button9"

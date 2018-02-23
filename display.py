@@ -17,6 +17,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.graphics import *
+from kivy.uix.behaviors import ButtonBehavior
 
 
 # ////////////////////////////////////////////////////////////////
@@ -34,9 +35,16 @@ class MyApp(App):
 Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 
+class ImageButton(ButtonBehavior, Image):
+	def on_press(self):
+		move()
+		print ('moved')
+		
 def quitAll():
     quit()
 
+def move():
+	
 
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
