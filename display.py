@@ -1,5 +1,5 @@
 # ////////////////////////////////////////////////////////////////
-# //                     IMPORT STATEMENTS                      //
+# //					 IMPORT STATEMENTS						//
 # ////////////////////////////////////////////////////////////////
 
 
@@ -21,88 +21,93 @@ from kivy.uix.behaviors import ButtonBehavior
 
 
 # ////////////////////////////////////////////////////////////////
-# //            DECLARE APP CLASS AND SCREENMANAGER             //
-# //                     LOAD KIVY FILE                         //
+# //			DECLARE APP CLASS AND SCREENMANAGER				//
+# //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
 
 
 sm = ScreenManager()
 
 class MyApp(App):
-    def build(self):
-        return sm
+	def build(self):
+		return sm
 
 Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 		
 def quitAll():
-    quit()
+	quit()
 	
 
 # ////////////////////////////////////////////////////////////////
-# //            DECLARE APP CLASS AND SCREENMANAGER             //
-# //                     LOAD KIVY FILE                         //
+# //			DECLARE APP CLASS AND SCREENMANAGER				//
+# //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
 
 class MyApp(App):
-    def build(self):
-        return sm
+	def build(self):
+		return sm
 
 Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 
-class MyButton(Button)
-def move(self, event):
-	self.event = event
-	if (self.event == 'btn1')
-		#DO STUFF HERE!!!! probably don't need that if statement btw
-
-
 class MainScreen(Screen):
-    def exitProgram(self, obj):
-        App.get_running_app().stop()
-        Window.close()
-
+	def exitProgram(self, obj):
+		App.get_running_app().stop()
+		Window.close()
+	def resetBoard(self):
+		for id in self.ids:
+			if ('image' in id):
+				self.ids[id].source = 'ICON_Transparent.png'
+	def addImage(self, location, type):
+		for id in self.ids:
+			if (id == location):
+				self.ids[id].source = type
+	def removeImage(self, location):
+		for id in self.ids:
+			if (id == location):
+				self.ids[id].source = 'ICON_Transparent.png'
+			
 # ////////////////////////////////////////////////////////////////
-# //                                                            //
-# //                          POPUPS                            //
-# //                                                            //
+# //															//
+# //						  POPUPS							//
+# //															//
 # ////////////////////////////////////////////////////////////////
 
-    def quitPop (self): # QUIT POPUP
-        quitLay = FloatLayout(size_hint = (0.5, 0.5))
-        quitPop = Popup(title = 'QUIT GAME',
-            size_hint = (0.3, 0.23),
-            auto_dismiss = True,
-            title_size = 30,
-            title_align = 'center',
-            content = quitLay)
-        yesButton = Button(text = 'YES',
-            size_hint = (0.46, 0.8),
-            font_size = 20,
-            pos = (700, 425))
-        noButton = Button(text = 'NO',
-            size_hint = (0.46, 0.8),
-            font_size = 20,
-            pos = (965, 425))
-        confirmationLabel = Label(text = 'Are you sure you want to quit?',
-            pos = (685, 487.5),
-            font_size = 20)
-        
-        yesButton.bind(on_release = self.exitProgram)
-        noButton.bind(on_release = quitPop.dismiss)
-        
-        quitLay.add_widget(yesButton)
-        quitLay.add_widget(noButton)
-        quitLay.add_widget(confirmationLabel)
+	def quitPop (self): # QUIT POPUP
+		quitLay = FloatLayout(size_hint = (0.5, 0.5))
+		quitPop = Popup(title = 'QUIT GAME',
+			size_hint = (0.3, 0.23),
+			auto_dismiss = True,
+			title_size = 30,
+			title_align = 'center',
+			content = quitLay)
+		yesButton = Button(text = 'YES',
+			size_hint = (0.46, 0.8),
+			font_size = 20,
+			pos = (700, 425))
+		noButton = Button(text = 'NO',
+			size_hint = (0.46, 0.8),
+			font_size = 20,
+			pos = (965, 425))
+		confirmationLabel = Label(text = 'Are you sure you want to quit?',
+			pos = (685, 487.5),
+			font_size = 20)
+		
+		yesButton.bind(on_release = self.exitProgram)
+		noButton.bind(on_release = quitPop.dismiss)
+		
+		quitLay.add_widget(yesButton)
+		quitLay.add_widget(noButton)
+		quitLay.add_widget(confirmationLabel)
 
-        quitPop.open()
+		quitPop.open()
 
 sm.add_widget(MainScreen(name = 'main'))
 
 
 # ////////////////////////////////////////////////////////////////
-# //                          RUN APP                           //
+# //						  RUN APP							//
 # ////////////////////////////////////////////////////////////////
 
 MyApp().run()
