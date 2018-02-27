@@ -34,10 +34,6 @@ class MyApp(App):
 
 Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
-
-class ImageButton(ButtonBehavior, Image):
-	def on_press(self):
-		print ('moved')
 		
 def quitAll():
     quit()
@@ -55,8 +51,14 @@ class MyApp(App):
 Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 
-class MainScreen(Screen):
+class MyButton(Button)
+def move(self, event):
+	self.event = event
+	if (self.event == 'btn1')
+		#DO STUFF HERE!!!! probably don't need that if statement btw
 
+
+class MainScreen(Screen):
     def exitProgram(self, obj):
         App.get_running_app().stop()
         Window.close()

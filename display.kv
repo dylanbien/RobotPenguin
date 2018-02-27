@@ -8,49 +8,93 @@
         spacing: 1
 
 # THINGS
-        ImageButton:
+        Button:
 			id: button1
-			source: 'ICON_Bear.png'
 			size_hint: None, None
-			on_press: temp = self.source; self.source = button2.source; button2.source = temp
-			
-        ImageButton:
+			on_press: on_press: root.move('btn1')
+			Image:
+				id: image1
+				source: 'ICON_Bear.png'
+				y: self.parent.y
+				x: self.parent.x
+				size_hint: None, None
+
+        Button:
 			id: button2
-			source: ''
 			size_hint: None, None
-			on_press: temp = self.source; self.source = 'ICON_Bear.png'
-
-        Button:
+			on_press: temp = image1.source; image1.source = image2.source; image2.source = temp
+			Image:
+				id: image2
+				source: 'ICON_Gear.png'
+				y: self.parent.y
+				x: self.parent.x
+				size_hint: None, None
+			
+		Button:
 			id: button3
-            size_hint: None, None
-			text: "button3"
-
-        Button:
+			size_hint: None, None
+			Image:
+				id: image3
+				source: 'ICON_Transparent.png'
+				y: self.parent.y
+				x: self.parent.x
+				size_hint: None, None
+		Button:
 			id: button4
-            size_hint: None, None
-			text: "button4"
-
-        Button:
+			size_hint: None, None
+			Image:
+				id: image4
+				source: 'ICON_Transparent.png'
+				y: self.parent.y
+				x: self.parent.x
+				size_hint: None, None
+				
+		Button:
 			id: button5
-            size_hint: None, None
-			text: "button5"
-
-        Button:
+			size_hint: None, None
+			Image:
+				id: image5
+				source: 'ICON_Transparent.png'
+				y: self.parent.y
+				x: self.parent.x
+				size_hint: None, None
+				
+		Button:
 			id: button6
-            size_hint: None, None
-			text: "button6"
-
-        Button:
+			size_hint: None, None
+			Image:
+				id: image6
+				source: 'ICON_Transparent.png'
+				y: self.parent.y
+				x: self.parent.x
+				size_hint: None, None
+				
+		Button:
 			id: button7
-            size_hint: None, None
-			text: "button7"
-            
-        Button:
+			size_hint: None, None
+			Image:
+				id: image7
+				source: 'ICON_Transparent.png'
+				y: self.parent.y
+				x: self.parent.x
+				size_hint: None, None
+				
+		Button:
 			id: button8
-            size_hint: None, None
-			text: "button8"
+			size_hint: None, None
+			Image:
+				id: image8
+				source: 'ICON_Transparent.png'
+				y: self.parent.y
+				x: self.parent.x
+				size_hint: None, None
 
         Button:
 			id: button9
-            size_hint: None, None
-			text: "button9"
+			size_hint: None, None
+			Image:
+				id: image9
+				source: 'ICON_Transparent.png'
+				y: self.parent.y
+				x: self.parent.x
+				size_hint: None, None
