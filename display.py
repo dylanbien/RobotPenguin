@@ -1,8 +1,7 @@
 # ////////////////////////////////////////////////////////////////
 # //					 IMPORT STATEMENTS						//
 # ////////////////////////////////////////////////////////////////
-
-
+import string
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -15,6 +14,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
+from kivy.uix.scatter import Scatter
 from kivy.clock import Clock
 from kivy.graphics import *
 from kivy.uix.behaviors import ButtonBehavior
@@ -32,7 +32,7 @@ class MyApp(App):
 	def build(self):
 		return sm
 
-Builder.load_file('display.kv')
+#Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 		
 def quitAll():
@@ -48,25 +48,36 @@ class MyApp(App):
 	def build(self):
 		return sm
 
-Builder.load_file('display.kv')
+#Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 
+# all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.png', 'ICON_Wrench.png', etc.
 class MainScreen(Screen):
 	def exitProgram(self, obj):
 		App.get_running_app().stop()
 		Window.close()
 	def resetBoard(self):
-		for id in self.ids:
-			if ('image' in id):
-				self.ids[id].source = 'ICON_Transparent.png'
-	def addImage(self, location, type):
-		for id in self.ids:
-			if (id == location):
-				self.ids[id].source = type
+		for actor in self.children[0].children:
+			actor.source = 'ICON_Wrench.png'
+	def addImage(self, location, type): 
+		for actor in self.children[0].children:
+			if (actor.id == location):
+				actor.source = type
 	def removeImage(self, location):
-		for id in self.ids:
-			if (id == location):
-				self.ids[id].source = 'ICON_Transparent.png'
+		for actor in self.children[0].children:
+			if (actor.id == location):
+				actor.source = 'ICON_Transparent.png'
+
+class Actor(ButtonBehavior, Image):
+	def on_press(self):
+		main.removeImage('actor5')
+		print('pressed')
+		
+	def moveRight(self):
+		next = int(self.id.strip(string.ascii_letters)) + 1
+		for id in main.ids:
+			if (id == 'actor' + str(next) and root.ids[id].source == 'ICON_Transparent.png'):
+				temp = self.source; self.source = root.ids[id].source, root.ids[id].source = temp
 			
 # ////////////////////////////////////////////////////////////////
 # //															//
@@ -103,8 +114,15 @@ class MainScreen(Screen):
 
 		quitPop.open()
 
-sm.add_widget(MainScreen(name = 'main'))
+grid = GridLayout(id = 'grid', cols = 3, rows = 3, minimum_size = [300, 300], padding = 10, spacing = 1)
+for i in range (9):
+	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Igloo.png', size_hint = [None, None])
+	grid.add_widget(b)
 
+main = MainScreen(name = 'main')
+main.add_widget(grid)
+sm.add_widget(main)
+main.children[0].children[4].on_press = main.addImage('actor5', 'ICON_Gear.png')  
 
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
