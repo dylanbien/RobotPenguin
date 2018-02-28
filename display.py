@@ -70,14 +70,16 @@ class MainScreen(Screen):
 
 class Actor(ButtonBehavior, Image):
 	def on_press(self):
-		main.removeImage('actor5')
+		self.moveRight()
 		print('pressed')
 		
 	def moveRight(self):
 		next = int(self.id.strip(string.ascii_letters)) + 1
-		for id in main.ids:
-			if (id == 'actor' + str(next) and root.ids[id].source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = root.ids[id].source, root.ids[id].source = temp
+		if (next % main.children[0].cols == 1):
+			return #should turn/rotate right eventually or something or other
+		for actor in main.children[0].children:
+			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Gray.png'):
+				temp = self.source; self.source = actor.source; actor.source = temp
 			
 # ////////////////////////////////////////////////////////////////
 # //															//
@@ -115,14 +117,16 @@ class Actor(ButtonBehavior, Image):
 		quitPop.open()
 
 grid = GridLayout(id = 'grid', cols = 3, rows = 3, minimum_size = [300, 300], padding = 10, spacing = 1)
-for i in range (9):
-	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Igloo.png', size_hint = [None, None])
+for i in range (0, 9):
+	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Gray.png', size_hint = [None, None])
 	grid.add_widget(b)
 
 main = MainScreen(name = 'main')
 main.add_widget(grid)
 sm.add_widget(main)
-main.children[0].children[4].on_press = main.addImage('actor5', 'ICON_Gear.png')  
+for actor in main.children[0].children:
+	if (actor.id == 'actor4'):
+		actor.source = 'ICON_Igloo.png'
 
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
