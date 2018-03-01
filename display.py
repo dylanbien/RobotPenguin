@@ -75,10 +75,28 @@ class MainScreen(Screen):
 				
 class Actor(ButtonBehavior, Image):
 	def on_press(self):
-		self.random()
 		print('pressed')
 	
+	def test(self, dt):
+		if ('Player' not in self.source): return
+		self.rotate(self.id, 90*random.randint(0, 3))
+		self.moveForward()
+		
+	def moveForward(self):
+		if ('90' in self.source): self.moveRight()
+		elif ('180' in self.source): self.moveDown()
+		elif ('270' in self.source): self.moveLeft()
+		else: self.moveUp()
+	
+	def moveBackward(self):
+		if ('90' in self.source): self.moveLeft()
+		elif ('180' in self.source): self.moveUp()
+		elif ('270' in self.source): self.moveRight()
+		else: self.moveDown()
+			
 	def random(self):
+		if ('Player' not in self.source):
+			return
 		index = random.randint(1,4)
 		if index == 1:
 			self.moveRight()
@@ -88,6 +106,12 @@ class Actor(ButtonBehavior, Image):
 			self.moveUp()
 		else:
 			self.moveDown()
+	
+	def rotate(self, location, degrees):
+		for actor in main.children[0].children:
+			if (actor.id == location and 'Player' in actor.source):
+				if (degrees == 0): actor.source = 'ICON_Player.png'
+				else: actor.source = 'ICON_Player_' + str(degrees) + '.png'
 		
 	def moveRight(self): #strafe
 		next = int(self.id.strip(string.ascii_letters)) + 1
@@ -166,10 +190,18 @@ main.add_widget(grid)
 sm.add_widget(main)
 for actor in main.children[0].children:
 	if (actor.id == 'actor1'):
-		actor.source = 'ICON_Gear.png'
-	if (actor.id == 'actor5'):
-		actor.source = 'ICON_Gear.png'
-Clock.schedule_interval(main.test, 1.0/30.0)
+		actor.source = 'ICON_Player.png'
+	if (actor.id == 'actor16'):
+		actor.source = 'ICON_Player.png'
+	if (actor.id == 'actor32'):
+		actor.source = 'ICON_Player.png'
+	if (actor.id == 'actor55'):
+		actor.source = 'ICON_Player.png'
+	if (actor.id == 'actor17'):
+		actor.source = 'ICON_Wrench.png'
+for actor in main.children[0].children: 
+	Clock.schedule_interval(actor.test, 1.0/30.0)
+
 
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//

@@ -2,7 +2,6 @@
 # //                     IMPORT STATEMENTS                      //
 # ////////////////////////////////////////////////////////////////
 
-
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
