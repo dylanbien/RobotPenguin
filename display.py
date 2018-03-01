@@ -2,6 +2,7 @@
 # //					 IMPORT STATEMENTS						//
 # ////////////////////////////////////////////////////////////////
 import string
+import random
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -50,7 +51,7 @@ class MyApp(App):
 
 #Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
-
+		
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.png', 'ICON_Wrench.png', etc.
 class MainScreen(Screen):
 	def exitProgram(self, obj):
@@ -58,25 +59,64 @@ class MainScreen(Screen):
 		Window.close()
 	def resetBoard(self):
 		for actor in self.children[0].children:
-			actor.source = 'ICON_Wrench.png'
-	def addImage(self, location, type): 
+			actor.source = 'ICON_Gray.png'
+	def addActor(self, location, type): 
 		for actor in self.children[0].children:
 			if (actor.id == location):
 				actor.source = type
-	def removeImage(self, location):
+	def removeActor(self, location):
 		for actor in self.children[0].children:
 			if (actor.id == location):
-				actor.source = 'ICON_Transparent.png'
-
+				actor.source = 'ICON_Gray.png'
+	def test(self, dt):
+		for actor in self.children[0].children:
+			if (actor.source != 'ICON_Gray.png'):
+				actor.random()
+				
 class Actor(ButtonBehavior, Image):
 	def on_press(self):
-		self.moveRight()
+		self.random()
 		print('pressed')
+	
+	def random(self):
+		index = random.randint(1,4)
+		if index == 1:
+			self.moveRight()
+		elif index == 2:
+			self.moveLeft()
+		elif index == 3:
+			self.moveUp()
+		else:
+			self.moveDown()
 		
-	def moveRight(self):
+	def moveRight(self): #strafe
 		next = int(self.id.strip(string.ascii_letters)) + 1
 		if (next % main.children[0].cols == 1):
 			return #should turn/rotate right eventually or something or other
+		for actor in main.children[0].children:
+			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Gray.png'):
+				temp = self.source; self.source = actor.source; actor.source = temp
+	
+	def moveLeft(self): #strafe
+		next = int(self.id.strip(string.ascii_letters)) - 1
+		if (next % main.children[0].cols == 0):
+			return #should turn/rotate left eventually or something or other
+		for actor in main.children[0].children:
+			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Gray.png'):
+				temp = self.source; self.source = actor.source; actor.source = temp
+	
+	def moveUp(self):
+		next = int(self.id.strip(string.ascii_letters)) - main.children[0].rows
+		if (next < 0):
+			return #should up/down methods rotate?
+		for actor in main.children[0].children:
+			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Gray.png'):
+				temp = self.source; self.source = actor.source; actor.source = temp
+	
+	def moveDown(self):
+		next = int(self.id.strip(string.ascii_letters)) + main.children[0].rows
+		if (next > main.children[0].rows*main.children[0].cols):
+			return
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Gray.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp
@@ -116,8 +156,8 @@ class Actor(ButtonBehavior, Image):
 
 		quitPop.open()
 
-grid = GridLayout(id = 'grid', cols = 3, rows = 3, minimum_size = [300, 300], padding = 10, spacing = 1)
-for i in range (0, 9):
+grid = GridLayout(id = 'grid', cols = 9, rows = 9, minimum_size = [300, 300], padding = 10, spacing = 1)
+for i in range (0, grid.cols*grid.rows):
 	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Gray.png', size_hint = [None, None])
 	grid.add_widget(b)
 
@@ -125,8 +165,11 @@ main = MainScreen(name = 'main')
 main.add_widget(grid)
 sm.add_widget(main)
 for actor in main.children[0].children:
-	if (actor.id == 'actor4'):
-		actor.source = 'ICON_Igloo.png'
+	if (actor.id == 'actor1'):
+		actor.source = 'ICON_Gear.png'
+	if (actor.id == 'actor5'):
+		actor.source = 'ICON_Gear.png'
+Clock.schedule_interval(main.test, 1.0/30.0)
 
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
