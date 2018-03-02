@@ -3,6 +3,8 @@
 # ////////////////////////////////////////////////////////////////
 import string
 import random
+import socket
+import sys
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -20,6 +22,50 @@ from kivy.clock import Clock
 from kivy.graphics import *
 from kivy.uix.behaviors import ButtonBehavior
 
+# ////////////////////////////////////////////////////////////////
+# //					 SERVER CREATION						//
+# ////////////////////////////////////////////////////////////////
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_address = (socket.gethostbyname(socket.gethostname()), 10003)
+print('starting up on {} port {}'.format(*server_address))
+sock.bind(server_address)
+sock.listen(1)
+x = 0
+y = 0
+a = 0
+b = 0
+while True:
+    # Wait for a connection
+    print('waiting for a connection')
+    connection, client_address = sock.accept()
+    try:
+        print('connection from', client_address)
+
+        # Receive the data in small chunks and retransmit it
+        while True:
+            data = connection.recv(16)
+            decoded_data = data.decode("utf-8")
+            print('received {!r}'.format(data))
+            try:
+                a,b = decoded_data.split(',')
+            except:
+                print('blank data')
+                a = 0
+                b = 0
+            x+=int(a)
+            y+=int(b)
+            return_data = (str(x)+','+str(y))
+            econded_data = return_data.encode("utf-8")
+            if data:
+                print('sending data back to the client')
+				# some sort of method call depending on connection.recv(bufsize)
+                connection.sendall(econded_data)
+            else:
+                print('no data from', client_address)
+                break
+
+    finally:
+        connection.close()
 
 # ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
@@ -40,10 +86,10 @@ def quitAll():
 	quit()
 	
 
-# ////////////////////////////////////////////////////////////////
-# //			DECLARE APP CLASS AND SCREENMANAGER				//
-# //					 LOAD KIVY FILE							//
-# ////////////////////////////////////////////////////////////////
+# ////////////////////////////////////////////////////////////////////////////
+# //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
+# //					 		LOAD KIVY FILE								//			
+# ////////////////////////////////////////////////////////////////////////////
 
 class MyApp(App):
 	def build(self):
@@ -110,7 +156,8 @@ class Actor(ButtonBehavior, Image):
 	def rotate(self, location, degrees):
 		for actor in main.children[0].children:
 			if (actor.id == location and 'Player' in actor.source):
-				if (degrees == 0): actor.source = 'ICON_Player.png'
+				if (degrees == 0 or degrees % 90 != 0): actor.source = 'ICON_Player.png'
+				elif (degrees >= 360): actor.source = 'ICON_Player_' + str(degrees%360) + '.png'
 				else: actor.source = 'ICON_Player_' + str(degrees) + '.png'
 		
 	def moveRight(self): #strafe
@@ -179,7 +226,10 @@ class Actor(ButtonBehavior, Image):
 		quitLay.add_widget(confirmationLabel)
 
 		quitPop.open()
-
+		
+# ////////////////////////////////////////////////////////////////
+# //					 CREATE GRID/ACTORS 					//
+# ////////////////////////////////////////////////////////////////
 grid = GridLayout(id = 'grid', cols = 9, rows = 9, minimum_size = [300, 300], padding = 10, spacing = 1)
 for i in range (0, grid.cols*grid.rows):
 	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Gray.png', size_hint = [None, None])
