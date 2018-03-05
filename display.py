@@ -23,51 +23,6 @@ from kivy.graphics import *
 from kivy.uix.behaviors import ButtonBehavior
 
 # ////////////////////////////////////////////////////////////////
-# //					 SERVER CREATION						//
-# ////////////////////////////////////////////////////////////////
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = (socket.gethostbyname(socket.gethostname()), 10003)
-print('starting up on {} port {}'.format(*server_address))
-sock.bind(server_address)
-sock.listen(1)
-x = 0
-y = 0
-a = 0
-b = 0
-while True:
-    # Wait for a connection
-    print('waiting for a connection')
-    connection, client_address = sock.accept()
-    try:
-        print('connection from', client_address)
-
-        # Receive the data in small chunks and retransmit it
-        while True:
-            data = connection.recv(16)
-            decoded_data = data.decode("utf-8")
-            print('received {!r}'.format(data))
-            try:
-                a,b = decoded_data.split(',')
-            except:
-                print('blank data')
-                a = 0
-                b = 0
-            x+=int(a)
-            y+=int(b)
-            return_data = (str(x)+','+str(y))
-            econded_data = return_data.encode("utf-8")
-            if data:
-                print('sending data back to the client')
-				# some sort of method call depending on connection.recv(bufsize)
-                connection.sendall(econded_data)
-            else:
-                print('no data from', client_address)
-                break
-
-    finally:
-        connection.close()
-
-# ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
@@ -90,13 +45,6 @@ def quitAll():
 # //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
 # //					 		LOAD KIVY FILE								//			
 # ////////////////////////////////////////////////////////////////////////////
-
-class MyApp(App):
-	def build(self):
-		return sm
-
-#Builder.load_file('display.kv')
-Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 		
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.png', 'ICON_Wrench.png', etc.
 class MainScreen(Screen):
@@ -239,22 +187,42 @@ main = MainScreen(name = 'main')
 main.add_widget(grid)
 sm.add_widget(main)
 for actor in main.children[0].children:
-	if (actor.id == 'actor1'):
-		actor.source = 'ICON_Player.png'
-	if (actor.id == 'actor16'):
-		actor.source = 'ICON_Player.png'
 	if (actor.id == 'actor32'):
-		actor.source = 'ICON_Player.png'
-	if (actor.id == 'actor55'):
 		actor.source = 'ICON_Player.png'
 	if (actor.id == 'actor17'):
 		actor.source = 'ICON_Wrench.png'
-for actor in main.children[0].children: 
-	Clock.schedule_interval(actor.test, 1.0/30.0)
+		
+# ////////////////////////////////////////////////////////////////
+# //						 SOCKET				 				//
+# ////////////////////////////////////////////////////////////////
 
+# Create a TCP/IP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+# Bind the socket to the port
+server_address = ('172.17.17.116', 10009)
+print('starting up on {} port {}'.format(*server_address))
+sock.bind(server_address)
+
+# Listen for incoming connections
+sock.listen(1)
+
+while True:
+	# Wait for a connection
+	print('waiting for a connection')
+	connection, client_address = sock.accept()
+	try:
+		print('connection from', client_address)
+		data = connection.recv(16)
+		print ('received this: ' + data)
+		connection.sendall(data)
+
+	finally:
+		# Clean up the connection
+		connection.close()
+		
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
 # ////////////////////////////////////////////////////////////////
 
-MyApp().run()
+#MyApp().run()
