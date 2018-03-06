@@ -27,7 +27,7 @@ from kivy.uix.behaviors import ButtonBehavior
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
 
-
+player_location = 1
 sm = ScreenManager()
 
 class MyApp(App):
@@ -66,11 +66,23 @@ class MainScreen(Screen):
 		for actor in self.children[0].children:
 			if (actor.source != 'ICON_Gray.png'):
 				actor.random()
+	def playerForward(self):
+		print('you have moved the player forwards or something')
+		for actor in self.children[0].children:
+			if ('Player' in actor.source):
+				actor.moveForward()
+	
+	def playerBackward(self):
+		print('you have moved the player backwards or something')
+		for actor in self.children[0].children:
+			if ('Player' in actor.source):
+				actor.moveBackward()
+				
 				
 class Actor(ButtonBehavior, Image):
 	def on_press(self):
 		print('pressed')
-	
+		
 	def test(self, dt):
 		if ('Player' not in self.source): return
 		self.rotate(self.id, 90*random.randint(0, 3))
@@ -189,6 +201,7 @@ sm.add_widget(main)
 for actor in main.children[0].children:
 	if (actor.id == 'actor32'):
 		actor.source = 'ICON_Player.png'
+		
 	if (actor.id == 'actor17'):
 		actor.source = 'ICON_Wrench.png'
 		
@@ -214,6 +227,7 @@ while True:
 	try:
 		print('connection from', client_address)
 		data = connection.recv(16)
+		getattr(main, data)() #playerForward, playerBackward
 		print ('received this: ' + data)
 		connection.sendall(data)
 

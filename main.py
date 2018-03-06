@@ -18,7 +18,24 @@ from kivy.graphics import *
 import socket
 import sys
 
+def send(command):
+	try:
+		# Send data
+		message = bytes(command, encoding='utf-8') 
+		print('sending {!r}'.format(message))
+		sock.sendall(message)
+		amount_received = 0
+		amount_expected = len(message)
 
+		while amount_received < amount_expected:
+			data = sock.recv(16)
+			amount_received += len(data)
+			print('received {!r}'.format(data))
+
+	finally:
+		print('please clap')
+
+	
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
 # //                     LOAD KIVY FILE                         //
@@ -182,23 +199,8 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_address = ('172.17.17.116', 10009)
 print('connecting to {} port {}'.format(*server_address))
 sock.connect(server_address)
+send('playerForward')
 
-try:
-	# Send data
-	message = b'foo.function()'
-	print('sending {!r}'.format(message))
-	sock.sendall(message)
-	amount_received = 0
-	amount_expected = len(message)
-
-	while amount_received < amount_expected:
-		data = sock.recv(16)
-		amount_received += len(data)
-		print('received {!r}'.format(data))
-
-finally:
-	print('closing socket')
-	sock.close()
 
 # ////////////////////////////////////////////////////////////////
 # //                          RUN APP                           //
