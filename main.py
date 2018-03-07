@@ -73,6 +73,8 @@ class MainScreen(Screen):
     def exitProgram(self, obj):
         App.get_running_app().stop()
         Window.close()
+	def playerAction(self, command):
+		send(command)
 
 # ////////////////////////////////////////////////////////////////
 # //                                                            //

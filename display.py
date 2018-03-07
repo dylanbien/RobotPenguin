@@ -27,23 +27,39 @@ from kivy.uix.behaviors import ButtonBehavior
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
 
-player_location = 1
 sm = ScreenManager()
 
 class MyApp(App):
 	def build(self):
+		Clock.schedule_once(startServer, 2)
 		return sm
 
-#Builder.load_file('display.kv')
-Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 		
 def quitAll():
 	quit()
-	
 
+def startServer(self):
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+	server_address = ('172.17.17.116', 10009)
+	sock.bind(server_address)
+	sock.listen(1)
+	while True:
+		# Wait for a connection
+		print('waiting for a connection')
+		connection, client_address = sock.accept()
+		try:
+			print('connection from', client_address)
+			data = connection.recv(16)
+			getattr(main, data)() #playerForward, playerBackward
+			print ('you sent me this: ' + data)
+			connection.sendall(data)
+
+		finally:
+			# Clean up the connection
+			connection.close()
 # ////////////////////////////////////////////////////////////////////////////
 # //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
-# //					 		LOAD KIVY FILE								//			
+# //							LOAD KIVY FILE								//			
 # ////////////////////////////////////////////////////////////////////////////
 		
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.png', 'ICON_Wrench.png', etc.
@@ -187,8 +203,10 @@ class Actor(ButtonBehavior, Image):
 
 		quitPop.open()
 		
+#Builder.load_file('display.kv')
+Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 # ////////////////////////////////////////////////////////////////
-# //					 CREATE GRID/ACTORS 					//
+# //					 CREATE GRID/ACTORS						//
 # ////////////////////////////////////////////////////////////////
 grid = GridLayout(id = 'grid', cols = 9, rows = 9, minimum_size = [300, 300], padding = 10, spacing = 1)
 for i in range (0, grid.cols*grid.rows):
@@ -204,39 +222,11 @@ for actor in main.children[0].children:
 		
 	if (actor.id == 'actor17'):
 		actor.source = 'ICON_Wrench.png'
-		
-# ////////////////////////////////////////////////////////////////
-# //						 SOCKET				 				//
-# ////////////////////////////////////////////////////////////////
+	
 
-# Create a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Bind the socket to the port
-server_address = ('172.17.17.116', 10009)
-print('starting up on {} port {}'.format(*server_address))
-sock.bind(server_address)
-
-# Listen for incoming connections
-sock.listen(1)
-
-while True:
-	# Wait for a connection
-	print('waiting for a connection')
-	connection, client_address = sock.accept()
-	try:
-		print('connection from', client_address)
-		data = connection.recv(16)
-		getattr(main, data)() #playerForward, playerBackward
-		print ('received this: ' + data)
-		connection.sendall(data)
-
-	finally:
-		# Clean up the connection
-		connection.close()
 		
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
 # ////////////////////////////////////////////////////////////////
-
-#MyApp().run()
+MyApp().run()
