@@ -93,6 +93,12 @@ class MainScreen(Screen):
 		for actor in self.children[0].children:
 			if ('Player' in actor.source):
 				actor.moveBackward()
+	
+	def playerRotate(self, degrees):
+		print('you have rotated the player ' + str(degrees))
+		for actor in self.children[0].children:
+			if('Player' in actor.source):
+				actor.rotate(actor.id, degrees)
 				
 				
 class Actor(ButtonBehavior, Image):
