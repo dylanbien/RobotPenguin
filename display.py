@@ -26,19 +26,34 @@ from kivy.uix.behaviors import ButtonBehavior
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
-
 sm = ScreenManager()
 
 class MyApp(App):
 	def build(self):
-		Clock.schedule_once(startServer, 2)
+		Clock.schedule_interval(obey, .5)
 		return sm
-
-		
+def obey(self):
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	server_address = ('172.17.17.116', 10009)
+	print('connecting to {} port {}'.format(*server_address))
+	sock.connect(server_address)
+	sock.sendall(b'?')
+	data = sock.recv(16)
+	if (data == 'bupkis'): return
+	print('received {!r}'.format(data))
+	
+	if (data == 'playerForward' or 'playerBackward'):
+		getattr(main, data)()
+	elif ('playerRotate' in data):
+		arg = string.split(data , " ")[-1]
+		main.playerRotate(arg)
+	else:
+		print ('fail')
+		return
 def quitAll():
 	quit()
 
-def startServer(self):
+'''def startServer(self):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 	server_address = ('172.17.17.116', 10009)
 	sock.bind(server_address)
@@ -56,7 +71,7 @@ def startServer(self):
 
 		finally:
 			# Clean up the connection
-			connection.close()
+			connection.close()'''
 # ////////////////////////////////////////////////////////////////////////////
 # //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
 # //							LOAD KIVY FILE								//			
@@ -84,7 +99,7 @@ class MainScreen(Screen):
 				actor.random()
 	def playerForward(self):
 		print('you have moved the player forwards or something')
-		for actor in self.children[0].children:
+		for actor in main.children[0].children:
 			if ('Player' in actor.source):
 				actor.moveForward()
 	
@@ -103,6 +118,7 @@ class MainScreen(Screen):
 				
 class Actor(ButtonBehavior, Image):
 	def on_press(self):
+		main.playerBackward()
 		print('pressed')
 		
 	def test(self, dt):

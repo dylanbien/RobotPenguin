@@ -30,7 +30,7 @@
             x: root.width * 0.2575
             y: root.height * 0.04
             text: 'MOVE UP'
-            on_release: root.upPopup()
+            on_release: root.upPopup(), root.playerAction('playerForward')
 
         Button: # DOWN BUTTON
             size_hint: None,None
