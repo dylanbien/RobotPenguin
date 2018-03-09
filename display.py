@@ -30,20 +30,24 @@ sm = ScreenManager()
 
 class MyApp(App):
 	def build(self):
-		Clock.schedule_interval(obey, .5)
+		#Clock.schedule_interval(obey, 1)
 		return sm
 def obey(self):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	server_address = ('172.17.17.116', 10009)
 	print('connecting to {} port {}'.format(*server_address))
 	sock.connect(server_address)
+	print('i am display.py')
 	sock.sendall(b'?')
 	data = sock.recv(16)
-	if (data == 'bupkis'): return
+	data = data.decode("utf-8")
+	if (data == 'bupkis'):
+		return
 	print('received {!r}'.format(data))
-	
-	if (data == 'playerForward' or 'playerBackward'):
-		getattr(main, data)()
+	if (data == 'playerForward'):
+		main.playerForward()
+	elif (data == 'playerBackward'):
+		main.playerBackward()
 	elif ('playerRotate' in data):
 		arg = string.split(data , " ")[-1]
 		main.playerRotate(arg)
@@ -53,25 +57,6 @@ def obey(self):
 def quitAll():
 	quit()
 
-'''def startServer(self):
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-	server_address = ('172.17.17.116', 10009)
-	sock.bind(server_address)
-	sock.listen(1)
-	while True:
-		# Wait for a connection
-		print('waiting for a connection')
-		connection, client_address = sock.accept()
-		try:
-			print('connection from', client_address)
-			data = connection.recv(16)
-			getattr(main, data)() #playerForward, playerBackward
-			print ('you sent me this: ' + data)
-			connection.sendall(data)
-
-		finally:
-			# Clean up the connection
-			connection.close()'''
 # ////////////////////////////////////////////////////////////////////////////
 # //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
 # //							LOAD KIVY FILE								//			
@@ -102,12 +87,14 @@ class MainScreen(Screen):
 		for actor in main.children[0].children:
 			if ('Player' in actor.source):
 				actor.moveForward()
+				return
 	
 	def playerBackward(self):
 		print('you have moved the player backwards or something')
 		for actor in self.children[0].children:
 			if ('Player' in actor.source):
 				actor.moveBackward()
+				return
 	
 	def playerRotate(self, degrees):
 		print('you have rotated the player ' + str(degrees))
@@ -118,7 +105,6 @@ class MainScreen(Screen):
 				
 class Actor(ButtonBehavior, Image):
 	def on_press(self):
-		main.playerBackward()
 		print('pressed')
 		
 	def test(self, dt):
@@ -154,8 +140,8 @@ class Actor(ButtonBehavior, Image):
 	def rotate(self, location, degrees):
 		for actor in main.children[0].children:
 			if (actor.id == location and 'Player' in actor.source):
-				if (degrees == 0 or degrees % 90 != 0): actor.source = 'ICON_Player.png'
-				elif (degrees >= 360): actor.source = 'ICON_Player_' + str(degrees%360) + '.png'
+				if (degrees == 0 or degrees == 360 or degrees % 90 != 0): actor.source = 'ICON_Player.png'
+				elif (degrees > 360): actor.source = 'ICON_Player_' + str(degrees%360) + '.png'
 				else: actor.source = 'ICON_Player_' + str(degrees) + '.png'
 		
 	def moveRight(self): #strafe
@@ -176,6 +162,7 @@ class Actor(ButtonBehavior, Image):
 	
 	def moveUp(self):
 		next = int(self.id.strip(string.ascii_letters)) - main.children[0].rows
+		print (next)
 		if (next < 0):
 			return #should up/down methods rotate?
 		for actor in main.children[0].children:
