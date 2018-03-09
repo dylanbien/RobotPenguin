@@ -27,12 +27,13 @@ def send(command):
 	sock.connect(server_address)
 	try:
 		# Send data
-		message = bytes(command, encoding='utf-8') 
+		message = command.encode()
 		print('sending {!r}'.format(message))
 		sock.sendall(message)
 
 	finally:
 		print('please clap')
+		sock.close()
 
 	
 # ////////////////////////////////////////////////////////////////

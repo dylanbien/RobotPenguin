@@ -5,6 +5,7 @@ import string
 import random
 import socket
 import sys
+import re
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -30,27 +31,32 @@ sm = ScreenManager()
 
 class MyApp(App):
 	def build(self):
-		#Clock.schedule_interval(obey, 1)
+		Clock.schedule_interval(obey, .1)
 		return sm
 def obey(self):
+	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	server_address = ('172.17.17.116', 10009)
 	print('connecting to {} port {}'.format(*server_address))
 	sock.connect(server_address)
 	print('i am display.py')
 	sock.sendall(b'?')
-	data = sock.recv(16)
-	data = data.decode("utf-8")
-	if (data == 'bupkis'):
+	spaceReceived = False
+	while (not spaceReceived):
+		request = sock.recv(16).decode()
+		data += request
+		if (' ' in data): spaceReceived = True
+	if (data == 'bupkis '):
 		return
 	print('received {!r}'.format(data))
-	if (data == 'playerForward'):
+	if (data == 'playerForward '):
 		main.playerForward()
-	elif (data == 'playerBackward'):
+	elif (data == 'playerBackward '):
 		main.playerBackward()
-	elif ('playerRotate' in data):
-		arg = string.split(data , " ")[-1]
-		main.playerRotate(arg)
+	elif (data == 'left '):
+		main.playerRotate('left')
+	elif (data == 'right '):
+		main.playerRotate('right')
 	else:
 		print ('fail')
 		return
@@ -96,11 +102,12 @@ class MainScreen(Screen):
 				actor.moveBackward()
 				return
 	
-	def playerRotate(self, degrees):
-		print('you have rotated the player ' + str(degrees))
+	def playerRotate(self, direction):
+		print('you have rotated the player ' + direction)
 		for actor in self.children[0].children:
 			if('Player' in actor.source):
-				actor.rotate(actor.id, degrees)
+				actor.rotateDirection(direction)
+				return
 				
 				
 class Actor(ButtonBehavior, Image):
@@ -137,12 +144,25 @@ class Actor(ButtonBehavior, Image):
 		else:
 			self.moveDown()
 	
-	def rotate(self, location, degrees):
+	def rotateDegrees(self, location, degrees):
 		for actor in main.children[0].children:
 			if (actor.id == location and 'Player' in actor.source):
 				if (degrees == 0 or degrees == 360 or degrees % 90 != 0): actor.source = 'ICON_Player.png'
 				elif (degrees > 360): actor.source = 'ICON_Player_' + str(degrees%360) + '.png'
 				else: actor.source = 'ICON_Player_' + str(degrees) + '.png'
+				
+	def rotateDirection(self, direction):
+		if (direction == 'left' and self.source == 'ICON_Player.png'): 
+			self.source = 'ICON_Player_270.png'
+			return
+		elif (direction == 'right' and self.source == 'ICON_Player.png'):
+			self.source = 'ICON_Player_90.png'
+			return
+		else:
+			degree = int(filter(str.isdigit, self.source))
+			if (direction == 'left'): self.source = 'ICON_Player_' + str(((degree + 270) % 360)) + '.png'
+			else: self.source = 'ICON_Player_' + str(((degree + 90) % 360)) + '.png'
+			if (self.source == 'ICON_Player_0.png'): self.source = 'ICON_Player.png'
 		
 	def moveRight(self): #strafe
 		next = int(self.id.strip(string.ascii_letters)) + 1

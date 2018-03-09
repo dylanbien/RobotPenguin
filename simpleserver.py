@@ -18,16 +18,17 @@ while True:
 	connection, client_address = sock.accept()
 	try:
 		print('connection from', client_address)
-		if (send): connection.sendall(str.encode(data))
+		if (send): 
+			connection.sendall(data)
+			send = False
 		else:
 			data = connection.recv(16)
-			data = data.decode("utf-8")
-			if ('?' in data): 
+			if ('?' in data.decode()): 
 				send = False
-				connection.sendall(b'bupkis')
+				connection.sendall(b'bupkis ')
 			else:
-				print ('received this: ' + data)
-				connection.sendall(str.encode(data))
+				print ('received this: ' + data.decode())
+				connection.sendall(data)
 				send = True
 
 	finally:
