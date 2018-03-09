@@ -17,12 +17,13 @@ from kivy.clock import Clock
 from kivy.graphics import *
 import socket
 import sys
+import ip
 def send(command):
 	# Create a TCP/IP socket
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	# Connect the socket to the port where the server is listening
-	server_address = ('172.17.17.116', 10009)
+	server_address = (ip.address, 10009)
 	print('main connecting to {} port {}'.format(*server_address))
 	sock.connect(server_address)
 	try:

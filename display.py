@@ -6,6 +6,7 @@ import random
 import socket
 import sys
 import re
+import ip
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -36,8 +37,9 @@ class MyApp(App):
 def obey(self):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	server_address = ('172.17.17.116', 10009)
+	server_address = (ip.address, 10009)
 	print('connecting to {} port {}'.format(*server_address))
+	sock.bind(('0.0.0.0', 55555))
 	sock.connect(server_address)
 	print('i am display.py')
 	sock.sendall(b'?')
@@ -159,7 +161,7 @@ class Actor(ButtonBehavior, Image):
 			self.source = 'ICON_Player_90.png'
 			return
 		else:
-			degree = int(filter(str.isdigit, self.source))
+			degree = int(''.join(ele for ele in self.source if ele.isdigit()))
 			if (direction == 'left'): self.source = 'ICON_Player_' + str(((degree + 270) % 360)) + '.png'
 			else: self.source = 'ICON_Player_' + str(((degree + 90) % 360)) + '.png'
 			if (self.source == 'ICON_Player_0.png'): self.source = 'ICON_Player.png'
