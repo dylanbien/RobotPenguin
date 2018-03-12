@@ -17,16 +17,15 @@ from kivy.clock import Clock
 from kivy.graphics import *
 import socket
 import sys
-import ip
 def send(command):
 	# Create a TCP/IP socket
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	# Connect the socket to the port where the server is listening
-	server_address = (ip.address, 10100)
+	server_address = ('172.17.17.117', 33333)
 	print('main connecting to {} port {}'.format(*server_address))
-	sock.bind(('0.0.0.0', 10110))
 	sock.connect(server_address)
+	
 	try:
 		# Send data
 		message = command.encode()
@@ -56,20 +55,7 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 def quitAll():
 	quit()
 
-
-# ////////////////////////////////////////////////////////////////
-# //			DECLARE APP CLASS AND SCREENMANAGER				//
-# //					 LOAD KIVY FILE							//
-# ////////////////////////////////////////////////////////////////
-
-
-class MyApp(App):
-	def build(self):
-		return sm
-
-Builder.load_file('main.kv')
-Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
-
+	
 class MainScreen(Screen):
 
 	def exitProgram(self, obj):

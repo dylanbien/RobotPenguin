@@ -6,7 +6,6 @@ import random
 import socket
 import sys
 import re
-import ip
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -37,9 +36,8 @@ class MyApp(App):
 def obey(self):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	server_address = (ip.address, 10100)
+	server_address = ('172.17.17.117', 10009)
 	print('connecting to {} port {}'.format(*server_address))
-	sock.bind(('0.0.0.0', 10109))
 	sock.connect(server_address)
 	print('i am display.py')
 	sock.sendall(b'?')
@@ -51,7 +49,6 @@ def obey(self):
 	if (data == 'bupkis '):
 		return
 	print('received {!r}'.format(data))
-	sock.close()
 	if (data == 'playerForward '):
 		main.playerForward()
 	elif (data == 'playerBackward '):
@@ -78,7 +75,7 @@ class MainScreen(Screen):
 		Window.close()
 	def resetBoard(self):
 		for actor in self.children[0].children:
-			actor.source = 'ICON_Gray.png'
+			actor.source = 'ICON_Transparent.png'
 	def addActor(self, location, type): 
 		for actor in self.children[0].children:
 			if (actor.id == location):
@@ -86,10 +83,10 @@ class MainScreen(Screen):
 	def removeActor(self, location):
 		for actor in self.children[0].children:
 			if (actor.id == location):
-				actor.source = 'ICON_Gray.png'
+				actor.source = 'ICON_Transparent.png'
 	def test(self, dt):
 		for actor in self.children[0].children:
-			if (actor.source != 'ICON_Gray.png'):
+			if (actor.source != 'ICON_Transparent.png'):
 				actor.random()
 	def playerForward(self):
 		print('you have moved the player forwards or something')
@@ -162,7 +159,7 @@ class Actor(ButtonBehavior, Image):
 			self.source = 'ICON_Player_90.png'
 			return
 		else:
-			degree = int(''.join(ele for ele in self.source if ele.isdigit()))
+			degree = int(filter(str.isdigit, self.source))
 			if (direction == 'left'): self.source = 'ICON_Player_' + str(((degree + 270) % 360)) + '.png'
 			else: self.source = 'ICON_Player_' + str(((degree + 90) % 360)) + '.png'
 			if (self.source == 'ICON_Player_0.png'): self.source = 'ICON_Player.png'
@@ -172,7 +169,7 @@ class Actor(ButtonBehavior, Image):
 		if (next % main.children[0].cols == 1):
 			return #should turn/rotate right eventually or something or other
 		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Gray.png'):
+			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp
 	
 	def moveLeft(self): #strafe
@@ -180,7 +177,7 @@ class Actor(ButtonBehavior, Image):
 		if (next % main.children[0].cols == 0):
 			return #should turn/rotate left eventually or something or other
 		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Gray.png'):
+			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp
 	
 	def moveUp(self):
@@ -189,7 +186,7 @@ class Actor(ButtonBehavior, Image):
 		if (next < 0):
 			return #should up/down methods rotate?
 		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Gray.png'):
+			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp
 	
 	def moveDown(self):
@@ -197,7 +194,7 @@ class Actor(ButtonBehavior, Image):
 		if (next > main.children[0].rows*main.children[0].cols):
 			return
 		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Gray.png'):
+			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp
 			
 # ////////////////////////////////////////////////////////////////
@@ -242,7 +239,7 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 # ////////////////////////////////////////////////////////////////
 grid = GridLayout(id = 'grid', cols = 9, rows = 9, minimum_size = [300, 300], padding = 10, spacing = 1)
 for i in range (0, grid.cols*grid.rows):
-	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Gray.png', size_hint = [None, None])
+	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
 	grid.add_widget(b)
 
 main = MainScreen(name = 'main')

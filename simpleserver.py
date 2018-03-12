@@ -1,12 +1,11 @@
 import socket
 import sys
-import ip
-lastMessage = '?'
+send = False
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the port
-server_address = (ip.address, 10100)
+server_address = ('172.17.17.117', 10009)
 print('starting up on {} port {}'.format(*server_address))
 sock.bind(server_address)
 
@@ -19,20 +18,18 @@ while True:
 	connection, client_address = sock.accept()
 	try:
 		print('connection from', client_address)
-		data = connection.recv(16)
-		print ('received this: ' + data.decode())
-		if ('?' not in data.decode() and '?' in lastMessage): 
+		if (send): 
 			connection.sendall(data)
-			
-		elif ('?' in data.decode() and '?' in lastMessage): 
-			connection.sendall(b'bupkis ')
-			
-		elif ('?' in data.decode() and '?' not in lastMessage):
-			connection.sendall(lastMessage)
-		
-		elif ('?' not in data.decode() and '?' not in lastMessage):
-			print('something went wrong and i don\'t know how to fix it')
-		lastMessage = data.decode()
+			send = False
+		else:
+			data = connection.recv(16)
+			if ('?' in data.decode()): 
+				send = False
+				connection.sendall(b'bupkis ')
+			else:
+				print ('received this: ' + data.decode())
+				connection.sendall(data)
+				send = True
 
 	finally:
 		# Clean up the connection
