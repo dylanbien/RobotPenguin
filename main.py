@@ -23,8 +23,9 @@ def send(command):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	# Connect the socket to the port where the server is listening
-	server_address = (ip.address, 10009)
+	server_address = (ip.address, 10100)
 	print('main connecting to {} port {}'.format(*server_address))
+	sock.bind(('0.0.0.0', 10110))
 	sock.connect(server_address)
 	try:
 		# Send data
@@ -83,7 +84,6 @@ class MainScreen(Screen):
 # //															//
 # ////////////////////////////////////////////////////////////////
 
-
 	def quitPopup (self): # QUIT POPUP
 		quitLay = FloatLayout(size_hint = (0.5, 0.5))
 		quitPop = Popup(title = 'QUIT GAME',
@@ -131,7 +131,7 @@ class MainScreen(Screen):
 		leftLay.add_widget(leftImage)
 
 		leftPop.open()
-		Clock.schedule_once(leftPop.dismiss, 1.5)
+		Clock.schedule_once(leftPop.dismiss, .1)
 		
 
 	def upPopup (self): # UP POPUP
@@ -152,7 +152,7 @@ class MainScreen(Screen):
 		upLay.add_widget(upImage)
 
 		upPop.open()
-		Clock.schedule_once(upPop.dismiss, 1.5)
+		Clock.schedule_once(upPop.dismiss, .1)
 
 	def downPopup (self): # DOWN POPUP
 		downLay = FloatLayout(size_hint = (0.5, 0.5))
@@ -172,7 +172,7 @@ class MainScreen(Screen):
 		downLay.add_widget(downImage)
 
 		downPop.open()
-		Clock.schedule_once(downPop.dismiss, 1.5)
+		Clock.schedule_once(downPop.dismiss, .1)
 
 	def rightPopup (self): # RIGHT POPUP
 		rightLay = FloatLayout(size_hint = (0.5, 0.5))
@@ -192,7 +192,7 @@ class MainScreen(Screen):
 		rightLay.add_widget(rightImage)
 
 		rightPop.open()
-		Clock.schedule_once(rightPop.dismiss, 1.5)
+		Clock.schedule_once(rightPop.dismiss, .1)
 
 sm.add_widget(MainScreen(name = 'main'))
 

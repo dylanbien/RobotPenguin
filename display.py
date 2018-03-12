@@ -37,9 +37,9 @@ class MyApp(App):
 def obey(self):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	server_address = (ip.address, 10009)
+	server_address = (ip.address, 10100)
 	print('connecting to {} port {}'.format(*server_address))
-	sock.bind(('0.0.0.0', 55555))
+	sock.bind(('0.0.0.0', 10109))
 	sock.connect(server_address)
 	print('i am display.py')
 	sock.sendall(b'?')
@@ -51,6 +51,7 @@ def obey(self):
 	if (data == 'bupkis '):
 		return
 	print('received {!r}'.format(data))
+	sock.close()
 	if (data == 'playerForward '):
 		main.playerForward()
 	elif (data == 'playerBackward '):
