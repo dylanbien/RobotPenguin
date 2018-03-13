@@ -1,7 +1,7 @@
 # ////////////////////////////////////////////////////////////////
 # //					 IMPORT STATEMENTS						//
 # ////////////////////////////////////////////////////////////////
-# write exception 
+
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -17,21 +17,27 @@ from kivy.clock import Clock
 from kivy.graphics import *
 import socket
 import sys
-def send(command):
+
+def send(command, retry = 2):
 	# Create a TCP/IP socket
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	# Connect the socket to the port where the server is listening
-	server_address = ('172.17.17.117', 33333)
+	server_address = ('172.17.17.117', 10009)
 	print('main connecting to {} port {}'.format(*server_address))
-	sock.connect(server_address)
 	
 	try:
 		# Send data
+		sock.connect(server_address)
 		message = command.encode()
 		print('sending {!r}'.format(message))
 		sock.sendall(message)
 
+	except OSError:
+		# Retry if retried less than two times
+		if(retry >= 0):
+			send(command, retry - 1)
+		
 	finally:
 		print('please clap')
 		sock.close()

@@ -28,6 +28,7 @@ from kivy.uix.behaviors import ButtonBehavior
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
 sm = ScreenManager()
+Window.size = (939, 939)
 
 class MyApp(App):
 	def build(self):
@@ -237,12 +238,14 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 # ////////////////////////////////////////////////////////////////
 # //					 CREATE GRID/ACTORS						//
 # ////////////////////////////////////////////////////////////////
-grid = GridLayout(id = 'grid', cols = 9, rows = 9, minimum_size = [300, 300], padding = 10, spacing = 1)
+grid = GridLayout(id = 'grid', cols = 9, rows = 9, padding = 15, spacing = 1.5)
+bg = Image(source = 'BG.png', size_hint = [1, 1])
 for i in range (0, grid.cols*grid.rows):
 	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
 	grid.add_widget(b)
 
 main = MainScreen(name = 'main')
+main.add_widget(bg)
 main.add_widget(grid)
 sm.add_widget(main)
 for actor in main.children[0].children:
