@@ -23,7 +23,7 @@ def send(command, retry = 2):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	# Connect the socket to the port where the server is listening
-	server_address = ('172.17.17.117', 10009)
+	server_address = ('172.17.17.116', 10009)
 	print('main connecting to {} port {}'.format(*server_address))
 	
 	try:

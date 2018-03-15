@@ -9,7 +9,9 @@ import re
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
+from kivy.uix.video import Video
 from kivy.uix.image import Image
+from kivy.loader import Loader
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.lang import Builder
@@ -37,7 +39,7 @@ class MyApp(App):
 def obey(self):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	server_address = ('172.17.17.117', 10009)
+	server_address = ('172.17.17.116', 10009)
 	print('connecting to {} port {}'.format(*server_address))
 	sock.connect(server_address)
 	print('i am display.py')
@@ -110,9 +112,16 @@ class MainScreen(Screen):
 				actor.rotateDirection(direction)
 				return
 				
+	def huntPlayer(self):
+		for hunter in self.children[0].children:
+			if ('Bear' in hunter.source): 
+				hunter.goTowards()
+				return
+		
 				
 class Actor(ButtonBehavior, Image):
 	def on_press(self):
+		self.goTowards()
 		print('pressed')
 		
 	def test(self, dt):
@@ -160,7 +169,7 @@ class Actor(ButtonBehavior, Image):
 			self.source = 'ICON_Player_90.png'
 			return
 		else:
-			degree = int(filter(str.isdigit, self.source))
+			degree = int(self.source.strip(string.ascii_letters + string.punctuation))
 			if (direction == 'left'): self.source = 'ICON_Player_' + str(((degree + 270) % 360)) + '.png'
 			else: self.source = 'ICON_Player_' + str(((degree + 90) % 360)) + '.png'
 			if (self.source == 'ICON_Player_0.png'): self.source = 'ICON_Player.png'
@@ -172,6 +181,9 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp
+			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				sm.current = 'Winner'
 	
 	def moveLeft(self): #strafe
 		next = int(self.id.strip(string.ascii_letters)) - 1
@@ -180,6 +192,9 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp
+			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				sm.current = 'Winner'
 	
 	def moveUp(self):
 		next = int(self.id.strip(string.ascii_letters)) - main.children[0].rows
@@ -189,6 +204,9 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp
+			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				sm.current = 'Winner'
 	
 	def moveDown(self):
 		next = int(self.id.strip(string.ascii_letters)) + main.children[0].rows
@@ -197,7 +215,30 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp
-			
+			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				sm.current = 'Winner'
+	def goTowards(self):
+		prey = 0
+		position = 0
+		for actor in main.children[0].children:
+			if ('Player' in actor.source): prey = 81 - main.children[0].children.index(actor)
+		for hunter in main.children[0].children:
+			if ('Bear' in hunter.source): position = 81 - main.children[0].children.index(hunter)
+		if (position > prey + 9): 
+			self.moveUp()
+			return
+		elif (position < prey - 9): 
+			self.moveDown()
+			return
+		elif (position - 9 > prey and (position % 9 != 0)): 
+			self.moveRight()
+			print ('i am moving right because (position - 9 > prey) is ' + str(bool(position - 9 > prey)) + ' and my prey is ' + str(prey) + 'and i am ' + str(position)) 
+			return
+		elif (position + 9 < prey and (position % 9 != 1)): 
+			self.moveLeft()
+			return
+		else: print ('i am stuck')
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
@@ -233,6 +274,7 @@ class Actor(ButtonBehavior, Image):
 
 		quitPop.open()
 		
+		
 #Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 # ////////////////////////////////////////////////////////////////
@@ -248,16 +290,24 @@ main = MainScreen(name = 'main')
 main.add_widget(bg)
 main.add_widget(grid)
 sm.add_widget(main)
+screen = Screen(name = "Winner")
+bang = Video(source = 'bang.mp4', play = True)
+screen.add_widget(bang)
+sm.add_widget(screen)
 for actor in main.children[0].children:
 	if (actor.id == 'actor32'):
 		actor.source = 'ICON_Player.png'
 		
 	if (actor.id == 'actor17'):
 		actor.source = 'ICON_Wrench.png'
+		
+	if (actor.id == 'actor80'):
+		actor.source = 'ICON_Jewel.png'
+	
+	if (actor.id == 'actor50'):
+		actor.source = 'ICON_Bear.png'
 	
 
-
-		
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
 # ////////////////////////////////////////////////////////////////

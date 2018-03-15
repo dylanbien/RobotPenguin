@@ -5,7 +5,7 @@ send = False
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the port
-server_address = ('172.17.17.117', 10009)
+server_address = ('172.17.17.116', 10009)
 print('starting up on {} port {}'.format(*server_address))
 sock.bind(server_address)
 
