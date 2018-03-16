@@ -6,6 +6,7 @@ import random
 import socket
 import sys
 import re
+import math
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -36,7 +37,7 @@ class MyApp(App):
 	def build(self):
 		Clock.schedule_interval(obey, .1)
 		return sm
-def obey(self):
+def obey(self, retry = 2):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	server_address = ('172.17.17.116', 10009)
@@ -45,10 +46,14 @@ def obey(self):
 	print('i am display.py')
 	sock.sendall(b'?')
 	spaceReceived = False
-	while (not spaceReceived):
-		request = sock.recv(16).decode()
-		data += request
-		if (' ' in data): spaceReceived = True
+	try:
+		while (not spaceReceived):
+			request = sock.recv(16).decode()
+			data += request
+			if (' ' in data): spaceReceived = True
+	except OSError:
+		if(retry >= 0): obey(retry - 1)
+				
 	if (data == 'bupkis '):
 		return
 	print('received {!r}'.format(data))
@@ -116,7 +121,7 @@ class MainScreen(Screen):
 		for hunter in self.children[0].children:
 			if ('Bear' in hunter.source): 
 				hunter.goTowards()
-				return
+				break
 		
 				
 class Actor(ButtonBehavior, Image):
@@ -130,16 +135,16 @@ class Actor(ButtonBehavior, Image):
 		self.moveForward()
 		
 	def moveForward(self):
-		if ('90' in self.source): self.moveRight()
-		elif ('180' in self.source): self.moveDown()
-		elif ('270' in self.source): self.moveLeft()
-		else: self.moveUp()
+		if ('90' in self.source): self.moveRight(); return
+		elif ('180' in self.source): self.moveDown(); return
+		elif ('270' in self.source): self.moveLeft(); return
+		else: self.moveUp(); return
 	
 	def moveBackward(self):
-		if ('90' in self.source): self.moveLeft()
-		elif ('180' in self.source): self.moveUp()
-		elif ('270' in self.source): self.moveRight()
-		else: self.moveDown()
+		if ('90' in self.source): self.moveLeft(); return
+		elif ('180' in self.source): self.moveUp(); return
+		elif ('270' in self.source): self.moveRight(); return
+		else: self.moveDown(); return
 			
 	def random(self):
 		if ('Player' not in self.source):
@@ -180,7 +185,7 @@ class Actor(ButtonBehavior, Image):
 			return #should turn/rotate right eventually or something or other
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp
+				temp = self.source; self.source = actor.source; actor.source = temp; main.huntPlayer(); return
 			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -191,7 +196,7 @@ class Actor(ButtonBehavior, Image):
 			return #should turn/rotate left eventually or something or other
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp
+				temp = self.source; self.source = actor.source; actor.source = temp; main.huntPlayer(); return
 			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -203,7 +208,7 @@ class Actor(ButtonBehavior, Image):
 			return #should up/down methods rotate?
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp
+				temp = self.source; self.source = actor.source; actor.source = temp; main.huntPlayer(); return
 			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -214,10 +219,11 @@ class Actor(ButtonBehavior, Image):
 			return
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp
+				temp = self.source; self.source = actor.source; actor.source = temp; main.huntPlayer(); return
 			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
+		
 	def goTowards(self):
 		prey = 0
 		position = 0
@@ -225,20 +231,24 @@ class Actor(ButtonBehavior, Image):
 			if ('Player' in actor.source): prey = 81 - main.children[0].children.index(actor)
 		for hunter in main.children[0].children:
 			if ('Bear' in hunter.source): position = 81 - main.children[0].children.index(hunter)
-		if (position > prey + 9): 
+		hunterCol = position % 9  if (position % 9 != 0) else 9 
+		hunterRow = math.ceil(position / 9)
+		preyCol = prey % 9 if (prey % 9 != 0) else 9
+		preyRow =  math.ceil(prey / 9)
+		if (hunterRow > preyRow):
 			self.moveUp()
 			return
-		elif (position < prey - 9): 
+		elif (hunterRow < preyRow):
 			self.moveDown()
 			return
-		elif (position - 9 > prey and (position % 9 != 0)): 
-			self.moveRight()
-			print ('i am moving right because (position - 9 > prey) is ' + str(bool(position - 9 > prey)) + ' and my prey is ' + str(prey) + 'and i am ' + str(position)) 
-			return
-		elif (position + 9 < prey and (position % 9 != 1)): 
-			self.moveLeft()
-			return
-		else: print ('i am stuck')
+		else:
+			if (hunterCol < preyCol):
+				self.moveRight()
+				return
+			elif (hunterCol > preyCol):
+				self.moveLeft()
+				return
+			else: print ('check line 252 and behavior for eating')
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
@@ -304,7 +314,7 @@ for actor in main.children[0].children:
 	if (actor.id == 'actor80'):
 		actor.source = 'ICON_Jewel.png'
 	
-	if (actor.id == 'actor50'):
+	if (actor.id == 'actor74'):
 		actor.source = 'ICON_Bear.png'
 	
 
