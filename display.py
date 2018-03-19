@@ -37,7 +37,7 @@ class MyApp(App):
 	def build(self):
 		Clock.schedule_interval(obey, .1)
 		return sm
-def obey(self, retry = 2):
+def obey(self, retry = 5):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	server_address = ('172.17.17.116', 10009)
@@ -135,16 +135,16 @@ class Actor(ButtonBehavior, Image):
 		self.moveForward()
 		
 	def moveForward(self):
-		if ('90' in self.source): self.moveRight(); return
-		elif ('180' in self.source): self.moveDown(); return
-		elif ('270' in self.source): self.moveLeft(); return
-		else: self.moveUp(); return
+		if ('90' in self.source): self.moveRight(); main.huntPlayer(); return
+		elif ('180' in self.source): self.moveDown(); main.huntPlayer(); return
+		elif ('270' in self.source): self.moveLeft(); main.huntPlayer(); return
+		else: self.moveUp(); main.huntPlayer(); return
 	
 	def moveBackward(self):
-		if ('90' in self.source): self.moveLeft(); return
-		elif ('180' in self.source): self.moveUp(); return
-		elif ('270' in self.source): self.moveRight(); return
-		else: self.moveDown(); return
+		if ('90' in self.source): self.moveLeft(); main.huntPlayer(); return
+		elif ('180' in self.source): self.moveUp(); main.huntPlayer(); return
+		elif ('270' in self.source): self.moveRight(); main.huntPlayer(); return
+		else: self.moveDown(); main.huntPlayer(); return
 			
 	def random(self):
 		if ('Player' not in self.source):
@@ -185,8 +185,8 @@ class Actor(ButtonBehavior, Image):
 			return #should turn/rotate right eventually or something or other
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp; main.huntPlayer(); return
-			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
+				temp = self.source; self.source = actor.source; actor.source = temp; return
+			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 	
@@ -196,8 +196,8 @@ class Actor(ButtonBehavior, Image):
 			return #should turn/rotate left eventually or something or other
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp; main.huntPlayer(); return
-			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
+				temp = self.source; self.source = actor.source; actor.source = temp; return
+			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 	
@@ -208,8 +208,8 @@ class Actor(ButtonBehavior, Image):
 			return #should up/down methods rotate?
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp; main.huntPlayer(); return
-			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
+				temp = self.source; self.source = actor.source; actor.source = temp; return
+			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 	
@@ -219,8 +219,8 @@ class Actor(ButtonBehavior, Image):
 			return
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp; main.huntPlayer(); return
-			elif (actor.id == 'actor' + str(next) and actor.source == 'ICON_Jewel.png' and 'Player' in actor.source):
+				temp = self.source; self.source = actor.source; actor.source = temp; return
+			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 		
@@ -248,7 +248,7 @@ class Actor(ButtonBehavior, Image):
 			elif (hunterCol > preyCol):
 				self.moveLeft()
 				return
-			else: print ('check line 252 and behavior for eating')
+			else: print ('check line 252 and behavior for eating and boobdobo')
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
@@ -303,6 +303,10 @@ sm.add_widget(main)
 screen = Screen(name = "Winner")
 bang = Video(source = 'bang.mp4', play = True)
 screen.add_widget(bang)
+winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
+korWinLabel = Label(text = '이겼네요!', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
+screen.add_widget(winLabel)
+screen.add_widget(korWinLabel)
 sm.add_widget(screen)
 for actor in main.children[0].children:
 	if (actor.id == 'actor32'):

@@ -15,8 +15,17 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.graphics import *
+from time import sleep
 import socket
 import sys
+commands = []
+def queue(command):
+	commands.append(command)
+
+def execute(self):
+	for (command in commands):
+		send(command)
+		sleep(0.2)
 
 def send(command, retry = 2):
 	# Create a TCP/IP socket
@@ -69,6 +78,10 @@ class MainScreen(Screen):
 		Window.close()
 	def playerAction(self, command):
 		send(command)
+	def queueAction(self, command):
+		queue(command)
+	def executeAction(self):
+		execute()
 
 # ////////////////////////////////////////////////////////////////
 # //															//
