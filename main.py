@@ -19,6 +19,7 @@ from time import sleep
 import socket
 import sys
 commands = []
+history = []
 def queue(command):
 	commands.append(command)
 
@@ -29,6 +30,7 @@ def execute(): # pause PLEASE 제발
 	commands = []
 
 def send(command, retry = 2):
+	history.append(command)
 	# Create a TCP/IP socket
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
