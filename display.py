@@ -75,7 +75,7 @@ def quitAll():
 # //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
 # //							LOAD KIVY FILE								//			
 # ////////////////////////////////////////////////////////////////////////////
-		
+#유자진 저
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.png', 'ICON_Wrench.png', etc.
 class MainScreen(Screen):
 	def exitProgram(self, obj):
@@ -227,28 +227,44 @@ class Actor(ButtonBehavior, Image):
 	def goTowards(self):
 		prey = 0
 		position = 0
+		obstacles = []
+		reverse = ''
+		canX = True
+		canY = True
 		for actor in main.children[0].children:
 			if ('Player' in actor.source): prey = 81 - main.children[0].children.index(actor)
 		for hunter in main.children[0].children:
 			if ('Bear' in hunter.source): position = 81 - main.children[0].children.index(hunter)
+		for obstacle in main.children[0].children:
+			if ('Player' not in obstacle.source and 'Bear' not in obstacle.source and 'Transparent' not in obstacle.source and 'Jewel' not in obstacle.source): loc = (81 - main.children[0].children.index(obstacle)); obstacles.append((loc % 9  if (loc % 9 != 0) else 9, math.ceil(loc / 9)))
 		hunterCol = position % 9  if (position % 9 != 0) else 9 
 		hunterRow = math.ceil(position / 9)
 		preyCol = prey % 9 if (prey % 9 != 0) else 9
 		preyRow =  math.ceil(prey / 9)
-		if (hunterRow > preyRow):
+		for tuple in obstacles: 
+			if (tuple[0] == hunterCol + 1 or hunterCol - 1 and hunterRow == tuple[1]) and not ((tuple[0] == hunterCol + 1 and tuple[1] == hunterRow + 1) or (tuple[0] == hunterCol - 1 and tuple[1] == hunterRow - 1)): canX = False
+		for tuple in obstacles:
+			if (tuple[1] == hunterRow + 1 or hunterRow - 1 and hunterCol == tuple[0]) and not ((tuple[0] == hunterCol + 1 and tuple[1] == hunterRow + 1) or (tuple[0] == hunterCol - 1 and tuple[1] == hunterRow - 1)) : canY = False
+		print (obstacles)
+		if (not canX and not canY and reverse): exec(reverse); return
+		if (hunterRow > preyRow and canY):
 			self.moveUp()
+			reverse = 'self.moveDown()'
 			return
-		elif (hunterRow < preyRow):
+		elif (hunterRow < preyRow and canY):
 			self.moveDown()
+			reverse = 'self.moveUp()'
 			return
 		else:
-			if (hunterCol < preyCol):
+			if (hunterCol < preyCol and canX):
 				self.moveRight()
+				reverse = 'self.moveLeft()'
 				return
-			elif (hunterCol > preyCol):
+			elif (hunterCol > preyCol and canX):
 				self.moveLeft()
+				reverse = 'self.moveRight()'
 				return
-			else: print ('check line 252 and behavior for eating and boobdobo')
+			else: print ('dead')
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
@@ -301,8 +317,10 @@ main.add_widget(bg)
 main.add_widget(grid)
 sm.add_widget(main)
 screen = Screen(name = "Winner")
-bang = Video(source = 'bang.mp4', play = True)
-screen.add_widget(bang)
+youWinner = Image(source = 'winner.png')
+screen.add_widget(youWinner)
+#bang = Video(source = 'bang.mp4', play = True)
+#screen.add_widget(bang)
 winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
 korWinLabel = Label(text = '이겼네요!', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
 screen.add_widget(winLabel)

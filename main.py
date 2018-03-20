@@ -22,10 +22,11 @@ commands = []
 def queue(command):
 	commands.append(command)
 
-def execute():
+def execute(): # pause PLEASE 제발
 	for command in commands:
 		send(command)
 		sleep(0.2)
+	commands = []
 
 def send(command, retry = 2):
 	# Create a TCP/IP socket
