@@ -22,8 +22,8 @@ commands = []
 def queue(command):
 	commands.append(command)
 
-def execute(self):
-	for (command in commands):
+def execute():
+	for command in commands:
 		send(command)
 		sleep(0.2)
 
