@@ -12,6 +12,7 @@ from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.graphics import *
@@ -22,6 +23,8 @@ commands = []
 history = []
 def queue(command):
 	commands.append(command)
+	queue.add_widget(Image(source = command + '.png'))
+	
 
 def execute(): # pause PLEASE 제발
 	for command in commands:
@@ -201,8 +204,17 @@ class MainScreen(Screen):
 
 		rightPop.open()
 		Clock.schedule_once(rightPop.dismiss, .1)
+main = MainScreen(name = 'main')
+queue = BoxLayout(padding = 15, size_hint=(.925, None), height=150, pos_hint={'top': 1})
+goButton = Button(text = 'GO', size_hint = (0.05, 0.1), pos_hint={'x' : 730 / Window.width, 'y' : 500 / Window.height})
 
-sm.add_widget(MainScreen(name = 'main'))
+for i in range(10):
+	queue.add_widget(Image(source='LEFT.png'))
+
+main.add_widget(queue)
+main.add_widget(goButton)
+sm.add_widget(main)
+
 
 
 # ////////////////////////////////////////////////////////////////
