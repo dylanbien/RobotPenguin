@@ -23,14 +23,18 @@ commands = []
 history = []
 def queue(command):
 	commands.append(command)
-	queue.add_widget(Image(source = command + '.png'))
+	name = command.replace(' ','')
+	name.upper()
+	imageQueue.add_widget(Image(source = name + '.png'))
 	
 
 def execute(): # pause PLEASE 제발
+	global commands
 	for command in commands:
 		send(command)
 		sleep(0.2)
 	commands = []
+	imageQueue.clear_widgets()
 
 def send(command, retry = 2):
 	history.append(command)
@@ -56,6 +60,26 @@ def send(command, retry = 2):
 	finally:
 		print('please clap')
 		sock.close()
+		
+def pause():
+	leftLay = FloatLayout(size_hint = (0.5, 0.5))
+	leftPop = Popup(title = 'IN PROGRESS...',
+		size_hint = (0.240, 0.73),
+		auto_dismiss = False,
+		title_size = 30,
+		title_align = 'center',
+		pos_hint = { 'x' : 19.5 / Window.width,
+					 'y' : 157 / Window.height},
+		content = leftLay)
+
+	leftImage = Image(source = 'CARD_Left.png',
+					  keep_ratio = True,
+					  size_hint = (1.5, 1.945),
+					  pos = (-78.95, 174.75))
+	leftLay.add_widget(leftImage)
+
+	leftPop.open()
+	Clock.schedule_once(leftPop.dismiss, 5)
 
 	
 # ////////////////////////////////////////////////////////////////
@@ -88,6 +112,8 @@ class MainScreen(Screen):
 		queue(command)
 	def executeAction(self):
 		execute()
+	def pauseAction(self):
+		pause()
 
 # ////////////////////////////////////////////////////////////////
 # //															//
@@ -204,15 +230,15 @@ class MainScreen(Screen):
 
 		rightPop.open()
 		Clock.schedule_once(rightPop.dismiss, .1)
+		
 main = MainScreen(name = 'main')
-queue = BoxLayout(padding = 15, size_hint=(.925, None), height=150, pos_hint={'top': 1})
-goButton = Button(text = 'GO', size_hint = (0.05, 0.1), pos_hint={'x' : 730 / Window.width, 'y' : 500 / Window.height})
+imageQueue = BoxLayout(padding = 15, size_hint=(.925, None), height=150, pos_hint={'top': 1})
 
-for i in range(10):
-	queue.add_widget(Image(source='LEFT.png'))
 
-main.add_widget(queue)
-main.add_widget(goButton)
+#for i in range(10):
+	#queue.add_widget(Image(source='LEFT.png'))
+
+main.add_widget(imageQueue)
 sm.add_widget(main)
 
 

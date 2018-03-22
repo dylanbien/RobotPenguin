@@ -1,6 +1,8 @@
 # ////////////////////////////////////////////////////////////////
 # //					 IMPORT STATEMENTS						//
 # ////////////////////////////////////////////////////////////////
+from kivy.config import Config
+Config.set('graphics', 'resizable', False)
 import string
 import random
 import socket
@@ -37,6 +39,7 @@ class MyApp(App):
 	def build(self):
 		Clock.schedule_interval(obey, .1)
 		return sm
+		
 def obey(self, retry = 5):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,9 +60,9 @@ def obey(self, retry = 5):
 	if (data == 'bupkis '):
 		return
 	print('received {!r}'.format(data))
-	if (data == 'playerForward '):
+	if (data == 'forward '):
 		main.playerForward()
-	elif (data == 'playerBackward '):
+	elif (data == 'backward '):
 		main.playerBackward()
 	elif (data == 'left '):
 		main.playerRotate('left')
@@ -68,14 +71,39 @@ def obey(self, retry = 5):
 	else:
 		print ('fail')
 		return
+		
 def quitAll():
 	quit()
+	
+def reset(event):
+	grid.clear_widgets()
+	for i in range (0, grid.cols*grid.rows):
+		b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
+		grid.add_widget(b)
+		
+	for actor in main.children[0].children:
+		if (actor.id == 'actor' + str(random.randint(1, 81))):
+			if (actor.source != 'ICON_Transparent.png'): continue
+			actor.source = 'ICON_Player.png'
+			
+		if (actor.id == 'actor' + str(random.randint(1, 81))):
+			if (actor.source != 'ICON_Transparent.png'): continue
+			actor.source = 'ICON_Wrench.png'
+			
+		if (actor.id == 'actor' + str(random.randint(1, 81))):
+			if (actor.source != 'ICON_Transparent.png'): continue
+			actor.source = 'ICON_Jewel.png'
+		
+		if (actor.id == 'actor' + str(random.randint(1, 81))):
+			if (actor.source != 'ICON_Transparent.png'): continue
+			actor.source = 'ICON_Bear.png'
+	sm.current = 'main'
+	
 
 # ////////////////////////////////////////////////////////////////////////////
 # //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
 # //							LOAD KIVY FILE								//			
 # ////////////////////////////////////////////////////////////////////////////
-#유자진 저
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.png', 'ICON_Wrench.png', etc.
 class MainScreen(Screen):
 	def exitProgram(self, obj):
@@ -182,10 +210,13 @@ class Actor(ButtonBehavior, Image):
 	def moveRight(self): #strafe
 		next = int(self.id.strip(string.ascii_letters)) + 1
 		if (next % main.children[0].cols == 1):
-			return #should turn/rotate right eventually or something or other
+			return
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp; return
+			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				print ('you are a failure')
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -193,10 +224,13 @@ class Actor(ButtonBehavior, Image):
 	def moveLeft(self): #strafe
 		next = int(self.id.strip(string.ascii_letters)) - 1
 		if (next % main.children[0].cols == 0):
-			return #should turn/rotate left eventually or something or other
+			return
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp; return
+			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				print ('you are a failure')
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -205,10 +239,13 @@ class Actor(ButtonBehavior, Image):
 		next = int(self.id.strip(string.ascii_letters)) - main.children[0].rows
 		print (next)
 		if (next < 0):
-			return #should up/down methods rotate?
+			return 
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp; return
+			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				print ('you are a failure')
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -220,11 +257,14 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp; return
+			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				print ('you are a failure')
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 		
-	def goTowards(self):
+	def goTowards(self): # if anyone wants to fix please feel free
 		prey = 0
 		position = 0
 		obstacles = []
@@ -321,10 +361,14 @@ youWinner = Image(source = 'winner.png')
 screen.add_widget(youWinner)
 #bang = Video(source = 'bang.mp4', play = True)
 #screen.add_widget(bang)
+#bang씨의 명복을 빌어요 T_T
 winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
 korWinLabel = Label(text = '이겼네요!', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
+playAgainButton = Button(text = 'Play again?', size_hint = (0.05, 0.1))
+playAgainButton.bind(on_press = reset)
 screen.add_widget(winLabel)
 screen.add_widget(korWinLabel)
+screen.add_widget(playAgainButton)
 sm.add_widget(screen)
 for actor in main.children[0].children:
 	if (actor.id == 'actor32'):
