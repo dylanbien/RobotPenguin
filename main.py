@@ -51,7 +51,7 @@ def send(command, retry = 2):
 		message = command.encode()
 		print('sending {!r}'.format(message))
 		sock.sendall(message)
-
+		
 	except OSError:
 		# Retry if retried less than two times
 		if(retry >= 0):

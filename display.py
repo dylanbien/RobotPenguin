@@ -9,6 +9,7 @@ import socket
 import sys
 import re
 import math
+from random import randint
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -77,26 +78,29 @@ def quitAll():
 	
 def reset(event):
 	grid.clear_widgets()
+	test = random.sample(range(1, 81), 80)
+	locs = random.sample(range(1, 81), 3)
+	banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10, locs[0] + 8]
 	for i in range (0, grid.cols*grid.rows):
 		b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
 		grid.add_widget(b)
 		
 	for actor in main.children[0].children:
-		if (actor.id == 'actor' + str(random.randint(1, 81))):
-			if (actor.source != 'ICON_Transparent.png'): continue
+		if (actor.id == 'actor' + str(locs[0])):
 			actor.source = 'ICON_Player.png'
 			
-		if (actor.id == 'actor' + str(random.randint(1, 81))):
-			if (actor.source != 'ICON_Transparent.png'): continue
+		if (actor.id == 'actor' + str(locs[1])):
 			actor.source = 'ICON_Wrench.png'
 			
-		if (actor.id == 'actor' + str(random.randint(1, 81))):
-			if (actor.source != 'ICON_Transparent.png'): continue
+		if (actor.id == 'actor' + str(locs[2])):
 			actor.source = 'ICON_Jewel.png'
+			
+	for actor in main.children[0].children:
+		i = 0
+		print (test[i])
+		if (actor.id == 'actor' + str(test[i]) and 'Transparent' in actor.source and test[i] not in banned): actor.source = 'ICON_Bear.png'; break
+		i += 1
 		
-		if (actor.id == 'actor' + str(random.randint(1, 81))):
-			if (actor.source != 'ICON_Transparent.png'): continue
-			actor.source = 'ICON_Bear.png'
 	sm.current = 'main'
 	
 
@@ -217,6 +221,7 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
+				sm.current = 'Loser'
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -231,6 +236,7 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
+				sm.current = 'Loser'
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -246,6 +252,7 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
+				sm.current = 'Loser'
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -260,6 +267,7 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
+				sm.current = 'Loser'
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
@@ -359,17 +367,28 @@ sm.add_widget(main)
 screen = Screen(name = "Winner")
 youWinner = Image(source = 'winner.png')
 screen.add_widget(youWinner)
+loserScreen = Screen(name = "Loser")
+youLoser = Image(source = 'loser.png')
+loserScreen.add_widget(youLoser)
 #bang = Video(source = 'bang.mp4', play = True)
 #screen.add_widget(bang)
 #bang씨의 명복을 빌어요 T_T
 winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
 korWinLabel = Label(text = '이겼네요!', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
-playAgainButton = Button(text = 'Play again?', size_hint = (0.05, 0.1))
+loseLabel = Label(text = 'You lost.', font_size = 64, pos = (0, 400))
+korLoseLabel = Label(text = '졌어요.', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
+playAgainButton = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
 playAgainButton.bind(on_press = reset)
+playAgainButtonLose = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (450, 0))
+playAgainButtonLose.bind(on_press = reset)
 screen.add_widget(winLabel)
 screen.add_widget(korWinLabel)
 screen.add_widget(playAgainButton)
+loserScreen.add_widget(loseLabel)
+loserScreen.add_widget(korLoseLabel)
+loserScreen.add_widget(playAgainButtonLose)
 sm.add_widget(screen)
+sm.add_widget(loserScreen)
 for actor in main.children[0].children:
 	if (actor.id == 'actor32'):
 		actor.source = 'ICON_Player.png'
