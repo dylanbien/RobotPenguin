@@ -80,7 +80,12 @@ def pause():
 
 	leftPop.open()
 	Clock.schedule_once(leftPop.dismiss, 5)
-
+	
+def clear():
+	global commands
+	if (len(commands) == 0): print ('nothing to clear'); return
+	del commands[len(commands) - 1]
+	imageQueue.remove_widget(imageQueue.children[len(commands) - 1])
 	
 # ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
@@ -114,6 +119,8 @@ class MainScreen(Screen):
 		execute()
 	def pauseAction(self):
 		pause()
+	def clearAction(self):
+		clear()
 
 # ////////////////////////////////////////////////////////////////
 # //															//

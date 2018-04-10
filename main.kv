@@ -59,6 +59,14 @@
 			x: root.width * .9
 			y: root.height * .85
 			on_release: root.executeAction()
+			
+		Button: # CLEAR BUTTON
+			size_hint: None, None
+			size: root.width * 0.05, root.height * 0.1
+			text: 'CLEAR'
+			x: root.width * .85
+			y: root.height * .85
+			on_release: root.clearAction()
 
 # IMAGES
         Screen:

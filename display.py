@@ -292,7 +292,7 @@ class Actor(ButtonBehavior, Image):
 		for tuple in obstacles: 
 			if (tuple[0] == hunterCol + 1 or hunterCol - 1 and hunterRow == tuple[1]) and not ((tuple[0] == hunterCol + 1 and tuple[1] == hunterRow + 1) or (tuple[0] == hunterCol - 1 and tuple[1] == hunterRow - 1)): canX = False
 		for tuple in obstacles:
-			if (tuple[1] == hunterRow + 1 or hunterRow - 1 and hunterCol == tuple[0]) and not ((tuple[0] == hunterCol + 1 and tuple[1] == hunterRow + 1) or (tuple[0] == hunterCol - 1 and tuple[1] == hunterRow - 1)) : canY = False
+			if (tuple[1] == hunterRow + 1 or hunterRow - 1 and hunterCol == tuple[0]) and not ((tuple[0] == hunterCol + 1 and tuple[1] == hunterRow + 1) or (tuple[0] == hunterCol - 1 and tuple[1] == hunterRow - 1)): canY = False
 		print (obstacles)
 		if (not canX and not canY and reverse): exec(reverse); return
 		if (hunterRow > preyRow and canY):
@@ -312,7 +312,7 @@ class Actor(ButtonBehavior, Image):
 				self.moveLeft()
 				reverse = 'self.moveRight()'
 				return
-			else: print ('dead')
+			elif (hunterCol == preyCol and hunterRow == preyRow): print('lost through towards method'); sm.current = 'Loser'
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
@@ -372,14 +372,14 @@ youLoser = Image(source = 'loser.png')
 loserScreen.add_widget(youLoser)
 #bang = Video(source = 'bang.mp4', play = True)
 #screen.add_widget(bang)
-#bang씨의 명복을 빌어요 T_T
+#bang님의 명복을 빌어요 T_T
 winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
-korWinLabel = Label(text = '이겼네요!', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
+korWinLabel = Label(text = '이기셨네요!', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
 loseLabel = Label(text = 'You lost.', font_size = 64, pos = (0, 400))
-korLoseLabel = Label(text = '졌어요.', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
+korLoseLabel = Label(text = '지셨어요.', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
 playAgainButton = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
 playAgainButton.bind(on_press = reset)
-playAgainButtonLose = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (450, 0))
+playAgainButtonLose = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
 playAgainButtonLose.bind(on_press = reset)
 screen.add_widget(winLabel)
 screen.add_widget(korWinLabel)
