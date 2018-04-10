@@ -84,9 +84,9 @@ def pause():
 def clear():
 	global commands
 	if (len(commands) == 0): print ('nothing to clear'); return
-	del commands[len(commands) - 1]
 	imageQueue.remove_widget(imageQueue.children[len(commands) - 1])
-	
+	del commands[len(commands) - 1]
+
 # ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
