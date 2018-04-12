@@ -84,7 +84,7 @@ def pause():
 def clear():
 	global commands
 	if (len(commands) == 0): print ('nothing to clear'); return
-	imageQueue.remove_widget(imageQueue.children[len(commands) - 1])
+	imageQueue.remove_widget(imageQueue.children[0])
 	del commands[len(commands) - 1]
 
 # ////////////////////////////////////////////////////////////////

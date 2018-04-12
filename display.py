@@ -33,6 +33,7 @@ from kivy.uix.behaviors import ButtonBehavior
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
+difficulty = 'normal'
 sm = ScreenManager()
 Window.size = (939, 939)
 
@@ -77,10 +78,13 @@ def quitAll():
 	quit()
 	
 def reset(event):
+	testIndex = 0
 	grid.clear_widgets()
-	test = random.sample(range(1, 81), 80)
-	locs = random.sample(range(1, 81), 3)
+	possible = []
+	test = random.sample(range(0, 81), 81)
+	locs = random.sample(range(1, 82), 3)
 	banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10, locs[0] + 8]
+	
 	for i in range (0, grid.cols*grid.rows):
 		b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
 		grid.add_widget(b)
@@ -90,16 +94,24 @@ def reset(event):
 			actor.source = 'ICON_Player.png'
 			
 		if (actor.id == 'actor' + str(locs[1])):
-			actor.source = 'ICON_Wrench.png'
-			
-		if (actor.id == 'actor' + str(locs[2])):
 			actor.source = 'ICON_Jewel.png'
 			
+		if (actor.id == 'actor' + str(locs[2])):
+			actor.source = 'ICON_Igloo.png'
+			
+			
 	for actor in main.children[0].children:
-		i = 0
-		print (test[i])
-		if (actor.id == 'actor' + str(test[i]) and 'Transparent' in actor.source and test[i] not in banned): actor.source = 'ICON_Bear.png'; break
-		i += 1
+		print ('test index first ' + str(testIndex) + ' number is ' + str(test[testIndex]))
+		if ('Transparent' in actor.source and test[testIndex] not in banned): possible.append(test[testIndex]); testIndex +=1; continue
+		else: testIndex += 1
+	
+	print (possible)
+	if len(possible) > 0: pos = random.randint(0, len(possible))
+	else: pos = 0
+	print ('pos is ' + str(pos))
+	
+	for actor in main.children[0].children:
+		if (actor.id == 'actor' + str(possible[pos])): actor.source = 'ICON_Bear.png'; print ('have set'); return
 		
 	sm.current = 'main'
 	
@@ -158,7 +170,6 @@ class MainScreen(Screen):
 				
 class Actor(ButtonBehavior, Image):
 	def on_press(self):
-		self.goTowards()
 		print('pressed')
 		
 	def test(self, dt):
@@ -218,7 +229,7 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp; return
-			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
+			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
 				sm.current = 'Loser'
@@ -233,7 +244,7 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp; return
-			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
+			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
 				sm.current = 'Loser'
@@ -249,7 +260,7 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp; return
-			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
+			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
 				sm.current = 'Loser'
@@ -264,7 +275,7 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp; return
-			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source):
+			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
 				sm.current = 'Loser'
@@ -312,7 +323,7 @@ class Actor(ButtonBehavior, Image):
 				self.moveLeft()
 				reverse = 'self.moveRight()'
 				return
-			elif (hunterCol == preyCol and hunterRow == preyRow): print('lost through towards method'); sm.current = 'Loser'
+			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner'): print('lost through towards method'); sm.current = 'Loser'
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
@@ -394,7 +405,7 @@ for actor in main.children[0].children:
 		actor.source = 'ICON_Player.png'
 		
 	if (actor.id == 'actor17'):
-		actor.source = 'ICON_Wrench.png'
+		actor.source = 'ICON_Igloo.png'
 		
 	if (actor.id == 'actor80'):
 		actor.source = 'ICON_Jewel.png'
