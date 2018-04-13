@@ -1,6 +1,7 @@
 # ////////////////////////////////////////////////////////////////
 # //					 IMPORT STATEMENTS						//
 # ////////////////////////////////////////////////////////////////
+#all wrenches are jewels, 扳手皆為寶石
 from kivy.config import Config
 Config.set('graphics', 'resizable', False)
 import string
@@ -9,6 +10,7 @@ import socket
 import sys
 import re
 import math
+import time
 from random import randint
 from kivy.app import App
 from kivy.uix import togglebutton
@@ -33,7 +35,8 @@ from kivy.uix.behaviors import ButtonBehavior
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
-difficulty = 'normal'
+difficulty = 'hard'
+turn = 1
 sm = ScreenManager()
 Window.size = (939, 939)
 
@@ -41,7 +44,6 @@ class MyApp(App):
 	def build(self):
 		Clock.schedule_interval(obey, .1)
 		return sm
-		
 def obey(self, retry = 5):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -77,13 +79,19 @@ def obey(self, retry = 5):
 def quitAll():
 	quit()
 	
-def reset(event):
+def reset(dif):
+	global turn
+	global difficulty
+	print ('difficulty was ' + difficulty)
+	difficulty = dif
+	print ('now is ' + difficulty)
+	turn = 1
 	testIndex = 0
 	grid.clear_widgets()
 	possible = []
-	test = random.sample(range(0, 81), 81)
+	test = random.sample(range(1, 82), 81)
 	locs = random.sample(range(1, 82), 3)
-	banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10, locs[0] + 8]
+	banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10, locs[0] + 8, locs[1], locs[2]]
 	
 	for i in range (0, grid.cols*grid.rows):
 		b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
@@ -91,12 +99,15 @@ def reset(event):
 		
 	for actor in main.children[0].children:
 		if (actor.id == 'actor' + str(locs[0])):
+			print ('player is ' + str(locs[0]))
 			actor.source = 'ICON_Player.png'
 			
 		if (actor.id == 'actor' + str(locs[1])):
+			print ('jewel/wrench is ' + str(locs[1]))
 			actor.source = 'ICON_Jewel.png'
 			
 		if (actor.id == 'actor' + str(locs[2])):
+			print ('igloo is ' + str(locs[2]))
 			actor.source = 'ICON_Igloo.png'
 			
 			
@@ -108,10 +119,10 @@ def reset(event):
 	print (possible)
 	if len(possible) > 0: pos = random.randint(0, len(possible))
 	else: pos = 0
-	print ('pos is ' + str(pos))
+	print ('pos is ' + str(pos) + ', will be set here ' + str(possible[pos]))
 	
 	for actor in main.children[0].children:
-		if (actor.id == 'actor' + str(possible[pos])): actor.source = 'ICON_Bear.png'; print ('have set'); return
+		if (actor.id == 'actor' + str(possible[pos])): actor.source = 'ICON_Bear.png'; print ('have set'); break
 		
 	sm.current = 'main'
 	
@@ -162,11 +173,23 @@ class MainScreen(Screen):
 				return
 				
 	def huntPlayer(self):
-		for hunter in self.children[0].children:
-			if ('Bear' in hunter.source): 
-				hunter.goTowards()
-				break
-		
+		global difficulty
+		global turn
+		print ('turn is ' + str(turn) + ', so moving twice will be ' + str(turn % 2 == 0))
+		if (difficulty == 'hard'):
+			print ('difficulty is hard')
+			if (turn % 2 == 0):
+				for hunter in self.children[0].children:
+					if ('Bear' in hunter.source): 
+						hunter.goTowards(); hunter.goTowards(); turn += 1; break
+			else:
+				for hunter in self.children[0].children:
+					if ('Bear' in hunter.source):
+						hunter.goTowards(); turn += 1; break
+		else:
+			for hunter in self.children[0].children:
+				if ('Bear' in hunter.source): 
+					hunter.goTowards(); break
 				
 class Actor(ButtonBehavior, Image):
 	def on_press(self):
@@ -188,6 +211,10 @@ class Actor(ButtonBehavior, Image):
 		elif ('180' in self.source): self.moveUp(); main.huntPlayer(); return
 		elif ('270' in self.source): self.moveRight(); main.huntPlayer(); return
 		else: self.moveDown(); main.huntPlayer(); return
+		
+	def loser(self, *args):
+		app = App.get_running_app()
+		app.root.current = "Loser"
 			
 	def random(self):
 		if ('Player' not in self.source):
@@ -203,6 +230,7 @@ class Actor(ButtonBehavior, Image):
 			self.moveDown()
 	
 	def rotateDegrees(self, location, degrees):
+		if (sm.current != 'main'): return
 		for actor in main.children[0].children:
 			if (actor.id == location and 'Player' in actor.source):
 				if (degrees == 0 or degrees == 360 or degrees % 90 != 0): actor.source = 'ICON_Player.png'
@@ -210,6 +238,7 @@ class Actor(ButtonBehavior, Image):
 				else: actor.source = 'ICON_Player_' + str(degrees) + '.png'
 				
 	def rotateDirection(self, direction):
+		if (sm.current != 'main'): return
 		if (direction == 'left' and self.source == 'ICON_Player.png'): 
 			self.source = 'ICON_Player_270.png'
 			return
@@ -223,6 +252,7 @@ class Actor(ButtonBehavior, Image):
 			if (self.source == 'ICON_Player_0.png'): self.source = 'ICON_Player.png'
 		
 	def moveRight(self): #strafe
+		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) + 1
 		if (next % main.children[0].cols == 1):
 			return
@@ -232,12 +262,19 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
-				sm.current = 'Loser'
+				Clock.schedule_once(self.loser, 1)
+				#sm.current = 'Loser'
+			elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
+				self.source = actor.source; actor.source = 'ICON_Transparent.png'
+				print ('you are a failure')
+				Clock.schedule_once(self.loser, 1)
+				#sm.current = 'Loser'
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 	
 	def moveLeft(self): #strafe
+		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) - 1
 		if (next % main.children[0].cols == 0):
 			return
@@ -247,12 +284,19 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
-				sm.current = 'Loser'
+				Clock.schedule_once(self.loser, 1)
+				#sm.current = 'Loser'
+			elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
+				self.source = actor.source; actor.source = 'ICON_Transparent.png'
+				print ('you are a failure')
+				Clock.schedule_once(self.loser, 1)
+				#sm.current = 'Loser'
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 	
 	def moveUp(self):
+		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) - main.children[0].rows
 		print (next)
 		if (next < 0):
@@ -263,12 +307,19 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
-				sm.current = 'Loser'
+				Clock.schedule_once(self.loser, 1)
+				#sm.current = 'Loser'
+			elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
+				self.source = actor.source; actor.source = 'ICON_Transparent.png'
+				print ('you are a failure')
+				Clock.schedule_once(self.loser, 1)
+				#sm.current = 'Loser'
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 	
 	def moveDown(self):
+		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) + main.children[0].rows
 		if (next > main.children[0].rows*main.children[0].cols):
 			return
@@ -278,12 +329,19 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				print ('you are a failure')
-				sm.current = 'Loser'
+				Clock.schedule_once(self.loser, 1)
+				#sm.current = 'Loser'
+			elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
+				self.source = actor.source; actor.source = 'ICON_Transparent.png'
+				print ('you are a failure')
+				Clock.schedule_once(self.loser, 1)
+				#sm.current = 'Loser'
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 		
 	def goTowards(self): # if anyone wants to fix please feel free
+		if (sm.current != 'main'): return
 		prey = 0
 		position = 0
 		obstacles = []
@@ -304,6 +362,7 @@ class Actor(ButtonBehavior, Image):
 			if (tuple[0] == hunterCol + 1 or hunterCol - 1 and hunterRow == tuple[1]) and not ((tuple[0] == hunterCol + 1 and tuple[1] == hunterRow + 1) or (tuple[0] == hunterCol - 1 and tuple[1] == hunterRow - 1)): canX = False
 		for tuple in obstacles:
 			if (tuple[1] == hunterRow + 1 or hunterRow - 1 and hunterCol == tuple[0]) and not ((tuple[0] == hunterCol + 1 and tuple[1] == hunterRow + 1) or (tuple[0] == hunterCol - 1 and tuple[1] == hunterRow - 1)): canY = False
+		print ('obstacles are here:')
 		print (obstacles)
 		if (not canX and not canY and reverse): exec(reverse); return
 		if (hunterRow > preyRow and canY):
@@ -323,7 +382,7 @@ class Actor(ButtonBehavior, Image):
 				self.moveLeft()
 				reverse = 'self.moveRight()'
 				return
-			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner'): print('lost through towards method'); sm.current = 'Loser'
+			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner'): print('lost through towards method'); Clock.schedule_once(self.loser, 1); #sm.current = 'Loser'
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
@@ -387,14 +446,21 @@ loserScreen.add_widget(youLoser)
 winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
 korWinLabel = Label(text = '이기셨네요!', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
 loseLabel = Label(text = 'You lost.', font_size = 64, pos = (0, 400))
-korLoseLabel = Label(text = '지셨어요.', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
+korLoseLabel = Label(text = '지셨어요.', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf')
+ 
 playAgainButton = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
-playAgainButton.bind(on_press = reset)
+playAgainButton.bind(on_press = lambda x: reset('normal'))  
+
+playAgainButtonHard = Button(text = 'Make it harder?', size_hint = (0.2, 0.1), pos = (800, 800))
+playAgainButtonHard.bind(on_press = lambda x: reset('hard'))  
+
 playAgainButtonLose = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
-playAgainButtonLose.bind(on_press = reset)
+playAgainButton.bind(on_press = lambda x: reset('normal')) 
+
 screen.add_widget(winLabel)
 screen.add_widget(korWinLabel)
 screen.add_widget(playAgainButton)
+screen.add_widget(playAgainButtonHard)
 loserScreen.add_widget(loseLabel)
 loserScreen.add_widget(korLoseLabel)
 loserScreen.add_widget(playAgainButtonLose)
