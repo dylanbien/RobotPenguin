@@ -239,13 +239,15 @@ class MainScreen(Screen):
 		Clock.schedule_once(rightPop.dismiss, .1)
 		
 main = MainScreen(name = 'main')
-imageQueue = BoxLayout(padding = 15, size_hint=(.925, None), height=150, pos_hint={'top': 1})
+imageQueue = BoxLayout(padding = 15, size_hint=(.8, None), height = 150, pos_hint={'top': 1})
+border = Image(source = 'rectangle.png', size_hint=(.8, None), height = 150, pos_hint={'top': 1})
 
 
 #for i in range(10):
 	#queue.add_widget(Image(source='LEFT.png'))
 
 main.add_widget(imageQueue)
+main.add_widget(border)
 sm.add_widget(main)
 
 

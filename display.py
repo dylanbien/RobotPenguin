@@ -110,14 +110,13 @@ def reset(dif):
 			print ('igloo is ' + str(locs[2]))
 			actor.source = 'ICON_Igloo.png'
 			
-			
-	for actor in main.children[0].children:
-		print ('test index first ' + str(testIndex) + ' number is ' + str(test[testIndex]))
-		if ('Transparent' in actor.source and test[testIndex] not in banned): possible.append(test[testIndex]); testIndex +=1; continue
-		else: testIndex += 1
-	
+	while testIndex < 81:
+		for actor in main.children[0].children:
+			print ('test index first ' + str(testIndex) + ' number is ' + str(test[testIndex]))
+			if ('Transparent' in actor.source and test[testIndex] not in banned and str(test[testIndex]) in actor.id): possible.append(test[testIndex]); break; testIndex+=1
+		testIndex +=1			
 	print (possible)
-	if len(possible) > 0: pos = random.randint(0, len(possible))
+	if len(possible) > 0: pos = random.randint(0, len(possible) - 1)
 	else: pos = 0
 	print ('pos is ' + str(pos) + ', will be set here ' + str(possible[pos]))
 	
@@ -455,7 +454,7 @@ playAgainButtonHard = Button(text = 'Make it harder?', size_hint = (0.2, 0.1), p
 playAgainButtonHard.bind(on_press = lambda x: reset('hard'))  
 
 playAgainButtonLose = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
-playAgainButton.bind(on_press = lambda x: reset('normal')) 
+playAgainButtonLose.bind(on_press = lambda x: reset('normal'))
 
 screen.add_widget(winLabel)
 screen.add_widget(korWinLabel)
