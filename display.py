@@ -180,7 +180,10 @@ class MainScreen(Screen):
 			if (turn % 2 == 0):
 				for hunter in self.children[0].children:
 					if ('Bear' in hunter.source): 
-						hunter.goTowards(); hunter.goTowards(); turn += 1; break
+						hunter.goTowards(); break
+				for hunter in self.children[0].children:
+					if ('Bear' in hunter.source): 
+						hunter.goTowards(); turn += 1; break;
 			else:
 				for hunter in self.children[0].children:
 					if ('Bear' in hunter.source):

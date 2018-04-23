@@ -22,6 +22,7 @@ import sys
 commands = []
 history = []
 def queue(command):
+	if (len(commands) >= 10): return
 	commands.append(command)
 	name = command.replace(' ','')
 	name.upper()
@@ -239,10 +240,9 @@ class MainScreen(Screen):
 		Clock.schedule_once(rightPop.dismiss, .1)
 		
 main = MainScreen(name = 'main')
-imageQueue = BoxLayout(padding = 15, size_hint=(.8, None), height = 150, pos_hint={'top': 1})
-border = Image(source = 'rectangle.png', size_hint=(.8, None), height = 150, pos_hint={'top': 1})
-
-
+imageQueue = BoxLayout(padding = 15, size_hint=(.825, None), height = 150, pos_hint={'top': .9875})
+border = Image(source = 'rectangle.png', allow_stretch = True, keep_ratio = False, pos = (Window.width * 0, Window.height * 1.4), size_hint_y = None, height = Window.height * .3, size_hint_x = None, width = Window.width * 1.975)
+				
 #for i in range(10):
 	#queue.add_widget(Image(source='LEFT.png'))
 
