@@ -29,14 +29,16 @@ from kivy.uix.label import Label
 from kivy.uix.scatter import Scatter
 from kivy.clock import Clock
 from kivy.graphics import *
+from functools import partial
 from kivy.uix.behaviors import ButtonBehavior
 
 # ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
-difficulty = 'hard'
+difficulty = 'normal'
 turn = 1
+canWin = False
 sm = ScreenManager()
 Window.size = (939, 939)
 
@@ -82,6 +84,8 @@ def quitAll():
 def reset(dif):
 	global turn
 	global difficulty
+	global canWin
+	canWin = False
 	print ('difficulty was ' + difficulty)
 	difficulty = dif
 	print ('now is ' + difficulty)
@@ -90,8 +94,8 @@ def reset(dif):
 	grid.clear_widgets()
 	possible = []
 	test = random.sample(range(1, 82), 81)
-	locs = random.sample(range(1, 82), 3)
-	banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10, locs[0] + 8, locs[1], locs[2]]
+	locs = random.sample(range(1, 82), 4)
+	banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10, locs[0] + 8, locs[0], locs[1], locs[2], locs[3]]
 	
 	for i in range (0, grid.cols*grid.rows):
 		b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
@@ -109,11 +113,15 @@ def reset(dif):
 		if (actor.id == 'actor' + str(locs[2])):
 			print ('igloo is ' + str(locs[2]))
 			actor.source = 'ICON_Igloo.png'
+		
+		if (actor.id == 'actor' + str(locs[3])):
+			print ('gear is ' + str(locs[3]))
+			actor.source = 'ICON_Gear.png'
 			
 	while testIndex < 81:
 		for actor in main.children[0].children:
 			print ('test index first ' + str(testIndex) + ' number is ' + str(test[testIndex]))
-			if ('Transparent' in actor.source and test[testIndex] not in banned and str(test[testIndex]) in actor.id): possible.append(test[testIndex]); break; testIndex+=1
+			if ('Transparent' in actor.source and test[testIndex] not in banned and str(test[testIndex]) in actor.id): possible.append(test[testIndex]); break
 		testIndex +=1			
 	print (possible)
 	if len(possible) > 0: pos = random.randint(0, len(possible) - 1)
@@ -254,6 +262,7 @@ class Actor(ButtonBehavior, Image):
 			if (self.source == 'ICON_Player_0.png'): self.source = 'ICON_Player.png'
 		
 	def moveRight(self): #strafe
+		global canWin
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) + 1
 		if (next % main.children[0].cols == 1):
@@ -271,11 +280,15 @@ class Actor(ButtonBehavior, Image):
 				print ('you are a failure')
 				Clock.schedule_once(self.loser, 1)
 				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
+			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				canWin = True
+			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 	
 	def moveLeft(self): #strafe
+		global canWin
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) - 1
 		if (next % main.children[0].cols == 0):
@@ -293,11 +306,15 @@ class Actor(ButtonBehavior, Image):
 				print ('you are a failure')
 				Clock.schedule_once(self.loser, 1)
 				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
+			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				canWin = True
+			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 	
 	def moveUp(self):
+		global canWin
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) - main.children[0].rows
 		print (next)
@@ -316,11 +333,15 @@ class Actor(ButtonBehavior, Image):
 				print ('you are a failure')
 				Clock.schedule_once(self.loser, 1)
 				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
+			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				canWin = True
+			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 	
 	def moveDown(self):
+		global canWin
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) + main.children[0].rows
 		if (next > main.children[0].rows*main.children[0].cols):
@@ -338,7 +359,10 @@ class Actor(ButtonBehavior, Image):
 				print ('you are a failure')
 				Clock.schedule_once(self.loser, 1)
 				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source):
+			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
+				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				canWin = True
+			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				sm.current = 'Winner'
 		
@@ -474,6 +498,9 @@ for actor in main.children[0].children:
 		
 	if (actor.id == 'actor17'):
 		actor.source = 'ICON_Igloo.png'
+		
+	if (actor.id == 'actor54'):
+		actor.source = 'ICON_Gear.png'
 		
 	if (actor.id == 'actor80'):
 		actor.source = 'ICON_Jewel.png'
