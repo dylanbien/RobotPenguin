@@ -96,7 +96,16 @@ def reset(dif):
 	test = random.sample(range(1, 82), 81)
 	locs = random.sample(range(1, 82), 4)
 	banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10, locs[0] + 8, locs[0], locs[1], locs[2], locs[3]]
+	edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 28, 37, 46, 55, 64, 73, 74, 75, 76, 77, 78, 79, 80, 81, 18, 27, 36, 45, 54, 63, 72] # will sometimes contain locations of other things
+	obstacles = []
 	
+	while len(obstacles) < 3: 
+		x = random.randint(1, 81)
+		if x not in edges and x != locs[0]:
+			obstacles.append(x)
+			edges.append(x)
+	print (obstacles)
+		 
 	for i in range (0, grid.cols*grid.rows):
 		b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
 		grid.add_widget(b)
@@ -106,16 +115,16 @@ def reset(dif):
 			print ('player is ' + str(locs[0]))
 			actor.source = 'ICON_Player.png'
 			
-		if (actor.id == 'actor' + str(locs[1])):
-			print ('jewel/wrench is ' + str(locs[1]))
+		if (actor.id == 'actor' + str(obstacles[0])):
+			print ('jewel/wrench is ' + str(obstacles[0]))
 			actor.source = 'ICON_Jewel.png'
 			
-		if (actor.id == 'actor' + str(locs[2])):
-			print ('igloo is ' + str(locs[2]))
+		if (actor.id == 'actor' + str(obstacles[1])):
+			print ('igloo is ' + str(obstacles[1]))
 			actor.source = 'ICON_Igloo.png'
 		
-		if (actor.id == 'actor' + str(locs[3])):
-			print ('gear is ' + str(locs[3]))
+		if (actor.id == 'actor' + str(obstacles[2])):
+			print ('gear is ' + str(obstacles[2]))
 			actor.source = 'ICON_Gear.png'
 			
 	while testIndex < 81:
@@ -477,7 +486,7 @@ loseLabel = Label(text = 'You lost.', font_size = 64, pos = (0, 400))
 playAgainButton = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
 playAgainButton.bind(on_press = lambda x: reset('normal'))  
 
-playAgainButtonHard = Button(text = 'Make it harder?', size_hint = (0.2, 0.1), pos = (800, 800))
+playAgainButtonHard = Button(text = 'Make it harder?', size_hint = (0.2, 0.1), pos = (700, 800))
 playAgainButtonHard.bind(on_press = lambda x: reset('hard'))  
 
 playAgainButtonLose = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
