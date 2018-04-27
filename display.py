@@ -11,6 +11,7 @@ import sys
 import re
 import math
 import time
+import ip
 from random import randint
 from kivy.app import App
 from kivy.uix import togglebutton
@@ -39,6 +40,8 @@ from kivy.uix.behaviors import ButtonBehavior
 difficulty = 'normal'
 turn = 1
 canWin = False
+highScore = 2
+score = 0
 sm = ScreenManager()
 Window.size = (939, 939)
 
@@ -49,7 +52,7 @@ class MyApp(App):
 def obey(self, retry = 5):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	server_address = ('172.17.17.116', 10009)
+	server_address = ip.server_address
 	print('connecting to {} port {}'.format(*server_address))
 	sock.connect(server_address)
 	print('i am display.py')
@@ -85,12 +88,14 @@ def reset(dif):
 	global turn
 	global difficulty
 	global canWin
+	global score
 	canWin = False
 	print ('difficulty was ' + difficulty)
 	difficulty = dif
 	print ('now is ' + difficulty)
 	turn = 1
 	testIndex = 0
+	score = 0
 	grid.clear_widgets()
 	possible = []
 	test = random.sample(range(1, 82), 81)
@@ -248,6 +253,15 @@ class Actor(ButtonBehavior, Image):
 		else:
 			self.moveDown()
 	
+	def spawnGear(self):
+		unset = True
+		while unset:
+			x = random.randint(1, 81)
+			for actor in main.children[0].children:
+				if (str(x) in actor.id and 'Transparent' in actor.source):
+					actor.source = 'ICON_Gear.png'; print ('gear was set at actor ' + actor.id); unset = False; return
+		
+	
 	def rotateDegrees(self, location, degrees):
 		if (sm.current != 'main'): return
 		for actor in main.children[0].children:
@@ -272,6 +286,8 @@ class Actor(ButtonBehavior, Image):
 		
 	def moveRight(self): #strafe
 		global canWin
+		global score
+		global highScore
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) + 1
 		if (next % main.children[0].cols == 1):
@@ -292,12 +308,18 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				canWin = True
+				score += 1
+				scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
+				self.spawnGear(); return	
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				if score > highScore: highScore = score; scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
 				sm.current = 'Winner'
 	
 	def moveLeft(self): #strafe
 		global canWin
+		global score
+		global highScore
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) - 1
 		if (next % main.children[0].cols == 0):
@@ -318,12 +340,18 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				canWin = True
+				score += 1
+				scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
+				self.spawnGear(); return
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				if score > highScore: highScore = score; scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
 				sm.current = 'Winner'
 	
 	def moveUp(self):
 		global canWin
+		global score
+		global highScore
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) - main.children[0].rows
 		print (next)
@@ -345,12 +373,18 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				canWin = True
+				score += 1
+				scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
+				self.spawnGear(); return
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				if score > highScore: highScore = score; scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
 				sm.current = 'Winner'
 	
 	def moveDown(self):
 		global canWin
+		global score
+		global highScore
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) + main.children[0].rows
 		if (next > main.children[0].rows*main.children[0].cols):
@@ -366,13 +400,17 @@ class Actor(ButtonBehavior, Image):
 			elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
 				self.source = actor.source; actor.source = 'ICON_Transparent.png'
 				print ('you are a failure')
-				Clock.schedule_once(self.loser, 1)
+				Clock.schedule_once(self.loser, 1) 
 				#sm.current = 'Loser'
 			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				canWin = True
+				score += 1
+				scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
+				self.spawnGear()
 			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
+				if score > highScore: highScore = score; scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
 				sm.current = 'Winner'
 		
 	def goTowards(self): # if anyone wants to fix please feel free
@@ -479,6 +517,7 @@ loserScreen.add_widget(youLoser)
 #screen.add_widget(bang)
 #bang님의 명복을 빌어요 T_T
 winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
+scoreLabel = Label(text = '', font_size = 16, pos = (0, 350))
 #korWinLabel = Label(text = '이기셨네요!', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
 loseLabel = Label(text = 'You lost.', font_size = 64, pos = (0, 400))
 #korLoseLabel = Label(text = '지셨어요.', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf')
@@ -493,6 +532,7 @@ playAgainButtonLose = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos =
 playAgainButtonLose.bind(on_press = lambda x: reset('normal'))
 
 screen.add_widget(winLabel)
+screen.add_widget(scoreLabel)
 #screen.add_widget(korWinLabel)
 screen.add_widget(playAgainButton)
 screen.add_widget(playAgainButtonHard)

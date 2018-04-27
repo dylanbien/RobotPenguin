@@ -1,11 +1,12 @@
 import socket
 import sys
+import ip
 send = False
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the port
-server_address = ('172.17.17.116', 10009)
+server_address = ip.server_address
 print('starting up on {} port {}'.format(*server_address))
 sock.bind(server_address)
 

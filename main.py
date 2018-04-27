@@ -19,8 +19,10 @@ from kivy.graphics import *
 from time import sleep
 import socket
 import sys
+import ip
 commands = []
 history = []
+		
 def queue(command):
 	if (len(commands) >= 10): return
 	commands.append(command)
@@ -43,7 +45,7 @@ def send(command, retry = 2):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	# Connect the socket to the port where the server is listening
-	server_address = ('172.17.17.116', 10009)
+	server_address = ip.server_address
 	print('main connecting to {} port {}'.format(*server_address))
 	
 	try:
