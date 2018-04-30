@@ -283,15 +283,11 @@ class Actor(ButtonBehavior, Image):
 			if (direction == 'left'): self.source = 'ICON_Player_' + str(((degree + 270) % 360)) + '.png'
 			else: self.source = 'ICON_Player_' + str(((degree + 90) % 360)) + '.png'
 			if (self.source == 'ICON_Player_0.png'): self.source = 'ICON_Player.png'
-		
-	def moveRight(self): #strafe
+	
+	def move(self, next):
 		global canWin
 		global score
 		global highScore
-		if (sm.current != 'main'): return
-		next = int(self.id.strip(string.ascii_letters)) + 1
-		if (next % main.children[0].cols == 1):
-			return
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
 				temp = self.source; self.source = actor.source; actor.source = temp; return
@@ -315,103 +311,36 @@ class Actor(ButtonBehavior, Image):
 				actor.source = self.source; self.source = 'ICON_Transparent.png'
 				if score > highScore: highScore = score; scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
 				sm.current = 'Winner'
+		
+	def moveRight(self): #strafe
+		if (sm.current != 'main'): return
+		next = int(self.id.strip(string.ascii_letters)) + 1
+		if (next % main.children[0].cols == 1):
+			return
+		else self.move(next)
+		
 	
 	def moveLeft(self): #strafe
-		global canWin
-		global score
-		global highScore
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) - 1
 		if (next % main.children[0].cols == 0):
 			return
-		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp; return
-			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
-				actor.source = self.source; self.source = 'ICON_Transparent.png'
-				print ('you are a failure')
-				Clock.schedule_once(self.loser, 1)
-				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
-				self.source = actor.source; actor.source = 'ICON_Transparent.png'
-				print ('you are a failure')
-				Clock.schedule_once(self.loser, 1)
-				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
-				actor.source = self.source; self.source = 'ICON_Transparent.png'
-				canWin = True
-				score += 1
-				scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
-				self.spawnGear(); return
-			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
-				actor.source = self.source; self.source = 'ICON_Transparent.png'
-				if score > highScore: highScore = score; scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
-				sm.current = 'Winner'
+		else self.move(next)
 	
 	def moveUp(self):
-		global canWin
-		global score
-		global highScore
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) - main.children[0].rows
 		print (next)
 		if (next < 0):
 			return 
-		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp; return
-			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
-				actor.source = self.source; self.source = 'ICON_Transparent.png'
-				print ('you are a failure')
-				Clock.schedule_once(self.loser, 1)
-				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
-				self.source = actor.source; actor.source = 'ICON_Transparent.png'
-				print ('you are a failure')
-				Clock.schedule_once(self.loser, 1)
-				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
-				actor.source = self.source; self.source = 'ICON_Transparent.png'
-				canWin = True
-				score += 1
-				scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
-				self.spawnGear(); return
-			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
-				actor.source = self.source; self.source = 'ICON_Transparent.png'
-				if score > highScore: highScore = score; scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
-				sm.current = 'Winner'
+		else self.move(next)
 	
 	def moveDown(self):
-		global canWin
-		global score
-		global highScore
 		if (sm.current != 'main'): return
 		next = int(self.id.strip(string.ascii_letters)) + main.children[0].rows
 		if (next > main.children[0].rows*main.children[0].cols):
 			return
-		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(next) and actor.source == 'ICON_Transparent.png'):
-				temp = self.source; self.source = actor.source; actor.source = temp; return
-			elif (actor.id == 'actor' + str(next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
-				actor.source = self.source; self.source = 'ICON_Transparent.png'
-				print ('you are a failure')
-				Clock.schedule_once(self.loser, 1)
-				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
-				self.source = actor.source; actor.source = 'ICON_Transparent.png'
-				print ('you are a failure')
-				Clock.schedule_once(self.loser, 1) 
-				#sm.current = 'Loser'
-			elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
-				actor.source = self.source; self.source = 'ICON_Transparent.png'
-				canWin = True
-				score += 1
-				scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
-				self.spawnGear()
-			elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
-				actor.source = self.source; self.source = 'ICON_Transparent.png'
-				if score > highScore: highScore = score; scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
-				sm.current = 'Winner'
+		else self.move(next)
 		
 	def goTowards(self): # if anyone wants to fix please feel free
 		if (sm.current != 'main'): return
