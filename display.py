@@ -38,9 +38,10 @@ from kivy.uix.behaviors import ButtonBehavior
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
 difficulty = 'normal'
-turn = 1
 canWin = False
+turn = 0
 justGeared = False
+gears = []
 highScore = 2
 score = 0
 sm = ScreenManager()
@@ -96,7 +97,7 @@ def reset(dif):
 	print ('difficulty was ' + difficulty)
 	difficulty = dif
 	print ('now is ' + difficulty)
-	turn = 1
+	turn = 0
 	testIndex = 0
 	score = 0
 	grid.clear_widgets()
@@ -107,11 +108,11 @@ def reset(dif):
 	edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 28, 37, 46, 55, 64, 73, 74, 75, 76, 77, 78, 79, 80, 81, 18, 27, 36, 45, 54, 63, 72] # will sometimes contain locations of other things
 	obstacles = []
 	
-	while len(obstacles) < 3: 
+	while len(obstacles) < 5: 
 		x = random.randint(1, 81)
 		if x not in edges and x != locs[0]:
 			obstacles.append(x)
-			edges.append(x)
+			edges.append(x) #add edges of x
 	print (obstacles)
 		 
 	for i in range (0, grid.cols*grid.rows):
@@ -141,12 +142,31 @@ def reset(dif):
 			if ('Transparent' in actor.source and test[testIndex] not in banned and str(test[testIndex]) in actor.id): possible.append(test[testIndex]); break
 		testIndex +=1			
 	print (possible)
-	if len(possible) > 0: pos = random.randint(0, len(possible) - 1)
-	else: pos = 0
-	print ('pos is ' + str(pos) + ', will be set here ' + str(possible[pos]))
-	
-	for actor in main.children[0].children:
-		if (actor.id == 'actor' + str(possible[pos])): actor.source = 'ICON_Bear.png'; print ('have set'); break
+	if ('hard' in difficulty):
+		for actor in main.children[0].children:
+			if (actor.id == 'actor' + str(obstacles[3])):
+				print ('igloo is ' + str(obstacles[3]))
+				actor.source = 'ICON_Igloo.png'
+				
+			if (actor.id == 'actor' + str(obstacles[4])):
+				print ('igloo is ' + str(obstacles[4]))
+				actor.source = 'ICON_Igloo.png'
+		
+		if len(possible) > 0: pos = random.sample(range(0, len(possible)), 2) #pos = random.randint(0, len(possible) - 1)
+		else: pos = 0
+		print ('pos is ' + str(pos) + ', will be set here ' + str(possible[pos[0]]) + ' and' + str(possible[pos[1]]))
+		
+		for actor in main.children[0].children:
+			if (actor.id == 'actor' + str(possible[pos[0]])): actor.source = 'ICON_Bear.png'; print ('have set'); break
+		for actor in main.children[0].children:
+			if (actor.id == 'actor' + str(possible[pos[1]])): actor.source = 'ICON_Bear.png'; print ('have set'); break
+	else:
+		if len(possible) > 0: pos = random.randint(0, len(possible) - 1)
+		else: pos = 0
+		print ('pos is ' + str(pos) + ', will be set here ' + str(possible[pos]))
+		
+		for actor in main.children[0].children:
+			if (actor.id == 'actor' + str(possible[pos])): actor.source = 'ICON_Bear.png'; print ('have set'); break
 		
 	sm.current = 'main'
 	
@@ -202,17 +222,9 @@ class MainScreen(Screen):
 		print ('turn is ' + str(turn) + ', so moving twice will be ' + str(turn % 2 == 0))
 		if (difficulty == 'hard'):
 			print ('difficulty is hard')
-			if (turn % 2 == 0):
-				for hunter in self.children[0].children:
-					if ('Bear' in hunter.source): 
-						hunter.goTowards(); break
-				for hunter in self.children[0].children:
-					if ('Bear' in hunter.source): 
-						hunter.goTowards(); turn += 1; break;
-			else:
-				for hunter in self.children[0].children:
-					if ('Bear' in hunter.source):
-						hunter.goTowards(); turn += 1; break
+			for hunter in self.children[0].children:
+				if ('Bear' in hunter.source): 
+					hunter.goTowards(); break
 		else:
 			for hunter in self.children[0].children:
 				if ('Bear' in hunter.source): 
@@ -257,12 +269,13 @@ class Actor(ButtonBehavior, Image):
 			self.moveDown()
 	
 	def spawnGear(self):
+		global gears
 		unset = True
 		while unset:
 			x = random.randint(1, 81)
 			for actor in main.children[0].children:
-				if (str(x) in actor.id and 'Transparent' in actor.source):
-					actor.source = 'ICON_Gear.png'; print ('gear was set at actor ' + actor.id); unset = False; return
+				if (str(x) in actor.id and 'Transparent' in actor.source and x not in gears):
+					actor.source = 'ICON_Gear.png'; print ('gear was set at actor ' + actor.id); gears.append(x); unset = False; return
 					
 	def clearGear(self):
 		for actor in main.children[0].children:
@@ -358,8 +371,11 @@ class Actor(ButtonBehavior, Image):
 		
 	def goTowards(self): # if anyone wants to fix please feel free
 		if (sm.current != 'main'): return
+		global turn
 		prey = 0
+		index = 0
 		position = 0
+		bears = []
 		obstacles = []
 		reverse = ''
 		canX = True
@@ -367,9 +383,16 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if ('Player' in actor.source): prey = 81 - main.children[0].children.index(actor)
 		for hunter in main.children[0].children:
-			if ('Bear' in hunter.source): position = 81 - main.children[0].children.index(hunter)
+			if ('Bear' in hunter.source): bears.append(81 - main.children[0].children.index(hunter)); continue
+			if ('Bear' in hunter.source): bears.append(81 - main.children[0].children.index(hunter)); break
+		if (len(bears) > 1): turn += 1
 		for obstacle in main.children[0].children:
 			if ('Player' not in obstacle.source and 'Bear' not in obstacle.source and 'Transparent' not in obstacle.source and 'Jewel' not in obstacle.source): loc = (81 - main.children[0].children.index(obstacle)); obstacles.append((loc % 9  if (loc % 9 != 0) else 9, math.ceil(loc / 9)))
+		if (turn % 2 == 0): position =  bears[0]
+		else: position = bears[1]
+		print ('the bear is going to be here ' + str(position)) 
+		print ('the bears are here ' + str(bears))
+		print ('turn is ' + str(turn))
 		hunterCol = position % 9  if (position % 9 != 0) else 9 
 		hunterRow = math.ceil(position / 9)
 		preyCol = prey % 9 if (prey % 9 != 0) else 9
@@ -382,21 +405,21 @@ class Actor(ButtonBehavior, Image):
 		print (obstacles)
 		if (not canX and not canY and reverse): exec(reverse); return
 		if (hunterRow > preyRow and canY):
-			self.moveUp()
-			reverse = 'self.moveDown()'
+			main.children[0].children[81 - position].moveUp()
+			reverse = 'main.children[0].children[81 - position].moveDown()'
 			return
 		elif (hunterRow < preyRow and canY):
-			self.moveDown()
-			reverse = 'self.moveUp()'
+			main.children[0].children[81 - position].moveDown()
+			reverse = 'main.children[0].children[81 - position].moveUp()'
 			return
 		else:
 			if (hunterCol < preyCol and canX):
-				self.moveRight()
-				reverse = 'self.moveLeft()'
+				main.children[0].children[81 - position].moveRight()
+				reverse = 'main.children[0].children[81 - position].moveLeft()'
 				return
 			elif (hunterCol > preyCol and canX):
-				self.moveLeft()
-				reverse = 'self.moveRight()'
+				main.children[0].children[81 - position].moveLeft()
+				reverse = 'main.children[0].children[81 - position].moveRight()'
 				return
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner' and justGeared): print('lost through towards method'); self.clearGear(); Clock.schedule_once(self.loser, 1); return #sm.current = 'Loser'
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner'): print('lost through towards method'); Clock.schedule_once(self.loser, 1); return
