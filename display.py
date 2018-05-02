@@ -280,7 +280,9 @@ class Actor(ButtonBehavior, Image):
 	def clearGear(self):
 		for actor in main.children[0].children:
 			if ('Gear' in actor.source): actor.source = 'ICON_Transparent.png'
-		
+	
+	def unflash(self):
+		self.source = 'ICON_Bear.png'
 	
 	def rotateDegrees(self, location, degrees):
 		if (sm.current != 'main'): return
@@ -403,26 +405,28 @@ class Actor(ButtonBehavior, Image):
 		#	if (tuple[1] == hunterRow + 1 or hunterRow - 1 and hunterCol == tuple[0]) and not ((tuple[0] == hunterCol + 1 and tuple[1] == hunterRow + 1) or (tuple[0] == hunterCol - 1 and tuple[1] == hunterRow - 1)): canY = False
 		print ('obstacles are here:')
 		print (obstacles)
+		prevPos = main.children[0].children[81 - position].source
 		if (not canX and not canY and reverse): exec(reverse); return
 		if (hunterRow > preyRow and canY):
 			main.children[0].children[81 - position].moveUp()
 			reverse = 'main.children[0].children[81 - position].moveDown()'
-			return
+			#return
 		elif (hunterRow < preyRow and canY):
 			main.children[0].children[81 - position].moveDown()
 			reverse = 'main.children[0].children[81 - position].moveUp()'
-			return
+			#return
 		else:
 			if (hunterCol < preyCol and canX):
 				main.children[0].children[81 - position].moveRight()
 				reverse = 'main.children[0].children[81 - position].moveLeft()'
-				return
+				#return
 			elif (hunterCol > preyCol and canX):
 				main.children[0].children[81 - position].moveLeft()
 				reverse = 'main.children[0].children[81 - position].moveRight()'
-				return
+				#return
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner' and justGeared): print('lost through towards method'); self.clearGear(); Clock.schedule_once(self.loser, 1); return #sm.current = 'Loser'
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner'): print('lost through towards method'); Clock.schedule_once(self.loser, 1); return
+		if (prevPos == main.children[0].children[81 - position].source): main.children[0].children[81 - position].source = 'ICON_Bear_Flash.png'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash(), 0.25);
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
