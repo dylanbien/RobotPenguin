@@ -1,7 +1,7 @@
 # ////////////////////////////////////////////////////////////////
 # //					 IMPORT STATEMENTS						//
 # ////////////////////////////////////////////////////////////////
-#all wrenches are jewels, 扳手皆為寶石
+#all wrenches are jewels, pan shou chieh wei pao shih
 from kivy.config import Config
 Config.set('graphics', 'resizable', False)
 import string
@@ -159,7 +159,7 @@ def reset(dif):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(possible[pos[0]])): actor.source = 'ICON_Bear.png'; print ('have set'); break
 		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(possible[pos[1]])): actor.source = 'ICON_Bear.png'; print ('have set'); break
+			if (actor.id == 'actor' + str(possible[pos[1]])): actor.source = 'ICON_Bear_2.png'; print ('have set'); break
 	else:
 		if len(possible) > 0: pos = random.randint(0, len(possible) - 1)
 		else: pos = 0
@@ -281,8 +281,9 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if ('Gear' in actor.source): actor.source = 'ICON_Transparent.png'
 	
-	def unflash(self):
-		self.source = 'ICON_Bear.png'
+	def unflash(self, arg):
+		if ('two' in arg): self.source = 'ICON_Bear_2.png'
+		else: self.source = 'ICON_Bear.png'
 	
 	def rotateDegrees(self, location, degrees):
 		if (sm.current != 'main'): return
@@ -387,7 +388,7 @@ class Actor(ButtonBehavior, Image):
 		for hunter in main.children[0].children:
 			if ('Bear' in hunter.source): bears.append(81 - main.children[0].children.index(hunter))
 		for hunter in main.children[0].children:	
-			if ('Bear' in hunter.source): bears.append(81 - main.children[0].children.index(hunter))
+			if ('Bear_2' in hunter.source): bears.append(81 - main.children[0].children.index(hunter))
 		print (bears)
 		if (len(bears) > 1): turn += 1
 		for obstacle in main.children[0].children:
@@ -432,7 +433,9 @@ class Actor(ButtonBehavior, Image):
 				#return
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner' and justGeared): print('lost through towards method'); self.clearGear(); Clock.schedule_once(self.loser, 1); return #sm.current = 'Loser'
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner'): print('lost through towards method'); Clock.schedule_once(self.loser, 1); return
-		if (prevPos == main.children[0].children[81 - position].source): main.children[0].children[81 - position].source = 'ICON_Bear_Flash.png'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash(), 0.1);
+		if (prevPos == main.children[0].children[81 - position].source): 
+			if ('Bear_2' in main.children[0].children[81 - position].source): main.children[0].children[81 - position].source = 'ICON_Bear_Flash.png'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash('two'), 0.1)
+			else: main.children[0].children[81 - position].source = 'ICON_Bear_Flash.png'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash('one'), 0.1)
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
@@ -492,9 +495,7 @@ youLoser = Image(source = 'loser.png')
 loserScreen.add_widget(youLoser)
 winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
 scoreLabel = Label(text = '', font_size = 16, pos = (0, 350))
-#korWinLabel = Label(text = '이기셨네요!', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf') 
 loseLabel = Label(text = 'You lost.', font_size = 64, pos = (0, 400))
-#korLoseLabel = Label(text = '지셨어요.', font_size = 32, pos = (0, 350), font_name = 'Malgun Gothic.ttf')
  
 playAgainButton = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
 playAgainButton.bind(on_press = lambda x: reset('normal'))  
@@ -507,11 +508,9 @@ playAgainButtonLose.bind(on_press = lambda x: reset('normal'))
 
 screen.add_widget(winLabel)
 screen.add_widget(scoreLabel)
-#screen.add_widget(korWinLabel)
 screen.add_widget(playAgainButton)
 screen.add_widget(playAgainButtonHard)
 loserScreen.add_widget(loseLabel)
-#loserScreen.add_widget(korLoseLabel)
 loserScreen.add_widget(playAgainButtonLose)
 sm.add_widget(screen)
 sm.add_widget(loserScreen)
