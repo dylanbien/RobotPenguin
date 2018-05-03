@@ -385,8 +385,10 @@ class Actor(ButtonBehavior, Image):
 		for actor in main.children[0].children:
 			if ('Player' in actor.source): prey = 81 - main.children[0].children.index(actor)
 		for hunter in main.children[0].children:
-			if ('Bear' in hunter.source): bears.append(81 - main.children[0].children.index(hunter)); continue
-			if ('Bear' in hunter.source): bears.append(81 - main.children[0].children.index(hunter)); break
+			if ('Bear' in hunter.source): bears.append(81 - main.children[0].children.index(hunter))
+		for hunter in main.children[0].children:	
+			if ('Bear' in hunter.source): bears.append(81 - main.children[0].children.index(hunter))
+		print (bears)
 		if (len(bears) > 1): turn += 1
 		for obstacle in main.children[0].children:
 			if ('Player' not in obstacle.source and 'Bear' not in obstacle.source and 'Transparent' not in obstacle.source and 'Jewel' not in obstacle.source): loc = (81 - main.children[0].children.index(obstacle)); obstacles.append((loc % 9  if (loc % 9 != 0) else 9, math.ceil(loc / 9)))
@@ -406,27 +408,31 @@ class Actor(ButtonBehavior, Image):
 		print ('obstacles are here:')
 		print (obstacles)
 		prevPos = main.children[0].children[81 - position].source
-		if (not canX and not canY and reverse): exec(reverse); return
+		if (not canX and not canY and reverse): return #exec(reverse); return
 		if (hunterRow > preyRow and canY):
 			main.children[0].children[81 - position].moveUp()
+			print ('moved up')
 			reverse = 'main.children[0].children[81 - position].moveDown()'
 			#return
 		elif (hunterRow < preyRow and canY):
 			main.children[0].children[81 - position].moveDown()
+			print ('moved down')
 			reverse = 'main.children[0].children[81 - position].moveUp()'
 			#return
 		else:
 			if (hunterCol < preyCol and canX):
 				main.children[0].children[81 - position].moveRight()
+				print ('moved right')
 				reverse = 'main.children[0].children[81 - position].moveLeft()'
 				#return
 			elif (hunterCol > preyCol and canX):
 				main.children[0].children[81 - position].moveLeft()
+				print ('moved left')
 				reverse = 'main.children[0].children[81 - position].moveRight()'
 				#return
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner' and justGeared): print('lost through towards method'); self.clearGear(); Clock.schedule_once(self.loser, 1); return #sm.current = 'Loser'
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner'): print('lost through towards method'); Clock.schedule_once(self.loser, 1); return
-		if (prevPos == main.children[0].children[81 - position].source): main.children[0].children[81 - position].source = 'ICON_Bear_Flash.png'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash(), 0.25);
+		if (prevPos == main.children[0].children[81 - position].source): main.children[0].children[81 - position].source = 'ICON_Bear_Flash.png'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash(), 0.1);
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
