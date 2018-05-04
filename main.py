@@ -1,7 +1,8 @@
 # ////////////////////////////////////////////////////////////////
 # //					 IMPORT STATEMENTS						//
 # ////////////////////////////////////////////////////////////////
-
+from kivy.config import Config
+Config.set('graphics', 'fullscreen', '0')
 from kivy.app import App
 from kivy.uix import togglebutton
 from kivy.uix.widget import Widget
@@ -28,7 +29,7 @@ def queue(command):
 	commands.append(command)
 	name = command.replace(' ','')
 	name.upper()
-	imageQueue.add_widget(Image(source = name + '.png'))
+	imageQueue.add_widget(Image(source = name + '.jpg'))
 	
 
 def execute(): # pause PLEASE 제발
@@ -45,7 +46,7 @@ def send(command, retry = 2):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	# Connect the socket to the port where the server is listening
-	server_address = ip.server_address
+	server_address = ip.main_address
 	print('main connecting to {} port {}'.format(*server_address))
 	
 	try:
@@ -75,7 +76,7 @@ def pause():
 					 'y' : 157 / Window.height},
 		content = leftLay)
 
-	leftImage = Image(source = 'CARD_Left.png',
+	leftImage = Image(source = 'CARD_Left.jpg',
 					  keep_ratio = True,
 					  size_hint = (1.5, 1.945),
 					  pos = (-78.95, 174.75))
@@ -171,7 +172,7 @@ class MainScreen(Screen):
 						 'y' : 157 / Window.height},
 			content = leftLay)
 
-		leftImage = Image(source = 'CARD_Left.png',
+		leftImage = Image(source = 'CARD_Left.jpg',
 						  keep_ratio = True,
 						  size_hint = (1.5, 1.945),
 						  pos = (-78.95, 174.75))
@@ -192,7 +193,7 @@ class MainScreen(Screen):
 						 'y' : 157.5 / Window.height},
 			content = upLay)
 
-		upImage = Image(source = 'CARD_Up.png',
+		upImage = Image(source = 'CARD_Up.jpg',
 						  keep_ratio = True,
 						  size_hint = (1.5, 1.945),
 						  pos = (381.75, 174.75))
@@ -212,7 +213,7 @@ class MainScreen(Screen):
 						 'y' : 157.5 / Window.height},
 			content = downLay)
 
-		downImage = Image(source = 'CARD_Down.png',
+		downImage = Image(source = 'CARD_Down.jpg',
 						  keep_ratio = True,
 						  size_hint = (1.5, 1.945),
 						  pos = (842.5, 174.75))
@@ -232,7 +233,7 @@ class MainScreen(Screen):
 						 'y' : 157 / Window.height},
 			content = rightLay)
 
-		rightImage = Image(source = 'CARD_Right.png',
+		rightImage = Image(source = 'CARD_Right.jpg',
 						  keep_ratio = True,
 						  size_hint = (1.5, 1.945),
 						  pos = (1303.5, 174.75))
@@ -246,7 +247,7 @@ imageQueue = BoxLayout(padding = 15, size_hint=(.825, None), height = 150, pos_h
 border = Image(source = 'rectangle.png', allow_stretch = True, keep_ratio = False, pos = (Window.width * 0, Window.height * 1.4), size_hint_y = None, height = Window.height * .3, size_hint_x = None, width = Window.width * 1.975)
 				
 #for i in range(10):
-	#queue.add_widget(Image(source='LEFT.png'))
+	#queue.add_widget(Image(source='LEFT.jpg'))
 
 main.add_widget(imageQueue)
 main.add_widget(border)

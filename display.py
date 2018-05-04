@@ -122,19 +122,19 @@ def reset(dif):
 	for actor in main.children[0].children:
 		if (actor.id == 'actor' + str(locs[0])):
 			print ('player is ' + str(locs[0]))
-			actor.source = 'ICON_Player.png'
+			actor.source = 'ICON_Player.jpg'
 			
 		if (actor.id == 'actor' + str(obstacles[0])):
 			print ('jewel/wrench is ' + str(obstacles[0]))
-			actor.source = 'ICON_Jewel.png'
+			actor.source = 'ICON_Jewel.jpg'
 			
 		if (actor.id == 'actor' + str(obstacles[1])):
 			print ('igloo is ' + str(obstacles[1]))
-			actor.source = 'ICON_Igloo.png'
+			actor.source = 'ICON_Igloo.jpg'
 		
 		if (actor.id == 'actor' + str(obstacles[2])):
 			print ('gear is ' + str(obstacles[2]))
-			actor.source = 'ICON_Gear.png'
+			actor.source = 'ICON_Gear.jpg'
 			
 	while testIndex < 81:
 		for actor in main.children[0].children:
@@ -146,27 +146,27 @@ def reset(dif):
 		for actor in main.children[0].children:
 			if (actor.id == 'actor' + str(obstacles[3])):
 				print ('igloo is ' + str(obstacles[3]))
-				actor.source = 'ICON_Igloo.png'
+				actor.source = 'ICON_Igloo.jpg'
 				
 			if (actor.id == 'actor' + str(obstacles[4])):
 				print ('igloo is ' + str(obstacles[4]))
-				actor.source = 'ICON_Igloo.png'
+				actor.source = 'ICON_Igloo.jpg'
 		
 		if len(possible) > 0: pos = random.sample(range(0, len(possible)), 2) #pos = random.randint(0, len(possible) - 1)
 		else: pos = 0
 		print ('pos is ' + str(pos) + ', will be set here ' + str(possible[pos[0]]) + ' and' + str(possible[pos[1]]))
 		
 		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(possible[pos[0]])): actor.source = 'ICON_Bear.png'; print ('have set'); break
+			if (actor.id == 'actor' + str(possible[pos[0]])): actor.source = 'ICON_Bear.jpg'; print ('have set'); break
 		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(possible[pos[1]])): actor.source = 'ICON_Bear_2.png'; print ('have set'); break
+			if (actor.id == 'actor' + str(possible[pos[1]])): actor.source = 'ICON_Bear_2.jpg'; print ('have set'); break
 	else:
 		if len(possible) > 0: pos = random.randint(0, len(possible) - 1)
 		else: pos = 0
 		print ('pos is ' + str(pos) + ', will be set here ' + str(possible[pos]))
 		
 		for actor in main.children[0].children:
-			if (actor.id == 'actor' + str(possible[pos])): actor.source = 'ICON_Bear.png'; print ('have set'); break
+			if (actor.id == 'actor' + str(possible[pos])): actor.source = 'ICON_Bear.jpg'; print ('have set'); break
 		
 	sm.current = 'main'
 	
@@ -175,7 +175,7 @@ def reset(dif):
 # //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
 # //							LOAD KIVY FILE								//			
 # ////////////////////////////////////////////////////////////////////////////
-# all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.png', 'ICON_Wrench.png', etc.
+# all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.jpg', 'ICON_Wrench.jpg', etc.
 class MainScreen(Screen):
 	def exitProgram(self, obj):
 		App.get_running_app().stop()
@@ -275,37 +275,37 @@ class Actor(ButtonBehavior, Image):
 			x = random.randint(1, 81)
 			for actor in main.children[0].children:
 				if (str(x) in actor.id and 'Transparent' in actor.source and x not in gears):
-					actor.source = 'ICON_Gear.png'; print ('gear was set at actor ' + actor.id); gears.append(x); unset = False; return
+					actor.source = 'ICON_Gear.jpg'; print ('gear was set at actor ' + actor.id); gears.append(x); unset = False; return
 					
 	def clearGear(self):
 		for actor in main.children[0].children:
 			if ('Gear' in actor.source): actor.source = 'ICON_Transparent.png'
 	
 	def unflash(self, arg):
-		if ('two' in arg): self.source = 'ICON_Bear_2.png'
-		else: self.source = 'ICON_Bear.png'
+		if ('two' in arg): self.source = 'ICON_Bear_2.jpg'
+		else: self.source = 'ICON_Bear.jpg'
 	
 	def rotateDegrees(self, location, degrees):
 		if (sm.current != 'main'): return
 		for actor in main.children[0].children:
 			if (actor.id == location and 'Player' in actor.source):
-				if (degrees == 0 or degrees == 360 or degrees % 90 != 0): actor.source = 'ICON_Player.png'
-				elif (degrees > 360): actor.source = 'ICON_Player_' + str(degrees%360) + '.png'
-				else: actor.source = 'ICON_Player_' + str(degrees) + '.png'
+				if (degrees == 0 or degrees == 360 or degrees % 90 != 0): actor.source = 'ICON_Player.jpg'
+				elif (degrees > 360): actor.source = 'ICON_Player_' + str(degrees%360) + '.jpg'
+				else: actor.source = 'ICON_Player_' + str(degrees) + '.jpg'
 				
 	def rotateDirection(self, direction):
 		if (sm.current != 'main'): return
-		if (direction == 'left' and self.source == 'ICON_Player.png'): 
-			self.source = 'ICON_Player_270.png'
+		if (direction == 'left' and self.source == 'ICON_Player.jpg'): 
+			self.source = 'ICON_Player_270.jpg'
 			return
-		elif (direction == 'right' and self.source == 'ICON_Player.png'):
-			self.source = 'ICON_Player_90.png'
+		elif (direction == 'right' and self.source == 'ICON_Player.jpg'):
+			self.source = 'ICON_Player_90.jpg'
 			return
 		else:
 			degree = int(self.source.strip(string.ascii_letters + string.punctuation))
-			if (direction == 'left'): self.source = 'ICON_Player_' + str(((degree + 270) % 360)) + '.png'
-			else: self.source = 'ICON_Player_' + str(((degree + 90) % 360)) + '.png'
-			if (self.source == 'ICON_Player_0.png'): self.source = 'ICON_Player.png'
+			if (direction == 'left'): self.source = 'ICON_Player_' + str(((degree + 270) % 360)) + '.jpg'
+			else: self.source = 'ICON_Player_' + str(((degree + 90) % 360)) + '.jpg'
+			if (self.source == 'ICON_Player_0.jpg'): self.source = 'ICON_Player.jpg'
 	
 	def move(self, next):
 		global canWin
@@ -434,8 +434,8 @@ class Actor(ButtonBehavior, Image):
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner' and justGeared): print('lost through towards method'); self.clearGear(); Clock.schedule_once(self.loser, 1); return #sm.current = 'Loser'
 			elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner'): print('lost through towards method'); Clock.schedule_once(self.loser, 1); return
 		if (prevPos == main.children[0].children[81 - position].source): 
-			if ('Bear_2' in main.children[0].children[81 - position].source): main.children[0].children[81 - position].source = 'ICON_Bear_Flash.png'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash('two'), 0.1)
-			else: main.children[0].children[81 - position].source = 'ICON_Bear_Flash.png'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash('one'), 0.1)
+			if ('Bear_2' in main.children[0].children[81 - position].source): main.children[0].children[81 - position].source = 'ICON_Bear_Flash.jpg'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash('two'), 0.1)
+			else: main.children[0].children[81 - position].source = 'ICON_Bear_Flash.jpg'; Clock.schedule_once(lambda dt: main.children[0].children[81 - position].unflash('one'), 0.1)
 # ////////////////////////////////////////////////////////////////
 # //															//
 # //						  POPUPS							//
@@ -478,7 +478,7 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 # //					 CREATE GRID/ACTORS						//
 # ////////////////////////////////////////////////////////////////
 grid = GridLayout(id = 'grid', cols = 9, rows = 9, padding = 15, spacing = 1.5)
-bg = Image(source = 'BG.png', size_hint = [1, 1])
+bg = Image(source = 'BG.jpg', size_hint = [1, 1])
 for i in range (0, grid.cols*grid.rows):
 	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
 	grid.add_widget(b)
@@ -488,10 +488,10 @@ main.add_widget(bg)
 main.add_widget(grid)
 sm.add_widget(main)
 screen = Screen(name = "Winner")
-youWinner = Image(source = 'winner.png')
+youWinner = Image(source = 'winner.jpg')
 screen.add_widget(youWinner)
 loserScreen = Screen(name = "Loser")
-youLoser = Image(source = 'loser.png')
+youLoser = Image(source = 'loser.jpg')
 loserScreen.add_widget(youLoser)
 winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
 scoreLabel = Label(text = '', font_size = 16, pos = (0, 350))
@@ -516,19 +516,19 @@ sm.add_widget(screen)
 sm.add_widget(loserScreen)
 for actor in main.children[0].children:
 	if (actor.id == 'actor32'):
-		actor.source = 'ICON_Player.png'
+		actor.source = 'ICON_Player.jpg'
 		
 	if (actor.id == 'actor17'):
-		actor.source = 'ICON_Igloo.png'
+		actor.source = 'ICON_Igloo.jpg'
 		
 	if (actor.id == 'actor54'):
-		actor.source = 'ICON_Gear.png'
+		actor.source = 'ICON_Gear.jpg'
 		
 	if (actor.id == 'actor80'):
-		actor.source = 'ICON_Jewel.png'
+		actor.source = 'ICON_Jewel.jpg'
 	
 	if (actor.id == 'actor74'):
-		actor.source = 'ICON_Bear.png'
+		actor.source = 'ICON_Bear.jpg'
 	
 
 # ////////////////////////////////////////////////////////////////
