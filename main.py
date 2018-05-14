@@ -32,7 +32,7 @@ def queue(command):
 	imageQueue.add_widget(Image(source = name + '.jpg'))
 	
 
-def execute(): # pause PLEASE 제발
+def execute(): # pause PLEASE
 	global commands
 	for command in commands:
 		send(command)
@@ -46,7 +46,7 @@ def send(command, retry = 2):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	# Connect the socket to the port where the server is listening
-	server_address = ip.main_address
+	server_address = ip.server_address
 	print('main connecting to {} port {}'.format(*server_address))
 	
 	try:
