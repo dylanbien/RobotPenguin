@@ -45,7 +45,7 @@ gears = []
 highScore = 2
 score = 0
 sm = ScreenManager()
-Window.size = (939, 939)
+Window.size = (1252, 1252)
 
 class MyApp(App):
 	def build(self):
@@ -116,7 +116,7 @@ def reset(dif):
 	print (obstacles)
 		 
 	for i in range (0, grid.cols*grid.rows):
-		b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
+		b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [1, 1])
 		grid.add_widget(b)
 		
 	for actor in main.children[0].children:
@@ -477,10 +477,10 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 # ////////////////////////////////////////////////////////////////
 # //					 CREATE GRID/ACTORS						//
 # ////////////////////////////////////////////////////////////////
-grid = GridLayout(id = 'grid', cols = 9, rows = 9, padding = 15, spacing = 1.5)
+grid = GridLayout(id = 'grid', cols = 9, rows = 9, padding = 15, spacing = 1.5, height = 1252, width = 1252)
 bg = Image(source = 'BG.jpg', size_hint = [1, 1])
 for i in range (0, grid.cols*grid.rows):
-	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [None, None])
+	b = Actor(id = 'actor' + str(i+1), source = 'ICON_Transparent.png', size_hint = [1, 1])
 	grid.add_widget(b)
 
 main = MainScreen(name = 'main')
@@ -497,13 +497,13 @@ winLabel = Label(text = 'You win!', font_size = 64, pos = (0, 400))
 scoreLabel = Label(text = '', font_size = 16, pos = (0, 350))
 loseLabel = Label(text = 'You lost.', font_size = 64, pos = (0, 400))
  
-playAgainButton = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
+playAgainButton = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (Window.width*.4, 0))
 playAgainButton.bind(on_press = lambda x: reset('normal'))  
 
-playAgainButtonHard = Button(text = 'Make it harder?', size_hint = (0.2, 0.1), pos = (700, 800))
+playAgainButtonHard = Button(text = 'Make it harder?', size_hint = (0.2, 0.1), pos = (Window.width*.75, Window.height*.85))
 playAgainButtonHard.bind(on_press = lambda x: reset('hard'))  
 
-playAgainButtonLose = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (375, 0))
+playAgainButtonLose = Button(text = 'Play again?', size_hint = (0.2, 0.1), pos = (Window.width*.4, 0))
 playAgainButtonLose.bind(on_press = lambda x: reset('normal'))
 
 screen.add_widget(winLabel)

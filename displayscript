@@ -1,0 +1,4 @@
+#!/bin/bash
+clear
+gnome-terminal -e 'python simpleserver.py'
+gnome-terminal -e 'python display.py'
