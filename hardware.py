@@ -7,6 +7,10 @@ import sys
 import ip
 
 da = DeltaArm.DeltaArm(0,1,2)
+current = (0, 0, 0)
+direction = 0
+#0 is up, 90 is right, 180 is down, 270 is left
+
 
 def obey(self, retry = 5):
 	data = ''
@@ -29,20 +33,44 @@ def obey(self, retry = 5):
 		return
 	print('received {!r}'.format(data))
 	if (data == 'forward '):
-		main.playerForward()
+		if (direction%360 == 0):
+			current[1] += 1
+			da.move_to_point(current)
+		elif (direction%360 == 90):
+			current[0] += 1
+			da.move_to_point(current)
+		elif (direction%360 == 180):
+			current[1] -= 1
+			da.move_to_point(current)
+		elif (direction%360 == 270):
+			current[0] -= 1
+			da.move_to_point(current)
 	elif (data == 'backward '):
-		main.playerBackward()
+		if (direction%360 == 0):
+			current[1] -= 1
+			da.move_to_point(current)
+		elif (direction%360 == 90):
+			current[0] -= 1
+			da.move_to_point(current)
+		elif (direction%360 == 180):
+			current[1] += 1
+			da.move_to_point(current)
+		elif (direction%360 == 270):
+			current[0] += 1
+			da.move_to_point(current)
 	elif (data == 'left '):
-		main.playerRotate('left')
+		direction += 270
+		#spin to win
 	elif (data == 'right '):
-		main.playerRotate('right')
+		direction += 90
+		#spin to win
 	else:
 		print ('fail')
 		return
 
 class MyApp(App):
 	def build(self):
-		pass
+		Clock.schedule_interval(obey, .1)
 
 
 
