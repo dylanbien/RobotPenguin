@@ -5,6 +5,7 @@
 import socket
 import sys
 import ip
+import hardwareip
 from threading import Timer
 from time import sleep
 
@@ -38,7 +39,7 @@ class RepeatedTimer(object):
 def obey(retry = 5):
 	data = ''
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	server_address = ('172.17.17.116', 10009)
+	server_address = hardwareip.server_address
 	print('connecting to {} port {}'.format(*server_address))
 	sock.connect(server_address)
 	print('i am hardware.py')
