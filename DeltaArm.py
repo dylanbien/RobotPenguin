@@ -1,6 +1,12 @@
 import Slush
 import math
 import time
+import sys
+sys.path.insert(0, "/home/pi/Documents/RaspberryPiCommon/pidev")
+from stepper import stepper
+sys.path.insert(0,'/home/pi/Adafruit_Python_PCA9685/Adafruit_PCA9685')
+from PCA9685 import PCA9685
+
 
 class DeltaArm:
 
@@ -19,31 +25,47 @@ class DeltaArm:
 
     def __init__(self, c1, c2, c3):
         self.board = Slush.sBoard()
-        self.motors = [Slush.Motor(c1),Slush.Motor(c2),Slush.Motor(c3)]
-        for m in self.motors:
-            m.setCurrent(20,100,100,100)
-            m.setAccel(750)
-            m.setMaxSpeed(750)
-            m.setLimitHardStop(0)
+        self.motors = [stepper(port = c1, micro_steps = 32, speed = 1000/8),
+                    stepper(port = c2, micro_steps = 32, speed = 1000/8),
+                     stepper(port = c3, micro_steps = 32, speed = 1000/8)]
+        self.rotator = stepper(port = 3, micro_steps = 128, speed = 1000)
+        
+        
 
     def home_all(self):
-        for m in self.motors:
-            while m.isBusy():
-                continue
-            m.goUntilPress(0,0,5000)
-         
+        for mtr in self.motors:
+            mtr.goUntilPress(0,1,5000)
+            print(self.get_position(0))
+            print(self.get_position(1))
+            print(self.get_position(2))
+            print('done')
 
 
     def set_single_position_steps(self,num,pos):
         while self.motors[num].isBusy():
             continue
-        self.motors[num].goTo(pos)
+        '''
+        if pos == 0:
+            self.motors[num].home(1)
+            return
+        '''    
+        self.motors[num].go_to_position(pos)
+        print(self.get_position(0))
+        print(self.get_position(1))
+        print(self.get_position(2))
+        
 
     def set_all_to_same_position(self,val): 
         for i in range(3):
             self.set_single_position_steps(i,val)
 
+    def rotator_home(self):
+        self.rotator.goUntilPress(0,1,1000)
+    
+    def rel_move(self, amount):
+        self.rotator.relative_move(amount)
 
+        
     def set_single_angle(self,num,ang):
         val = int(self.angle_to_position(num, ang))
         self.set_single_position_steps(num,val)
@@ -240,6 +262,11 @@ class DeltaArm:
                 rCurr =  math.sqrt(deltatemp[0]**2 + deltatemp[1]**2 + deltatemp[2]**2)
             
         self.move_to_point(x,y,z)
+
+
+     
+
+
 
 
      
