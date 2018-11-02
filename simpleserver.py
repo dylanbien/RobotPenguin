@@ -1,5 +1,4 @@
 import socket
-import sys
 import ip
 send = False
 # Create a TCP/IP socket

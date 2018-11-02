@@ -1,6 +1,4 @@
 import socket
-import sys
-import ip
 import hardwareip
 send = False
 # Create a TCP/IP socket
