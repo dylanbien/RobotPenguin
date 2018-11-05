@@ -103,7 +103,7 @@ def pause():
                               'y': 157 / Window.height},
                     content=leftLay)
 
-    leftImage = Image(source='CARD_Left.jpg',
+    leftImage = Image(source='cards/CARD_Left.jpg',
                       keep_ratio=True,
                       size_hint=(1.5, 1.945),
                       pos=(-78.95, 174.75))
@@ -209,7 +209,7 @@ class MainScreen(Screen):
                                   'y': 157 / Window.height},
                         content=leftLay)
 
-        leftImage = Image(source='CARD_Left.jpg',
+        leftImage = Image(source='cards/CARD_Left.jpg',
                           keep_ratio=True,
                           size_hint=(1.5, 1.945),
                           pos=(-78.95, 174.75))
@@ -229,7 +229,7 @@ class MainScreen(Screen):
                                 'y': 157.5 / Window.height},
                       content=upLay)
 
-        upImage = Image(source='CARD_Up.jpg',
+        upImage = Image(source='cards/CARD_Up.jpg',
                         keep_ratio=True,
                         size_hint=(1.5, 1.945),
                         pos=(381.75, 174.75))
@@ -249,7 +249,7 @@ class MainScreen(Screen):
                                   'y': 157.5 / Window.height},
                         content=downLay)
 
-        downImage = Image(source='CARD_Down.jpg',
+        downImage = Image(source='cards/CARD_Down.jpg',
                           keep_ratio=True,
                           size_hint=(1.5, 1.945),
                           pos=(842.5, 174.75))
@@ -269,7 +269,7 @@ class MainScreen(Screen):
                                    'y': 157 / Window.height},
                          content=rightLay)
 
-        rightImage = Image(source='CARD_Right.jpg',
+        rightImage = Image(source='cards/CARD_Right.jpg',
                            keep_ratio=True,
                            size_hint=(1.5, 1.945),
                            pos=(1303.5, 174.75))

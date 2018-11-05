@@ -111,25 +111,25 @@ def reset(dif):
     print(obstacles)
 
     for i in range(0, grid.cols * grid.rows):
-        b = Actor(id='actor' + str(i + 1), source='ICON_Transparent.png', size_hint=[1, 1])
+        b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
         grid.add_widget(b)
 
     for actor in main.children[0].children:
         if (actor.id == 'actor' + str(locs[0])):
             print('player is ' + str(locs[0]))
-            actor.source = 'ICON_Player.jpg'
+            actor.source = 'players/ICON_Player.jpg'
 
         if (actor.id == 'actor' + str(obstacles[0])):
             print('jewel/wrench is ' + str(obstacles[0]))
-            actor.source = 'ICON_Jewel.jpg'
+            actor.source = 'icons/ICON_Jewel.jpg'
 
         if (actor.id == 'actor' + str(obstacles[1])):
             print('igloo is ' + str(obstacles[1]))
-            actor.source = 'ICON_Igloo.jpg'
+            actor.source = 'icons/ICON_Igloo.jpg'
 
         if (actor.id == 'actor' + str(obstacles[2])):
             print('gear is ' + str(obstacles[2]))
-            actor.source = 'ICON_Gear.jpg'
+            actor.source = 'icons/ICON_Gear.jpg'
 
     while testIndex < 81:
         for actor in main.children[0].children:
@@ -142,11 +142,11 @@ def reset(dif):
         for actor in main.children[0].children:
             if (actor.id == 'actor' + str(obstacles[3])):
                 print('igloo is ' + str(obstacles[3]))
-                actor.source = 'ICON_Igloo.jpg'
+                actor.source = 'icons/ICON_Igloo.jpg'
 
             if (actor.id == 'actor' + str(obstacles[4])):
                 print('igloo is ' + str(obstacles[4]))
-                actor.source = 'ICON_Igloo.jpg'
+                actor.source = 'icons/ICON_Igloo.jpg'
 
         if len(possible) > 0:
             pos = random.sample(range(0, len(possible)), 2)  # pos = random.randint(0, len(possible) - 1)
@@ -183,7 +183,7 @@ class MainScreen(Screen):
 
     def resetBoard(self):
         for actor in self.children[0].children:
-            actor.source = 'ICON_Transparent.png'
+            actor.source = 'icons/ICON_Transparent.png'
 
     def addActor(self, location, type):
         for actor in self.children[0].children:
@@ -193,11 +193,11 @@ class MainScreen(Screen):
     def removeActor(self, location):
         for actor in self.children[0].children:
             if (actor.id == location):
-                actor.source = 'ICON_Transparent.png'
+                actor.source = 'icons/ICON_Transparent.png'
 
     def test(self):
         for actor in self.children[0].children:
-            if (actor.source != 'ICON_Transparent.png'):
+            if (actor.source != 'icons/ICON_Transparent.png'):
                 actor.random()
 
     def playerForward(self):
@@ -291,7 +291,7 @@ class Actor(ButtonBehavior, Image):
             x = random.randint(1, 81)
             for actor in main.children[0].children:
                 if (str(x) in actor.id and 'Transparent' in actor.source and x not in gears):
-                    actor.source = 'ICON_Gear.jpg';
+                    actor.source = 'icons/ICON_Gear.jpg';
                     print('gear was set at actor ' + actor.id);
                     gears.append(x);
                     unset = False;
