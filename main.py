@@ -29,67 +29,22 @@ def queue(command):
     commands.append(command)
     name = command.replace(' ', '')
     name.upper()
-    imageQueue.add_widget(Image(source=name + '.jpg'))
+    imageQueue.add_widget(Image(source= 'direction/' + name + '.jpg'))
 
 
 def execute():  # pause PLEASE
     global commands
     for command in commands:
         send(command)
-        hardwareSend(command)
         sleep(0.2)
     commands = []
     imageQueue.clear_widgets()
 
 
-def send(command, retry=2):
-    history.append(command)
-    # Create a TCP/IP socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Connect the socket to the port where the server is listening
-    server_address = ip.server_address
-    print('main connecting to {} port {}'.format(*server_address))
-
-    try:
-        # Send data
-        sock.connect(server_address)
-        message = command.encode()
-        print('sending {!r}'.format(message))
-        sock.sendall(message)
-
-    except OSError:
-        # Retry if retried less than two times
-        if (retry >= 0):
-            send(command, retry - 1)
-
-    finally:
-        print('please clap')
-        sock.close()
-
-
-def hardwareSend(command, retry=2):
-    # Create a TCP/IP socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Connect the socket to the port where the server is listening
-    server_address = hardwareip.server_address
-    print('main connecting to hardware {} port {}'.format(*server_address))
-
-    try:
-        # Send data
-        sock.connect(server_address)
-        message = command.encode()
-        print('sending to hardware {!r}'.format(message))
-        sock.sendall(message)
-
-    except OSError:
-        # Retry if retried less than two times
-        if (retry >= 0):
-            hardwareSend(command, retry - 1)
-
-    finally:
-        sock.close()
+'''
+def send(command, retry=2): #needs to be connected with the a server paul is writing
+    #code must be added
+'''
 
 
 def pause():
@@ -121,13 +76,12 @@ def clear():
 
 
 # ////////////////////////////////////////////////////////////////
-# //			DECLARE APP CLASS AND SCREENMANAGER				//
-# //					 LOAD KIVY FILE							//
+# //			DECLARE APP CLASS AND SCREENMANAGER	//
+# //					 LOAD KIVY FILE		//
 # ////////////////////////////////////////////////////////////////
 
 
 sm = ScreenManager()
-
 
 class MyApp(App):
     def build(self):
@@ -163,8 +117,8 @@ class MainScreen(Screen):
     def clearAction(self):
         clear()
 
-    # ////////////////////////////////////////////////////////////////
-    # //															//
+    # ////////////////////////////////////////////////////////////////     
+ # //														//
     # //						  POPUPS							//
     # //															//
     # ////////////////////////////////////////////////////////////////
@@ -285,8 +239,6 @@ border = Image(source='images/rectangle.png', allow_stretch=True, keep_ratio=Fal
                pos=(Window.width * 0, Window.height * 1.4), size_hint_y=None, height=Window.height * .3,
                size_hint_x=None, width=Window.width * 1.975)
 
-# for i in range(10):
-# queue.add_widget(Image(source='LEFT.jpg'))
 
 main.add_widget(imageQueue)
 main.add_widget(border)
