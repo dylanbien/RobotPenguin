@@ -1,5 +1,5 @@
 # ////////////////////////////////////////////////////////////////
-# //					 IMPORT STATEMENTS						//
+# //					 IMPORT STATEMENTS	//
 # ////////////////////////////////////////////////////////////////
 from kivy.config import Config
 
@@ -17,8 +17,8 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from time import sleep
 import socket
-import ip
-import hardwareip
+#import ip
+#import hardwareip
 
 commands = []
 history = []
@@ -117,10 +117,8 @@ class MainScreen(Screen):
     def clearAction(self):
         clear()
 
-    # ////////////////////////////////////////////////////////////////     
- # //														//
-    # //						  POPUPS							//
-    # //															//
+    # ////////////////////////////////////////////////////////////////         # //														//
+    # //						    POPUPS						                    //  		#   //															//
     # ////////////////////////////////////////////////////////////////
 
     def quitPopup(self):  # QUIT POPUP
