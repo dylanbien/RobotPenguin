@@ -35,6 +35,8 @@ highScore = 2
 score = 0
 sm = ScreenManager()
 Window.size = (1252, 1252)
+
+
 da = DeltaArm.DeltaArm(0, 1, 2)
 current = (0, 0, 0)
 direction = 0
@@ -44,40 +46,6 @@ class MyApp(App):
        #Clock.schedule_interval(obey, .1)
         return sm
 
-'''
-def obey(self, retry=5):
-    data = ''
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_address = ip.server_address
-    print('connecting to {} port {}'.format(*server_address))
-    sock.connect(server_address)
-    print('i am display.py')
-    sock.sendall(b'?')
-    spaceReceived = False
-    try:
-        while (not spaceReceived):
-            request = sock.recv(16).decode()
-            data += request
-            if (' ' in data): spaceReceived = True
-    except OSError:
-        if (retry >= 0): obey(retry - 1)
-
-    if (data == 'bupkis '):
-        return
-    print('received {!r}'.format(data))
-    if (data == 'forward '):
-        main.playerForward()
-    elif (data == 'backward '):
-        main.playerBackward()
-    elif (data == 'left '):
-        main.playerRotate('left')
-    elif (data == 'right '):
-        main.playerRotate('right')
-    else:
-        print('fail')
-        return
-
-'''
 def quitAll():
     quit()
 
@@ -100,48 +68,61 @@ def reset(dif):
     possible = []
     test = random.sample(range(1, 82), 81)
     locs = random.sample(range(1, 82), 4)
-    banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10, locs[0] + 8,
-              locs[0]]
+    
+    banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10,     locs[0] + 8,
+              locs[0]] #8 spots around the penguin
+
+'''
+
+                b     b a n    
+                a loc[0]  n
+                n n e d   e
+
+'''
+
     edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 28, 37, 46, 55, 64, 73, 74, 75, 76, 77, 78, 79, 80, 81, 18, 27, 36, 45,
              54, 63, 72]  # will sometimes contain locations of other things
     obstacles = []
 
     while len(obstacles) < 5:
-        x = random.randint(1, 81)
-        if x not in edges and x != locs[0]:
-            obstacles.append(x)
-            edges.append(x)  # add edges of x
+        x = random.randint(1, 81) #random integer from 1-81
+        if x not in edges and x != locs[0]: #checks if it is an edge and not at 0
+            obstacles.append(x) #adds the random number to obstacles list
+            edges.append(x)  # adds x to edges (why??? need to understand why: Dylan B)
     print(obstacles)
 
-    for i in range(0, grid.cols * grid.rows):
+    for i in range(0, grid.cols * grid.rows): #resets all 81 grids to transparent
         b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
         grid.add_widget(b)
 
     for actor in main.children[0].children:
-        if (actor.id == 'actor' + str(locs[0])):
+
+        if (actor.id == 'actor' + str(locs[0])):  #assigns players id to actor + random location 
             print('player is ' + str(locs[0]))
             actor.source = 'players/ICON_Player.jpg'
 
-        if (actor.id == 'actor' + str(obstacles[0])):
+        if (actor.id == 'actor' + str(obstacles[0])):  # assigns jewels id to actor + obstacle
             print('jewel/wrench is ' + str(obstacles[0]))
             actor.source = 'icons/ICON_Jewel.jpg'
 
-        if (actor.id == 'actor' + str(obstacles[1])):
+        if (actor.id == 'actor' + str(obstacles[1])): # assigns igloo id to actor + obstacle
             print('igloo is ' + str(obstacles[1]))
             actor.source = 'icons/ICON_Igloo.jpg'
 
-        if (actor.id == 'actor' + str(obstacles[2])):
+        if (actor.id == 'actor' + str(obstacles[2])):  # assigns gear id to actor + obstacle
             print('gear is ' + str(obstacles[2]))
             actor.source = 'icons/ICON_Gear.jpg'
 
-    while testIndex < 81:
+    while testIndex < 81: #goes through values 0-81
         for actor in main.children[0].children:
             print('test index first ' + str(testIndex) + ' number is ' + str(test[testIndex]))
             if ('Transparent' in actor.source and test[testIndex] not in banned and str(
                 test[testIndex]) in actor.id): possible.append(test[testIndex]); break
         testIndex += 1
     print(possible)
-    if ('hard' in difficulty):
+
+
+    if ('hard' in difficulty):  #places the players if difficulty is 'hard'
         for actor in main.children[0].children:
             if (actor.id == 'actor' + str(obstacles[3])):
                 print('igloo is ' + str(obstacles[3]))
@@ -177,30 +158,8 @@ def reset(dif):
 
 #Combined hardware.py functions
 def obey_paul(retry=5):
-    data = ''
-    '''
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_address = hardwareip.server_address
-    print('connecting to {} port {}'.format(*server_address))
-    sock.connect(server_address)
-    print('i am hardware.py')
-    sock.sendall(b'?')
-    spaceReceived = False
-    '''
-    try:
-        while (not spaceReceived):
-            request = sock.recv(16).decode()
-            data += request
-            if (' ' in data): spaceReceived = True
-    except OSError:
-        if (retry >= 0): obey(retry - 1)
-
-    if (data == 'bupkis '):
-        return
-
-    print('received {!r}'.format(data))
-
-    if (data == 'forward '):
+    
+    if (data == 'forward '): #recieves forward
         if (direction % 360 == 0):
             current[1] += 1
             da.move_to_point(current)
@@ -213,7 +172,10 @@ def obey_paul(retry=5):
         elif (direction % 360 == 270):
             current[0] -= 1
             da.move_to_point(current)
-    elif (data == 'backward '):
+
+        main.playerForward()
+
+    elif (data == 'backward '): #recieves backwards
         if (direction % 360 == 0):
             current[1] -= 1
             da.move_to_point(current)
@@ -226,12 +188,20 @@ def obey_paul(retry=5):
         elif (direction % 360 == 270):
             current[0] += 1
             da.move_to_point(current)
-    elif (data == 'left '):
+
+       main.playerBackward()
+
+    elif (data == 'left '): #receives left
         direction += 270
-    # spin to win
-    elif (data == 'right '):
+
+        main.playerRotate('left')
+
+
+    elif (data == 'right '): #revieves right
         direction += 90
-    # spin to win
+        
+        main.playerRotate('right')
+
     else:
         print('fail')
         return
@@ -251,7 +221,8 @@ def obey_paul(retry=5):
 
 #These handle the visual component of all of the things that happen in the obey() function
 
-# all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.jpg', 'ICON_Wrench.jpg', etc.
+# all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.jpg', 'ICON_Wrench.jpg', etc.]
+
 class MainScreen(Screen):
     def exitProgram(self):
         App.get_running_app().stop()
@@ -276,6 +247,14 @@ class MainScreen(Screen):
         for actor in self.children[0].children:
             if (actor.source != 'icons/ICON_Transparent.png'):
                 actor.random()
+    
+   '''
+   the below move the actor
+   they get called in the obey function
+   tehy call functions in the actor class
+
+
+   '''
 
     def playerForward(self):
         print('you have moved the player forwards or something')
@@ -297,6 +276,9 @@ class MainScreen(Screen):
             if ('Player' in actor.source):
                 actor.rotateDirection(direction)
                 return
+   #done with calls to actor
+
+
 
     def huntPlayer(self):
         global difficulty
@@ -315,8 +297,9 @@ class MainScreen(Screen):
                     break
 
 
-class Actor(ButtonBehavior, Image):
-    def on_press(self):
+class Actor(ButtonBehavior, Image): #creates an actor class
+
+    def on_press(self): #when button is pressed
         print('pressed')
 
     def test(self):
@@ -324,6 +307,11 @@ class Actor(ButtonBehavior, Image):
         self.rotate(self.id, 90 * random.randint(0, 3))
         self.moveForward()
 
+
+   '''
+    below are called above in the main class
+
+   '''  
     def moveForward(self):
         if ('90' in self.source):
             self.moveRight(); main.huntPlayer(); return
@@ -343,6 +331,8 @@ class Actor(ButtonBehavior, Image):
             self.moveRight(); main.huntPlayer(); return
         else:
             self.moveDown(); main.huntPlayer(); return
+
+
 
     def loser(self, *args):
         app = App.get_running_app()
@@ -567,10 +557,8 @@ class Actor(ButtonBehavior, Image):
                 main.children[0].children[81 - position].source = 'icons/ICON_Bear_Flash.jpg'; Clock.schedule_once(
                     lambda dt: main.children[0].children[81 - position].unflash('one'), 0.1)
 
-    # ////////////////////////////////////////////////////////////////
-    # //															//
-    # //						  POPUPS							//
-    # //															//
+# ////////////////////////////////////////////////////////////////   # //															//
+# //						  POPUPS							// # //															//
     # ////////////////////////////////////////////////////////////////
 
     def quitPop(self):  # QUIT POPUP
@@ -605,25 +593,38 @@ class Actor(ButtonBehavior, Image):
 
 # Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
+
 # ////////////////////////////////////////////////////////////////
-# //					 CREATE GRID/ACTORS						//
+# //					 CREATE GRID/ACTORS	//
 # ////////////////////////////////////////////////////////////////
-grid = GridLayout(id='grid', cols=9, rows=9, padding=15, spacing=1.5, height=1252, width=1252)
+
+#creates a 9 * 9 grid
+grid = GridLayout(id='grid', cols=9, rows=9, padding=15, spacing=1.5, height=1252, width=1252) 
+
+#sets the background image 
 bg = Image(source='images/BG.jpg', size_hint=[1, 1])
-for i in range(0, grid.cols * grid.rows):
+
+for i in range(0, grid.cols * grid.rows): #adds the transparent image to all 81 boxes
     b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
     grid.add_widget(b)
 
-main = MainScreen(name='main')
-main.add_widget(bg)
-main.add_widget(grid)
+main = MainScreen(name='main') #creates a main screen
+main.add_widget(bg) #adds background to the screen
+main.add_widget(grid) #adds grid to the scren
+
 sm.add_widget(main)
+
+#creates winner screen
 screen = Screen(name="Winner")
 youWinner = Image(source='winner/winner.jpg')
 screen.add_widget(youWinner)
+
+#creates loser screen
 loserScreen = Screen(name="Loser")
 youLoser = Image(source='loser/loser.jpg')
 loserScreen.add_widget(youLoser)
+
+#creates labels
 winLabel = Label(text='You win!', font_size=64, pos=(0, 400))
 scoreLabel = Label(text='', font_size=16, pos=(0, 350))
 loseLabel = Label(text='You lost.', font_size=64, pos=(0, 400))
@@ -648,7 +649,9 @@ loserScreen.add_widget(loseLabel)
 #loserScreen.add_widget(playAgainButtonLose)
 sm.add_widget(screen)
 sm.add_widget(loserScreen)
-for actor in main.children[0].children:
+
+
+for actor in main.children[0].children: #creates an array with the actors
     if (actor.id == 'actor32'):
         actor.source = 'icons/ICON_Player.jpg'
 
