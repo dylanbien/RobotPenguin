@@ -6,7 +6,7 @@ import random
 import socket
 import sys
 import math
-import ip
+#import ip
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -38,10 +38,10 @@ Window.size = (1252, 1252)
 
 class MyApp(App):
     def build(self):
-        Clock.schedule_interval(obey, .1)
+       #Clock.schedule_interval(obey, .1)
         return sm
 
-
+'''
 def obey(self, retry=5):
     data = ''
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -74,7 +74,7 @@ def obey(self, retry=5):
         print('fail')
         return
 
-
+'''
 def quitAll():
     quit()
 
