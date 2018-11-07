@@ -233,9 +233,9 @@ class MainScreen(Screen):
 
 main = MainScreen(name='main')
 imageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
-border = Image(source='images/rectangle.png', allow_stretch=True, keep_ratio=False,
-               pos=(Window.width * 0, Window.height * 1.4), size_hint_y=None, height=Window.height * .3,
-               size_hint_x=None, width=Window.width * 1.975)
+#border = Image(source='images/rectangle.png', allow_stretch=True, keep_ratio=False,
+            #   pos=(Window.width * 0, Window.height * 1.4), size_hint_y=None, height=Window.height * .3,
+             #  size_hint_x=None, width=Window.width * 1.975)
 
 
 main.add_widget(imageQueue)

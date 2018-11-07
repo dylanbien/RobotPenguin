@@ -3,11 +3,14 @@
 	id: main1
     GridLayout:
 		id: grid
-        cols: 3
-        rows: 3
+        cols: 9
+        rows: 9
         minimum_size: 300, 300
         padding: 10
         spacing: 1
+
+	FloatLayout:
+		orietnation: 'horizontal'     
 
 # BUTTON DECLARATIONS
         Button:
@@ -31,7 +34,7 @@
 				rotation: 0
 				pos: self.parent.x, self.parent.y
 				Image:
-					source: 'ICON_Bear.png'
+					source: 'icons/ICON_Bear.jpg'
 					size_hint: None, None
 		
 		Button:
