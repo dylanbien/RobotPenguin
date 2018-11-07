@@ -20,8 +20,7 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.uix.behaviors import ButtonBehavior
 
-sys.path.insert(0, 'loser/')
-sys.path.insert(0, 'players/')
+
 # ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
@@ -38,6 +37,7 @@ Window.size = (1252, 1252)
 
 
 da = DeltaArm.DeltaArm(0, 1, 2)
+da.home_all()
 current = (0, 0, 0)
 direction = 0
 
@@ -401,6 +401,8 @@ class Actor(ButtonBehavior, Image): #creates an actor class
                 self.source = 'icons/ICON_Player_' + str(((degree + 90) % 360)) + '.jpg'
             if (self.source == 'icons/ICON_Player_0.jpg'): self.source = 'icons/ICON_Player.jpg'
 
+
+    #gets called in all the directional moves
     def move(self, next):
         global canWin
         global score
@@ -448,6 +450,12 @@ class Actor(ButtonBehavior, Image): #creates an actor class
                     score) + '. High score: ' + str(highScore)
                 sm.current = 'Winner'
 
+
+
+    '''
+    get called in move forward and move backwards
+
+    '''
     def moveRight(self):  # strafe
         if (sm.current != 'main'): return
         next = int(self.id.strip(string.ascii_letters)) + 1
@@ -481,6 +489,8 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         else:
             self.move(next)
 
+
+#needs to be fixed for harder levels
     def goTowards(self):  # if anyone wants to fix please feel free
         if (sm.current != 'main'): return
         global turn
