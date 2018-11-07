@@ -7,6 +7,7 @@ import socket
 import sys
 import math
 #import ip
+import DeltaArm
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -34,7 +35,9 @@ highScore = 2
 score = 0
 sm = ScreenManager()
 Window.size = (1252, 1252)
-
+da = DeltaArm.DeltaArm(0, 1, 2)
+current = (0, 0, 0)
+direction = 0
 
 class MyApp(App):
     def build(self):
@@ -171,16 +174,90 @@ def reset(dif):
     sm.current = 'main'
 
 
+
+#Combined hardware.py functions
+def obey_paul(retry=5):
+    data = ''
+    '''
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_address = hardwareip.server_address
+    print('connecting to {} port {}'.format(*server_address))
+    sock.connect(server_address)
+    print('i am hardware.py')
+    sock.sendall(b'?')
+    spaceReceived = False
+    '''
+    try:
+        while (not spaceReceived):
+            request = sock.recv(16).decode()
+            data += request
+            if (' ' in data): spaceReceived = True
+    except OSError:
+        if (retry >= 0): obey(retry - 1)
+
+    if (data == 'bupkis '):
+        return
+
+    print('received {!r}'.format(data))
+
+    if (data == 'forward '):
+        if (direction % 360 == 0):
+            current[1] += 1
+            da.move_to_point(current)
+        elif (direction % 360 == 90):
+            current[0] += 1
+            da.move_to_point(current)
+        elif (direction % 360 == 180):
+            current[1] -= 1
+            da.move_to_point(current)
+        elif (direction % 360 == 270):
+            current[0] -= 1
+            da.move_to_point(current)
+    elif (data == 'backward '):
+        if (direction % 360 == 0):
+            current[1] -= 1
+            da.move_to_point(current)
+        elif (direction % 360 == 90):
+            current[0] -= 1
+            da.move_to_point(current)
+        elif (direction % 360 == 180):
+            current[1] += 1
+            da.move_to_point(current)
+        elif (direction % 360 == 270):
+            current[0] += 1
+            da.move_to_point(current)
+    elif (data == 'left '):
+        direction += 270
+    # spin to win
+    elif (data == 'right '):
+        direction += 90
+    # spin to win
+    else:
+        print('fail')
+        return
+
+
+
+
+
+
+
+
+
 # ////////////////////////////////////////////////////////////////////////////
 # //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
 # //							LOAD KIVY FILE								//			
 # ////////////////////////////////////////////////////////////////////////////
+
+#These handle the visual component of all of the things that happen in the obey() function
+
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.jpg', 'ICON_Wrench.jpg', etc.
 class MainScreen(Screen):
     def exitProgram(self):
         App.get_running_app().stop()
         Window.close()
 
+    #Replaces every image with a blank image
     def resetBoard(self):
         for actor in self.children[0].children:
             actor.source = 'icons/ICON_Transparent.png'
@@ -551,6 +628,8 @@ winLabel = Label(text='You win!', font_size=64, pos=(0, 400))
 scoreLabel = Label(text='', font_size=16, pos=(0, 350))
 loseLabel = Label(text='You lost.', font_size=64, pos=(0, 400))
 
+#Buttons should be put in main.py
+'''
 playAgainButton = Button(text='Play again?', size_hint=(0.2, 0.1), pos=(Window.width * .4, 0))
 playAgainButton.bind(on_press=lambda x: reset('normal'))
 
@@ -560,13 +639,13 @@ playAgainButtonHard.bind(on_press=lambda x: reset('hard'))
 
 playAgainButtonLose = Button(text='Play again?', size_hint=(0.2, 0.1), pos=(Window.width * .4, 0))
 playAgainButtonLose.bind(on_press=lambda x: reset('normal'))
-
+'''
 screen.add_widget(winLabel)
 screen.add_widget(scoreLabel)
-screen.add_widget(playAgainButton)
-screen.add_widget(playAgainButtonHard)
+#screen.add_widget(playAgainButton)
+#screen.add_widget(playAgainButtonHard)
 loserScreen.add_widget(loseLabel)
-loserScreen.add_widget(playAgainButtonLose)
+#loserScreen.add_widget(playAgainButtonLose)
 sm.add_widget(screen)
 sm.add_widget(loserScreen)
 for actor in main.children[0].children:
