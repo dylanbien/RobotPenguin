@@ -39,7 +39,6 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
 def quitAll():
     quit()
 	
-
 # ////////////////////////////////////////////////////////////////
 # //            DECLARE APP CLASS AND SCREENMANAGER             //
 # //                     LOAD KIVY FILE                         //

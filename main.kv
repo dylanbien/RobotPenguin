@@ -99,3 +99,41 @@
                 size_hint: 4.3, 7.5
                 x: root.width * 0.7375
                 y: root.height * 0.12
+
+<NewGameScreen>:
+    name: 'new_game'
+    FloatLayout:
+        size_hint: None, None
+        Label:
+            text: 'Start New Game'
+
+        Button: #easy
+            text: 'Easy'
+            font_size: 23
+            size_hint: None,None
+            size: root.width * 0.05, root.height * 0.1
+            x: root.width * 0.250
+            y: root.height * 0.300
+            background_color: 0.7, 0.7, 0.7, 1
+            on_release:
+
+        Button: #medium
+            text: 'Medium'
+            font_size: 23
+            size_hint: None,None
+            size: root.width * 0.05, root.height * 0.1
+            x: root.width * 0.500
+            y: root.height * 0.300
+            background_color: 0.7, 0.7, 0.7, 1
+            on_release:
+
+        Button: #hard
+            text: 'Hard'
+            font_size: 23
+            size_hint: None,None
+            size: root.width * 0.05, root.height * 0.1
+            x: root.width * 0.750
+            y: root.height * 0.300
+            background_color: 0.7, 0.7, 0.7, 1
+            on_release:
+

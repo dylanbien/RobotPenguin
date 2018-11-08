@@ -88,8 +88,7 @@ def reset(dif):
         grid.add_widget(b)
 
     for actor in main.children[0].children:
-
-        if (actor.id == 'actor' + str(locs[0])):  #assigns players id to actor + random location 
+        if (actor.id == 'actor' + str(locs[0])):
             print('player is ' + str(locs[0]))
             actor.source = 'players/ICON_Player.jpg'
 
@@ -146,8 +145,6 @@ def reset(dif):
 
     sm.current = 'main'
 
-
-
 #Combined hardware.py functions
 def obey_paul(retry=5):
     
@@ -198,17 +195,9 @@ def obey_paul(retry=5):
         print('fail')
         return
 
-
-
-
-
-
-
-
-
 # ////////////////////////////////////////////////////////////////////////////
-# //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//				
-# //							LOAD KIVY FILE								//			
+# //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//
+# //							LOAD KIVY FILE								//
 # ////////////////////////////////////////////////////////////////////////////
 
 #These handle the visual component of all of the things that happen in the obey() function
@@ -667,7 +656,5 @@ for actor in main.children[0].children: #creates an array with the actors
 
     if (actor.id == 'actor74'):
         actor.source = 'icons/ICON_Bear.jpg'
-
-
 if __name__ == "__main__":
     MyApp().run()

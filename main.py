@@ -81,8 +81,8 @@ def clear():
 
 
 # ////////////////////////////////////////////////////////////////
-# //			DECLARE APP CLASS AND SCREENMANAGER	//
-# //					 LOAD KIVY FILE		//
+# //			DECLARE APP CLASS AND SCREENMANAGER	            //
+# //					 LOAD KIVY FILE		                    //
 # ////////////////////////////////////////////////////////////////
 
 
@@ -122,6 +122,7 @@ class MainScreen(Screen):
     def clearAction(self):
         clear()
 
+<<<<<<< Updated upstream
     def beginGame(self, difficulty):
         gameStart(difficulty)
         sm.current = main
@@ -129,6 +130,10 @@ class MainScreen(Screen):
 
     # ////////////////////////////////////////////////////////////////         # //														//
     # //						    POPUPS						                    //  		#   //															//
+=======
+    # ////////////////////////////////////////////////////////////////
+    # //						    POPUPS						     //
+>>>>>>> Stashed changes
     # ////////////////////////////////////////////////////////////////
 
     def quitPopup(self):  # QUIT POPUP
@@ -221,7 +226,7 @@ class MainScreen(Screen):
         Clock.schedule_once(downPop.dismiss, .1)
 
     def rightPopup(self):  # RIGHT POPUP
-        rightLay = FloatLayout(size_hint=(0.5, 0.5))
+        rightmLay = FloatLayout(size_hint=(0.5, 0.5))
         rightPop = Popup(title='IN PROGRESS...',
                          size_hint=(0.240, 0.73),
                          auto_dismiss=False,
@@ -240,7 +245,10 @@ class MainScreen(Screen):
         rightPop.open()
         Clock.schedule_once(rightPop.dismiss, .1)
 
+<<<<<<< Updated upstream
 #creates the different screens
+=======
+>>>>>>> Stashed changes
 main = MainScreen(name='main')
 new_game = MainScreen(name='new_game')
 winner = MainScreen(name='winner')
