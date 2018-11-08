@@ -40,9 +40,14 @@ def execute():  # pause PLEASE
     commands = []
     imageQueue.clear_widgets()
 
+'''
+def beginGame(difficulty):
+    #runs restart w/ command   
+ 
+'''
 
 '''
-def send(command, retry=2): #needs to be connected with the a server paul is writing
+def send(command): #needs to be connected with the a server paul is writing
     #code must be added
 '''
 
@@ -116,6 +121,11 @@ class MainScreen(Screen):
 
     def clearAction(self):
         clear()
+
+    def beginGame(self, difficulty):
+        gameStart(difficulty)
+        sm.current = main
+
 
     # ////////////////////////////////////////////////////////////////         # //														//
     # //						    POPUPS						                    //  		#   //															//
@@ -230,8 +240,12 @@ class MainScreen(Screen):
         rightPop.open()
         Clock.schedule_once(rightPop.dismiss, .1)
 
-
+#creates the different screens
 main = MainScreen(name='main')
+new_game = MainScreen(name='new_game')
+winner = MainScreen(name='winner')
+loser = MainScreen(name='loser')
+
 imageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
 #border = Image(source='images/rectangle.png', allow_stretch=True, keep_ratio=False,
             #   pos=(Window.width * 0, Window.height * 1.4), size_hint_y=None, height=Window.height * .3,
@@ -239,8 +253,12 @@ imageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint=
 
 
 main.add_widget(imageQueue)
+new_game.add_widget(imageQueue)
+winner.add_widget(imageQueue)
+loser.add_widget(imageQueue)
+
 #main.add_widget(border)
-sm.add_widget(main)
+sm.add_widget(new_game)
 
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
