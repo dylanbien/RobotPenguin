@@ -29,7 +29,7 @@ def queue(command):
     commands.append(command)
     name = command.replace(' ', '')
     name.upper()
-    imageQueue.add_widget(Image(source= 'direction/' + name + '.jpg'))
+    mainImageQueue.add_widget(Image(source= 'direction/' + name + '.jpg'))
 
 
 def execute():  # pause PLEASE
@@ -38,7 +38,7 @@ def execute():  # pause PLEASE
         send(command)
         sleep(0.2)
     commands = []
-    imageQueue.clear_widgets()
+    mainImageQueue.clear_widgets()
 
 '''
 def beginGame(difficulty):
@@ -76,7 +76,7 @@ def pause():
 def clear():
     global commands
     if (len(commands) == 0): print('nothing to clear'); return
-    imageQueue.remove_widget(imageQueue.children[0])
+    mainImageQueue.remove_widget(mainImageQueue.children[0])
     del commands[len(commands) - 1]
 
 
@@ -86,11 +86,11 @@ def clear():
 # ////////////////////////////////////////////////////////////////
 
 
-sm = ScreenManager()
+screenManager = ScreenManager()
 
 class MyApp(App):
     def build(self):
-        return sm
+        return screenManager
 
 
 Builder.load_file('main.kv')
@@ -122,19 +122,13 @@ class MainScreen(Screen):
     def clearAction(self):
         clear()
 
-<<<<<<< Updated upstream
-    def beginGame(self, difficulty):
-        gameStart(difficulty)
-        sm.current = main
+   
 
 
     # ////////////////////////////////////////////////////////////////         # //														//
     # //						    POPUPS						                    //  		#   //															//
-=======
-    # ////////////////////////////////////////////////////////////////
-    # //						    POPUPS						     //
->>>>>>> Stashed changes
-    # ////////////////////////////////////////////////////////////////
+
+
 
     def quitPopup(self):  # QUIT POPUP
         quitLay = FloatLayout(size_hint=(0.5, 0.5))
@@ -245,28 +239,47 @@ class MainScreen(Screen):
         rightPop.open()
         Clock.schedule_once(rightPop.dismiss, .1)
 
-<<<<<<< Updated upstream
-#creates the different screens
-=======
->>>>>>> Stashed changes
-main = MainScreen(name='main')
-new_game = MainScreen(name='new_game')
-winner = MainScreen(name='winner')
-loser = MainScreen(name='loser')
 
-imageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+#creates the different screens
+
+
+mainImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+newGameImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+
+
 #border = Image(source='images/rectangle.png', allow_stretch=True, keep_ratio=False,
             #   pos=(Window.width * 0, Window.height * 1.4), size_hint_y=None, height=Window.height * .3,
              #  size_hint_x=None, width=Window.width * 1.975)
 
 
-main.add_widget(imageQueue)
-new_game.add_widget(imageQueue)
-winner.add_widget(imageQueue)
-loser.add_widget(imageQueue)
+
+class NewGame(Screen):
+    pass
+#def beginGame(self, difficulty):
+      #  gameStart(difficulty)
+        #screenManager.current = main
+
+main = MainScreen(name='main')
+newGame = NewGame(name='newGame')
+
+
+
+
+main.add_widget(mainImageQueue)
+newGame.add_widget(newGameImageQueue)
+
+
+screenManager.add_widget(main)
+screenManager.add_widget(newGame)
+
+screenManager.current= 'newGame'
+
+sleep(3)
+
+screenManager.current= 'main'
 
 #main.add_widget(border)
-sm.add_widget(new_game)
+
 
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
