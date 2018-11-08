@@ -6,8 +6,7 @@ import random
 import socket
 import sys
 import math
-#import ip
-import DeltaArm
+#import DeltaArm
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -35,12 +34,12 @@ score = 0
 sm = ScreenManager()
 Window.size = (1252, 1252)
 
-
+'''
 da = DeltaArm.DeltaArm(0, 1, 2)
 da.home_all()
 current = (0, 0, 0)
 direction = 0
-
+'''
 class MyApp(App):
     def build(self):
        #Clock.schedule_interval(obey, .1)
@@ -72,13 +71,6 @@ def reset(dif):
     banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10,     locs[0] + 8,
               locs[0]] #8 spots around the penguin
 
-'''
-
-                b     b a n    
-                a loc[0]  n
-                n n e d   e
-
-'''
 
     edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 28, 37, 46, 55, 64, 73, 74, 75, 76, 77, 78, 79, 80, 81, 18, 27, 36, 45,
              54, 63, 72]  # will sometimes contain locations of other things
@@ -189,7 +181,7 @@ def obey_paul(retry=5):
             current[0] += 1
             da.move_to_point(current)
 
-       main.playerBackward()
+        main.playerBackward()
 
     elif (data == 'left '): #receives left
         direction += 270
@@ -248,13 +240,12 @@ class MainScreen(Screen):
             if (actor.source != 'icons/ICON_Transparent.png'):
                 actor.random()
     
-   '''
-   the below move the actor
-   they get called in the obey function
-   tehy call functions in the actor class
 
+   #the below move the actor
+   #they get called in the obey function
+   #tehy call functions in the actor class
 
-   '''
+ 
 
     def playerForward(self):
         print('you have moved the player forwards or something')
@@ -308,10 +299,10 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         self.moveForward()
 
 
-   '''
-    below are called above in the main class
+  
+    #below are called above in the main class
 
-   '''  
+    
     def moveForward(self):
         if ('90' in self.source):
             self.moveRight(); main.huntPlayer(); return
@@ -452,10 +443,10 @@ class Actor(ButtonBehavior, Image): #creates an actor class
 
 
 
-    '''
-    get called in move forward and move backwards
+    
+    #get called in move forward and move backwards
 
-    '''
+    
     def moveRight(self):  # strafe
         if (sm.current != 'main'): return
         next = int(self.id.strip(string.ascii_letters)) + 1

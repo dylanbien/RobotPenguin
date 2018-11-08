@@ -239,7 +239,7 @@ imageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint=
 
 
 main.add_widget(imageQueue)
-main.add_widget(border)
+#main.add_widget(border)
 sm.add_widget(main)
 
 # ////////////////////////////////////////////////////////////////
