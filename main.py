@@ -25,10 +25,16 @@ history = []
 
 
 def queue(command):
-    if (len(commands) >= 10): return
+    if (len(commands) >= 22): return
+
     commands.append(command)
     name = command.replace(' ', '')
     name.upper()
+
+    if (len(commands) >= 12):
+        mainImageQueue2.add_widget(Image(source='direction/' + name + '.jpg'))
+        return
+
     mainImageQueue.add_widget(Image(source= 'direction/' + name + '.jpg'))
 
 
@@ -39,10 +45,11 @@ def execute():  # pause PLEASE
         sleep(0.2)
     commands = []
     mainImageQueue.clear_widgets()
+    mainImageQueue2.clear_widgets()
 
 '''
-def beginGame(difficulty):
-    #runs restart w/ command   
+def setDifficulty(difficulty)
+   #
  
 '''
 
@@ -244,6 +251,7 @@ class MainScreen(Screen):
 
 
 mainImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+mainImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .85})
 newGameImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
 
 
@@ -254,18 +262,18 @@ newGameImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, po
 
 
 class NewGame(Screen):
-    pass
-#def beginGame(self, difficulty):
-      #  gameStart(difficulty)
-        #screenManager.current = main
+
+    def setDif(self):
+        screenManager.current = 'main'
+        #setDifficulty(difficulty)
 
 main = MainScreen(name='main')
+
 newGame = NewGame(name='newGame')
 
-
-
-
 main.add_widget(mainImageQueue)
+
+main.add_widget(mainImageQueue2)
 newGame.add_widget(newGameImageQueue)
 
 
@@ -273,10 +281,6 @@ screenManager.add_widget(main)
 screenManager.add_widget(newGame)
 
 screenManager.current= 'newGame'
-
-sleep(3)
-
-screenManager.current= 'main'
 
 #main.add_widget(border)
 

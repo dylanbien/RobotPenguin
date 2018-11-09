@@ -6,7 +6,7 @@ import random
 import socket
 import sys
 import math
-#import DeltaArm
+import DeltaArm
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -17,6 +17,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
+from time import sleep
 from kivy.uix.behaviors import ButtonBehavior
 
 
@@ -35,8 +36,8 @@ sm = ScreenManager()
 Window.size = (1252, 1252)
 
 '''
-da = DeltaArm.DeltaArm(0, 1, 2)
-da.home_all()
+da = DeltaArm.DeltaArm(0, 1, 2) #creates arm
+da.home_all() #homes it
 current = (0, 0, 0)
 direction = 0
 '''
@@ -149,7 +150,7 @@ def reset(dif):
 def obey_paul(retry=5):
     
     if (data == 'forward '): #recieves forward
-        if (direction % 360 == 0):
+        if (direction % 360 == 0): #direction comes from how its facing (starts at 0)
             current[1] += 1
             da.move_to_point(current)
         elif (direction % 360 == 90):
@@ -640,10 +641,10 @@ loserScreen.add_widget(loseLabel)
 sm.add_widget(screen)
 sm.add_widget(loserScreen)
 
-
+'''
 for actor in main.children[0].children: #creates an array with the actors
     if (actor.id == 'actor32'):
-        actor.source = 'icons/ICON_Player.jpg'
+        actor.source = 'players/ICON_Player.jpg'
 
     if (actor.id == 'actor17'):
         actor.source = 'icons/ICON_Igloo.jpg'
@@ -656,5 +657,8 @@ for actor in main.children[0].children: #creates an array with the actors
 
     if (actor.id == 'actor74'):
         actor.source = 'icons/ICON_Bear.jpg'
+'''
+
 if __name__ == "__main__":
     MyApp().run()
+

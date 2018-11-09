@@ -100,40 +100,56 @@
                 x: root.width * 0.7375
                 y: root.height * 0.12
 
-<NewGameScreen>:
+<NewGame>:
     name: 'newGame'
     FloatLayout:
         size_hint: None, None
         
-#Buttons
-
-        Button: #easy
-            text: 'Easy'
-            font_size: 23
+# BUTTONS
+        Button: #EASY BUTTON
             size_hint: None,None
-            size: root.width * 0.05, root.height * 0.1
-            x: root.width * 0.250
-            y: root.height * 0.300
-            background_color: 1, 0, 0, 1
-            #on_release:
+            font_size: 50
+            size: root.width * 0.25, root.height * 0.15
+            x: root.width * 0.1
+            y: root.height * 0.25
+            text: 'EASY'
+            background_color: 0,1,0, 1
+            on_release: root.setDif()
 
-        Button: #medium
-            text: 'Medium'
-            font_size: 23
+        Button: #MEDIUM BUTTON
             size_hint: None,None
-            size: root.width * 0.05, root.height * 0.1
-            x: root.width * 0.500
-            y: root.height * 0.300
-            background_color: 0.7, 0.7, 0.7, 1
-            #on_release:
+            font_size: 50
+            size: root.width * 0.25, root.height * 0.15
+            x: root.width * 0.4
+            y: root.height * 0.25
+            text: 'MEDIUM'
+            background_color: 0, 1,0, 1
+            on_release: root.setDif()
 
-        Button: #hard
-            text: 'Hard'
-            font_size: 23
+
+        Button: #HEARD BUTTON
             size_hint: None,None
-            size: root.width * 0.05, root.height * 0.1
-            x: root.width * 0.750
-            y: root.height * 0.300
-            background_color: 0.7, 0.7, 0.7, 1
-            #on_release:
+            font_size: 50
+            size: root.width * 0.25, root.height * 0.15
+            x: root.width * 0.7
+            y: root.height * 0.25
+            text: 'HARD'
+            background_color: 0, 1,0, 1
+            on_release: root.setDif()
 
+# LABELS
+
+        Label:
+            text: 'New Game:'
+            font_size: 150
+            size: root.width * 0.5, root.height * 0.2
+            x: root.width * 0.5
+            y: root.height * 0.75
+
+        Label:
+
+            text: 'Select a Level'
+            font_size: 150
+            size: root.width * 0.5, root.height * 0.3
+            x: root.width * 0.5
+            y: root.height * 0.5
