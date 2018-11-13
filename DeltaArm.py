@@ -4,8 +4,8 @@ import time
 import sys
 sys.path.insert(0, "/home/pi/Documents/RaspberryPiCommon/pidev")
 from stepper import stepper
-sys.path.insert(0,'/home/pi/Adafruit_Python_PCA9685/Adafruit_PCA9685')
-import PCA9685
+#sys.path.insert(0,'Adafruit_Python_PCA9685/Adafruit_PCA9685')
+#import PCA9685
 
 
 class DeltaArm:
@@ -26,10 +26,10 @@ class DeltaArm:
     def __init__(self, c1, c2, c3):
         self.board = Slush.sBoard()
         self.motors = [stepper(port = c1, micro_steps = 32, speed = 1000/8),
-                    stepper(port = c2, micro_steps = 32, speed = 1000/8),
-                     stepper(port = c3, micro_steps = 32, speed = 1000/8)]
-        self.rotator = stepper(port = 3, micro_steps = 128, speed = 1000)
-        self.solenoid = PCA9685.PCA9685()  
+                   stepper(port = c2, micro_steps = 32, speed = 1000/8),
+                    stepper(port = c3, micro_steps = 32, speed = 1000/8)]
+      #  self.rotator = stepper(port = 3, micro_steps = 128, speed = 1000)
+       # self.solenoid = PCA9685.PCA9685() 
         
         
 
@@ -41,11 +41,11 @@ class DeltaArm:
             print(self.get_position(2))
             print('done')
 
-    def magnet_up(self):
-        self.solenoid.set_pwm(0,1,0)
+   # def magnet_up(self):
+    #    self.solenoid.set_pwm(0,1,0)
     
-    def magnet_down(self):
-        self.solenoid.set_pwm(0,0,0)
+   # def magnet_down(self):
+        #self.solenoid.set_pwm(0,0,0)
 
     def set_single_position_steps(self,num,pos):
         while self.motors[num].isBusy():
@@ -65,11 +65,11 @@ class DeltaArm:
         for i in range(3):
             self.set_single_position_steps(i,val)
 
-    def rotator_home(self):
-        self.rotator.goUntilPress(0,1,1000)
+    #def rotator_home(self):
+      #  self.rotator.goUntilPress(0,1,1000)
     
-    def rel_move(self, amount):
-        self.rotator.relative_move(amount)
+  #  def rel_move(self, amount):
+     #   self.rotator.relative_move(amount)
 
         
     def set_single_angle(self,num,ang):
