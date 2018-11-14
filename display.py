@@ -36,6 +36,8 @@ sm = ScreenManager()
 #Window.size = (1920, 1080)
 Window.fullscreen = True
 
+
+
 '''
 da = DeltaArm.DeltaArm(0, 1, 2) #creates arm
 da.home_all() #homes it
@@ -161,7 +163,14 @@ def reset(dif):
     sm.current = 'main'
 
 #Combined hardware.py functions
-def obey_paul(retry=5):
+def obey_paul(data):
+    
+    #if (date =='easy'):
+        
+    #elif(date == 'medium'):
+        
+    #elif (date == 'hard'):
+        
     
     if (data == 'forward '): #recieves forward
         if (direction % 360 == 0): #direction comes from how its facing (starts at 0)
@@ -176,7 +185,8 @@ def obey_paul(retry=5):
         elif (direction % 360 == 270):
             current[0] -= 1
             da.move_to_point(current)
-
+            
+            
         main.playerForward()
 
     elif (data == 'backward '): #recieves backwards
@@ -603,7 +613,8 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 # ////////////////////////////////////////////////////////////////
 
 #creates a 9 * 9 grid
-grid = GridLayout(id='grid', cols=9, rows=9,height=213, width=120)
+grid = GridLayout(id='grid', cols=9, rows=9, padding=15, spacing=1.5, height=1080, width=1080) 
+
 
 #sets the background image
 bg = Image(source='images/BG.jpg', size_hint=[1, 1])
@@ -617,7 +628,7 @@ main.add_widget(bg) #adds background to the screen
 main.add_widget(grid) #adds grid to the scren
 
 sm.add_widget(main)
-
+'''
 #creates winner screen
 screen = Screen(name="Winner")
 youWinner = Image(source='winner/winner.jpg')
@@ -634,7 +645,7 @@ scoreLabel = Label(text='', font_size=16, pos=(0, 350))
 loseLabel = Label(text='You lost.', font_size=64, pos=(0, 400))
 
 #Buttons should be put in main.py
-'''
+
 playAgainButton = Button(text='Play again?', size_hint=(0.2, 0.1), pos=(Window.width * .4, 0))
 playAgainButton.bind(on_press=lambda x: reset('normal'))
 
@@ -644,7 +655,7 @@ playAgainButtonHard.bind(on_press=lambda x: reset('hard'))
 
 playAgainButtonLose = Button(text='Play again?', size_hint=(0.2, 0.1), pos=(Window.width * .4, 0))
 playAgainButtonLose.bind(on_press=lambda x: reset('normal'))
-'''
+
 screen.add_widget(winLabel)
 screen.add_widget(scoreLabel)
 #screen.add_widget(playAgainButton)
@@ -653,6 +664,7 @@ loserScreen.add_widget(loseLabel)
 #loserScreen.add_widget(playAgainButtonLose)
 sm.add_widget(screen)
 sm.add_widget(loserScreen)
+'''
 
 '''
 for actor in main.children[0].children: #creates an array with the actors

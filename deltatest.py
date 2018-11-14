@@ -4,6 +4,7 @@ arm = DeltaArm.DeltaArm(0,1,2)
 
 while(True):
     command = input('>>>>')
+    print(command)
     if command == 'home':
         arm.home_all()
     elif command[:4] == 'move':
@@ -15,3 +16,10 @@ while(True):
         arm.set_all_to_same_position(amount)
     elif command == 'leave':
         break
+    elif command[:3] == 'pos':
+        print(arm.get_position(0))
+        print(arm.get_position(1))
+        print(arm.get_position(2))
+        print(arm.get_angle(0))
+        print(arm.get_angle(1))
+        print(arm.get_angle(2))
