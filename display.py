@@ -6,7 +6,7 @@ import random
 import socket
 import sys
 import math
-import DeltaArm
+#import DeltaArm
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -33,7 +33,8 @@ gears = []
 highScore = 2
 score = 0
 sm = ScreenManager()
-Window.size = (1252, 1252)
+#Window.size = (1920, 1080)
+Window.fullscreen = True
 
 '''
 da = DeltaArm.DeltaArm(0, 1, 2) #creates arm
@@ -67,31 +68,47 @@ def reset(dif):
     grid.clear_widgets()
     possible = []
     test = random.sample(range(1, 82), 81)
-    locs = random.sample(range(1, 82), 4)
+    locPenguin = 1 #sets starting location of the penguin
+    locGoal = 81
     
     banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10,     locs[0] + 8,
-              locs[0]] #8 spots around the penguin
+              locs[0]] #8 spots around the penguin needs to be fixe
 
 
     edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 28, 37, 46, 55, 64, 73, 74, 75, 76, 77, 78, 79, 80, 81, 18, 27, 36, 45,
              54, 63, 72]  # will sometimes contain locations of other things
-    obstacles = []
 
-    while len(obstacles) < 5:
-        x = random.randint(1, 81) #random integer from 1-81
-        if x not in edges and x != locs[0]: #checks if it is an edge and not at 0
-            obstacles.append(x) #adds the random number to obstacles list
-            edges.append(x)  # adds x to edges (why??? need to understand why: Dylan B)
-    print(obstacles)
+    #sets possible locations of the obstacles
+    allObstacles = [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    ]
+
+    assignedObstacleLocations = []
 
     for i in range(0, grid.cols * grid.rows): #resets all 81 grids to transparent
         b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
         grid.add_widget(b)
+  #work on this
+    for x in allObstacles:
+       y = random.randint(0, len(x)) #get random in in each array
+       assignedObstacleLocations.append(y)
+    print(obstacles)
+
+
 
     for actor in main.children[0].children:
-        if (actor.id == 'actor' + str(locs[0])):
-            print('player is ' + str(locs[0]))
+        if (actor.id == 'actor' + str(locPenguin)): #places penguin
+            print('player is ' + str(locPenguin))
             actor.source = 'players/ICON_Player.jpg'
+
+        if (actor.id == 'actor' + str(locGoal)):  # assigns goal id to actor + obstacle
+            print('goal is ' + str((locGoal)))
+            actor.source = 'icons/ICON_Goal.jpg'
 
         if (actor.id == 'actor' + str(obstacles[0])):  # assigns jewels id to actor + obstacle
             print('jewel/wrench is ' + str(obstacles[0]))
@@ -101,9 +118,6 @@ def reset(dif):
             print('igloo is ' + str(obstacles[1]))
             actor.source = 'icons/ICON_Igloo.jpg'
 
-        if (actor.id == 'actor' + str(obstacles[2])):  # assigns gear id to actor + obstacle
-            print('gear is ' + str(obstacles[2]))
-            actor.source = 'icons/ICON_Gear.jpg'
 
     while testIndex < 81: #goes through values 0-81
         for actor in main.children[0].children:
@@ -186,19 +200,18 @@ def obey_paul(retry=5):
 
         main.playerRotate('left')
 
-
     elif (data == 'right '): #revieves right
+
         direction += 90
-        
+
         main.playerRotate('right')
 
     else:
         print('fail')
         return
-
-# ////////////////////////////////////////////////////////////////////////////
-# //	DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//
-# //							LOAD KIVY FILE								//
+#// DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//
+# # ////////////////////////////////////////////////////////////////////////////
+# # //	D						LOAD KIVY FILE								//
 # ////////////////////////////////////////////////////////////////////////////
 
 #These handle the visual component of all of the things that happen in the obey() function
@@ -331,24 +344,24 @@ class Actor(ButtonBehavior, Image): #creates an actor class
             self.moveUp()
         else:
             self.moveDown()
-
+    '''
     def spawnGear(self):
         global gears
         unset = True
         while unset:
             x = random.randint(1, 81)
             for actor in main.children[0].children:
-                if (str(x) in actor.id and 'Transparent' in actor.source and x not in gears):
+                if (str(81) in actor.id and 'Transparent' in actor.source and 81 not in gears):
                     actor.source = 'icons/ICON_Gear.jpg';
                     print('gear was set at actor ' + actor.id);
-                    gears.append(x);
+                    gears.append(81);
                     unset = False;
                     return
 
     def clearGear(self):
         for actor in main.children[0].children:
             if ('Gear' in actor.source): actor.source = 'icons/ICON_Transparent.png'
-
+    '''
     def unflash(self, arg):
         if ('two' in arg):
             self.source = 'icons/ICON_Bear_2.jpg'
@@ -388,43 +401,43 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         global canWin
         global score
         global highScore
-        global justGeared
+        global justGoaled
         for actor in main.children[0].children:
             if (actor.id == 'actor' + str(next) and actor.source == 'icons/ICON_Transparent.png'):
                 temp = self.source;
                 self.source = actor.source;
                 actor.source = temp;
-                justGeared = False;
+                justGoaled = False;
                 return
             elif (actor.id == 'actor' + str(
                     next) and 'Player' in actor.source and 'Bear' in self.source and sm.current != 'Winner'):
                 actor.source = self.source;
                 self.source = 'icons/ICON_Transparent.png'
-                if (justGeared): self.clearGear()
-                justGeared = False
+                if (justGoaled): self.clearGoal()
+                justGoaled = False
                 print('you are a failure')
                 Clock.schedule_once(self.loser, 1)
             # sm.current = 'Loser'
             elif (actor.id == 'actor' + str(
                     next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
-                if (justGeared): self.clearGear()
-                justGeared = False
+                if (justGoaled): self.clearGoal()
+                justGoaled = False
                 self.source = actor.source;
                 actor.source = 'icons/ICON_Transparent.png'
                 print('you are a failure')
                 Clock.schedule_once(self.loser, 1)
             # sm.current = 'Loser'
-            elif (actor.id == 'actor' + str(next) and 'Gear' in actor.source and 'Player' in self.source):
+            elif (actor.id == 'actor' + str(next) and 'Goal' in actor.source and 'Player' in self.source):
                 actor.source = self.source;
                 self.source = 'icons/ICON_Transparent.png'
-                justGeared = True
+                justGoaled = True
                 canWin = True
                 score += 1
                 scoreLabel.text = 'Your score was ' + str(score) + '. High score: ' + str(highScore)
-                self.spawnGear();
+                self.spawnGoal();
                 return
             elif (actor.id == 'actor' + str(next) and 'Jewel' in actor.source and 'Player' in self.source and canWin):
-                justGeared = False
+                justGoaled = False
                 actor.source = self.source;
                 self.source = 'icons/ICON_Transparent.png'
                 if score > highScore: highScore = score; scoreLabel.text = 'Your score was ' + str(
@@ -535,8 +548,8 @@ class Actor(ButtonBehavior, Image): #creates an actor class
                 print('moved left')
                 reverse = 'main.children[0].children[81 - position].moveRight()'
             # return
-            elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner' and justGeared):
-                print('lost through towards method'); self.clearGear(); Clock.schedule_once(self.loser,
+            elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner' and justGoaled):
+                print('lost through towards method'); self.clearGoal(); Clock.schedule_once(self.loser,
                                                                                             1); return  # sm.current = 'Loser'
             elif (hunterCol == preyCol and hunterRow == preyRow and sm.current != 'Winner'):
                 print('lost through towards method'); Clock.schedule_once(self.loser, 1); return
@@ -590,9 +603,9 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 # ////////////////////////////////////////////////////////////////
 
 #creates a 9 * 9 grid
-grid = GridLayout(id='grid', cols=9, rows=9, padding=15, spacing=1.5, height=1252, width=1252) 
+grid = GridLayout(id='grid', cols=9, rows=9,height=213, width=120)
 
-#sets the background image 
+#sets the background image
 bg = Image(source='images/BG.jpg', size_hint=[1, 1])
 
 for i in range(0, grid.cols * grid.rows): #adds the transparent image to all 81 boxes
@@ -643,19 +656,19 @@ sm.add_widget(loserScreen)
 
 '''
 for actor in main.children[0].children: #creates an array with the actors
-    if (actor.id == 'actor32'):
+    if (actor.id == 'actor1'):
         actor.source = 'players/ICON_Player.jpg'
 
     if (actor.id == 'actor17'):
         actor.source = 'icons/ICON_Igloo.jpg'
 
-    if (actor.id == 'actor54'):
-        actor.source = 'icons/ICON_Gear.jpg'
+    if (actor.id == 'actor81'):
+        actor.source = 'icons/ICON_Goal.jpg'
 
-    if (actor.id == 'actor80'):
+    if (actor.id == 'actor40'):
         actor.source = 'icons/ICON_Jewel.jpg'
 
-    if (actor.id == 'actor74'):
+    if (actor.id == 'actor54'):
         actor.source = 'icons/ICON_Bear.jpg'
 '''
 
