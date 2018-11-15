@@ -227,7 +227,7 @@ class MainScreen(Screen):
         Clock.schedule_once(downPop.dismiss, .1)
 
     def rightPopup(self):  # RIGHT POPUP
-        rightmLay = FloatLayout(size_hint=(0.5, 0.5))
+        rightLay = FloatLayout(size_hint=(0.5, 0.5))
         rightPop = Popup(title='IN PROGRESS...',
                          size_hint=(0.240, 0.73),
                          auto_dismiss=False,
@@ -246,7 +246,37 @@ class MainScreen(Screen):
         rightPop.open()
         Clock.schedule_once(rightPop.dismiss, .1)
 
+    def victoryPopup(self):  # victory POPUP
+        victoryLay = FloatLayout(size_hint=(0.5, 0.5))
+        victoryPop = Popup(title='Win',
+                         content=Label(text='You Win!'),
+                         size_hint=(None, None),
+                         size=(400, 400),
+                         auto_dismiss=False,
+                         title_size=30,
+                         title_align='center',
+                         pos_hint={'x': 1401.5 / Window.width,
+                                   'y': 157 / Window.height},
+                         content=victoryLay)
+        victoryPop.open()
 
+
+    def defeatPopup(self):  # defeat POPUP
+        defeatLay = FloatLayout(size_hint=(0.5, 0.5))
+        defeatPop = Popup(title='Lose',
+                           content=Label(text='You Lose!'),
+                           size_hint=(None, None),
+                           size=(400, 400),
+                           auto_dismiss=False,
+                           title_size=30,
+                           title_align='center',
+                           pos_hint={'x': 1401.5 / Window.width,
+                                     'y': 157 / Window.height},
+                           content=defeatLay)
+        defeatPop.open()
+
+
+<<<<<<< Updated upstream
 #creates the different screens
 
 
