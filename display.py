@@ -33,7 +33,7 @@ gears = []
 highScore = 2
 score = 0
 sm = ScreenManager()
-#Window.size = (1920, 1080)
+Window.size = (1920, 1080)
 Window.fullscreen = True
 
 
