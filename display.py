@@ -102,10 +102,11 @@ def reset(dif):
         b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
         grid.add_widget(b)
 
-    for x in allObstacles:
-        y = random.randint(0, len(x)) #get random in in each array
-        assignedObstacleLocations.append(y)
-        #print(obstacles)
+    for temp in allObstacles:
+        y = random.randint(0, len(temp)-1) #get random in in each array
+        saved = temp[y]
+        assignedObstacleLocations.append(saved)
+        print(assignedObstacleLocations)
 
     assignedGoal = 0
 
@@ -127,6 +128,7 @@ def reset(dif):
             actor.source = 'icons/ICON_Goal.jpg'
 
     for actor in main.children[0].children:
+
         for i in assignedObstacleLocations:
 
             if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle

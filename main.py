@@ -17,6 +17,7 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from time import sleep
 import socket
+from kivy.core.audio import SoundLoader
 #import ip
 #import hardwareip
 
@@ -253,19 +254,19 @@ class MainScreen(Screen):
                            title_size=30,
                            title_align='center',
                            content=victoryLay)
+        victoryImage = Image(source='winner/winner.png',
+                             keep_ratio=True,
+                             size_hint=(None, None))
         quitButton = Button(text='Back To Main Menu',
                             size_hint=(0.46, 0.8),
                             font_size=20,
                             pos=(700, 425))
-        winLabel = Label(text='YOU WIN',
-                         pos=(685, 487.5),
-                         font_size=20)
 
         quitButton.bind(on_release=victoryPop.dismiss)
         quitButton.bind(on_release=MainScreen.setToNewGameScreen)
 
         victoryLay.add_widget(quitButton)
-        victoryLay.add_widget(winLabel)
+        victoryLay.add_widget(victoryImage)
         victoryPop.open()
 
 
@@ -277,19 +278,19 @@ class MainScreen(Screen):
                           title_size=30,
                           title_align='center',
                           content=defeatLay)
+        defeatImage = Image(source='loser/loser.png',
+                             keep_ratio=True,
+                             size_hint=(None, None))
         quitButton = Button(text='Back To Main Menu',
                             size_hint=(0.46, 0.8),
                             font_size=20,
                             pos=(700, 425))
-        loseLabel = Label(text='YOU LOSE',
-                          pos=(685, 487.5),
-                          font_size=20)
 
         quitButton.bind(on_release=defeatPop.dismiss)
         quitButton.bind(on_release=MainScreen.setToNewGameScreen)
 
         defeatLay.add_widget(quitButton)
-        defeatLay.add_widget(loseLabel)
+        defeatLay.add_widget(defeatImage)
         defeatPop.open()
 
 
