@@ -148,14 +148,14 @@ class MainScreen(Screen):
         yesButton = Button(text='YES',
                            size_hint=(0.46, 0.8),
                            font_size=20,
-                           pos=(700, 425))
+                           pos=(675, 425))
         noButton = Button(text='NO',
                           size_hint=(0.46, 0.8),
                           font_size=20,
-                          pos=(965, 425))
+                          pos=(1065, 425))
         confirmationLabel = Label(text='Are you sure you want to quit?',
-                                  pos=(685, 487.5),
-                                  font_size=20)
+                                  pos=(725, 487.5),
+                                  font_size=30)
 
         yesButton.bind(on_release=self.exitProgram)
         noButton.bind(on_release=quitPop.dismiss)
@@ -256,11 +256,12 @@ class MainScreen(Screen):
                            content=victoryLay)
         victoryImage = Image(source='winner/winner.png',
                              keep_ratio=True,
-                             size_hint=(None, None))
+                             size_hint=(1.5, 1.945),
+                             pos=(575, 525))
         quitButton = Button(text='Back To Main Menu',
                             size_hint=(0.46, 0.8),
                             font_size=20,
-                            pos=(700, 425))
+                            pos=(875, 425))
 
         quitButton.bind(on_release=victoryPop.dismiss)
         quitButton.bind(on_release=MainScreen.setToNewGameScreen)
@@ -279,12 +280,13 @@ class MainScreen(Screen):
                           title_align='center',
                           content=defeatLay)
         defeatImage = Image(source='loser/loser.png',
-                             keep_ratio=True,
-                             size_hint=(None, None))
+                            keep_ratio=True,
+                            size_hint=(1.5, 1.945),
+                            pos=(575, 525))
         quitButton = Button(text='Back To Main Menu',
                             size_hint=(0.46, 0.8),
                             font_size=20,
-                            pos=(700, 425))
+                            pos=(875, 425))
 
         quitButton.bind(on_release=defeatPop.dismiss)
         quitButton.bind(on_release=MainScreen.setToNewGameScreen)
