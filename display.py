@@ -6,7 +6,7 @@ import random
 import socket
 import sys
 import math
-import DeltaArm
+#import DeltaArm
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -37,13 +37,13 @@ sm = ScreenManager()
 Window.fullscreen = True
 
 
-
+'''
 
 da = DeltaArm.DeltaArm(0, 1, 2) #creates arm
 da.home_all() #homes it
 current = (0, 0, 0)
 direction = 0
-
+'''
 class MyApp(App):
     def build(self):
        #Clock.schedule_interval(obey, .1)
@@ -109,11 +109,11 @@ def reset(dif):
 
     assignedGoal = 0
 
-    if (dif = 'easy')
+    if (dif == 'easy'):
         assignedGoal = locGoal[0]
-    elif (dif = 'medium')
+    elif (dif == 'medium'):
         assignedGoal = locGoal[1]
-    elif (dif = 'hard')
+    elif (dif == 'hard'):
         assignedGoal = locGoal[2]
 
 
@@ -122,10 +122,11 @@ def reset(dif):
             print('player is ' + str(locPenguin))
             actor.source = 'players/ICON_Player.jpg'
 
-        if (actor.id == 'actor' + assignedGoal):  # assigns goal id to actor + obstacle
+        if (actor.id == 'actor' + str(assignedGoal)):  # assigns goal id to actor + obstacle
             print('goal is ' + str((locGoal)))
             actor.source = 'icons/ICON_Goal.jpg'
 
+    for actor in main.children[0].children:
         for i in assignedObstacleLocations:
 
             if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
@@ -142,8 +143,8 @@ def reset(dif):
         testIndex += 1
     print(possible)
 '''
-
-    if ('hard' in difficulty):  #places the players if difficulty is 'hard'
+'''
+    if('hard' in difficulty):  #places the players if difficulty is 'hard'
         for actor in main.children[0].children:
             if (actor.id == 'actor' + str(obstacles[3])):
                 print('igloo is ' + str(obstacles[3]))
@@ -172,20 +173,20 @@ def reset(dif):
 
         for actor in main.children[0].children:
             if (actor.id == 'actor' + str(possible[pos])): actor.source = 'ICON_Bear.jpg'; print('have set'); break
-
-    sm.current = 'main'
+'''
+    #sm.current = 'main'
 
 #Combined hardware.py functions
 def obey_paul(data):
     
     #if (date =='easy'):
-        self.reset('easy')
+        #self.reset('easy')
     #elif(date == 'medium'):
-        self.reset('medium')
+      #  self.reset('medium')
     #elif (date == 'hard'):
-        self.reset('hard')
+        #self.reset('hard')
     
-    if (data == 'forward '): #recieves forward
+    if (data == 'forward '):
         if (direction % 360 == 0): #direction comes from how its facing (starts at 0)
             current[1] += 1
             da.move_to_point(current)
@@ -696,7 +697,7 @@ for actor in main.children[0].children: #creates an array with the actors
     if (actor.id == 'actor54'):
         actor.source = 'icons/ICON_Bear.jpg'
 '''
-
+reset('easy')
 if __name__ == "__main__":
     MyApp().run()
 
