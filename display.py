@@ -6,7 +6,7 @@ import random
 import socket
 import sys
 import math
-#import DeltaArm
+import DeltaArm
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -38,12 +38,12 @@ Window.fullscreen = True
 
 
 
-'''
+
 da = DeltaArm.DeltaArm(0, 1, 2) #creates arm
 da.home_all() #homes it
 current = (0, 0, 0)
 direction = 0
-'''
+
 class MyApp(App):
     def build(self):
        #Clock.schedule_interval(obey, .1)
@@ -613,7 +613,7 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 # ////////////////////////////////////////////////////////////////
 
 #creates a 9 * 9 grid
-grid = GridLayout(id='grid', cols=9, rows=9, padding=15, spacing=1.5, height=1080, width=1080) 
+grid = GridLayout(id='grid', cols=13, rows=7, padding=15, spacing=1.5) 
 
 
 #sets the background image
