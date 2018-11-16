@@ -25,7 +25,7 @@ from kivy.uix.behaviors import ButtonBehavior
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
-difficulty = 'normal'
+difficulty = 'easy'
 canWin = False
 turn = 0
 justGeared = False
@@ -71,10 +71,10 @@ def reset(dif):
     possible = []
     test = random.sample(range(1, 82), 81)
     locPenguin = 1 #sets starting location of the penguin
-    locGoal = 81
+    locGoal = [85,88,91]
     
-    banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10,     locs[0] + 8,
-              locs[0]] #8 spots around the penguin needs to be fixe
+  # banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10,     locs[0] + 8,
+          #    locs[0]] #8 spots around the penguin needs to be fixe
 
 
     edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 28, 37, 46, 55, 64, 73, 74, 75, 76, 77, 78, 79, 80, 81, 18, 27, 36, 45,
@@ -82,12 +82,18 @@ def reset(dif):
 
     #sets possible locations of the obstacles
     allObstacles = [
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
+    [3,4, 5, 6],
+    [27, 28,30 ,31],
+    [66, 79],
+    [43, 44, 57],
+    [81,82, 83, 84],
+    [33, 34, 46, 47],
+    [10, 23, 36],
+    [61,62,74,75],
+    [86,87],
+    [25, 38, 51],
+    [52, 65, 78 ],
+
     ]
 
     assignedObstacleLocations = []
@@ -95,12 +101,20 @@ def reset(dif):
     for i in range(0, grid.cols * grid.rows): #resets all 81 grids to transparent
         b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
         grid.add_widget(b)
-  #work on this
-    for x in allObstacles:
-       y = random.randint(0, len(x)) #get random in in each array
-       assignedObstacleLocations.append(y)
-    print(obstacles)
 
+    for x in allObstacles:
+        y = random.randint(0, len(x)) #get random in in each array
+        assignedObstacleLocations.append(y)
+        #print(obstacles)
+
+    assignedGoal = 0
+
+    if (dif = 'easy')
+        assignedGoal = locGoal[0]
+    elif (dif = 'medium')
+        assignedGoal = locGoal[1]
+    elif (dif = 'hard')
+        assignedGoal = locGoal[2]
 
 
     for actor in main.children[0].children:
@@ -108,19 +122,18 @@ def reset(dif):
             print('player is ' + str(locPenguin))
             actor.source = 'players/ICON_Player.jpg'
 
-        if (actor.id == 'actor' + str(locGoal)):  # assigns goal id to actor + obstacle
+        if (actor.id == 'actor' + assignedGoal):  # assigns goal id to actor + obstacle
             print('goal is ' + str((locGoal)))
             actor.source = 'icons/ICON_Goal.jpg'
 
-        if (actor.id == 'actor' + str(obstacles[0])):  # assigns jewels id to actor + obstacle
-            print('jewel/wrench is ' + str(obstacles[0]))
-            actor.source = 'icons/ICON_Jewel.jpg'
+        for i in assignedObstacleLocations:
 
-        if (actor.id == 'actor' + str(obstacles[1])): # assigns igloo id to actor + obstacle
-            print('igloo is ' + str(obstacles[1]))
-            actor.source = 'icons/ICON_Igloo.jpg'
+            if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
+                print('jewel/wrench is ' + str(i))
+                actor.source = 'icons/ICON_Igloo.jpg'
 
 
+'''
     while testIndex < 81: #goes through values 0-81
         for actor in main.children[0].children:
             print('test index first ' + str(testIndex) + ' number is ' + str(test[testIndex]))
@@ -128,7 +141,7 @@ def reset(dif):
                 test[testIndex]) in actor.id): possible.append(test[testIndex]); break
         testIndex += 1
     print(possible)
-
+'''
 
     if ('hard' in difficulty):  #places the players if difficulty is 'hard'
         for actor in main.children[0].children:
@@ -166,11 +179,11 @@ def reset(dif):
 def obey_paul(data):
     
     #if (date =='easy'):
-        
+        self.reset('easy')
     #elif(date == 'medium'):
-        
+        self.reset('medium')
     #elif (date == 'hard'):
-        
+        self.reset('hard')
     
     if (data == 'forward '): #recieves forward
         if (direction % 360 == 0): #direction comes from how its facing (starts at 0)
