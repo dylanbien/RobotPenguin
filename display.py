@@ -83,7 +83,7 @@ def reset(dif):
     #sets possible locations of the obstacles
     allObstacles = [
     [3,4, 5, 6],
-    [27, 28,30 ,31],
+    [27, 28,40 ,41],
     [66, 79],
     [43, 44, 57],
     [81,82, 83, 84],
