@@ -25,9 +25,10 @@ class DeltaArm:
 
     def __init__(self, c1, c2, c3):
         self.board = Slush.sBoard()
-        self.motors = [stepper(port = c1, micro_steps = 32, speed = 1000/8),
-                   stepper(port = c2, micro_steps = 32, speed = 1000/8),
-                    stepper(port = c3, micro_steps = 32, speed = 1000/8)]
+        print("wuz up")
+        self.motors = [stepper(port = c1, micro_steps = 32, speed = 20),
+                   stepper(port = c2, micro_steps = 32, speed = 20),
+                    stepper(port = c3, micro_steps = 32, speed = 20)]
       #  self.rotator = stepper(port = 3, micro_steps = 128, speed = 1000)
        # self.solenoid = PCA9685.PCA9685() 
         
@@ -266,7 +267,7 @@ class DeltaArm:
                 (xtemp,ytemp,ztemp) = DeltaArm.forward_kinematics(atemp1,atemp2,atemp3)
                 deltatemp = tuple([a-b for (a,b) in zip((xtemp,ytemp,ztemp),(x0,y0,z0))])
                 rCurr =  math.sqrt(deltatemp[0]**2 + deltatemp[1]**2 + deltatemp[2]**2)
-            
+        #~ print("XYZ: " + str(x) + " : " + str(y) + " : " + str(z))
         self.move_to_point(x,y,z)
 
 
