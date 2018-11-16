@@ -12,7 +12,7 @@
             x: root.width * 0.972
             y: root.height * 0.945
             background_color: 0.7, 0.7, 0.7, 1
-            on_release: root.quitPopup()
+            on_release: root.defeatPopup()
 
         Button: # LEFT BUTTON
             text: 'TURN LEFT'
@@ -115,7 +115,7 @@
             text: 'EASY'
             background_normal: ''
             background_color: 0.0, 1.0, 0.0, 1.0
-            on_release: root.setDif()
+            on_release: root.setMainScreen()
 
         Button: #MEDIUM BUTTON
             size_hint: None,None
@@ -128,7 +128,7 @@
             text: 'MEDIUM'
             background_normal: ''
             background_color: 1.0, 1.0, 0.0, 1.0
-            on_release: root.setDif()
+            on_release: root.setMainScreen()
 
 
         Button: #HARD BUTTON
@@ -140,7 +140,7 @@
             text: 'HARD'
             background_normal: ''
             background_color: 1.0, 0.0, 0.0, 1.0
-            on_release: root.setDif()
+            on_release: root.setMainScreen()
 
 # LABELS
 

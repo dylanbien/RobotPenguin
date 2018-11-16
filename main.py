@@ -107,7 +107,6 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 def quitAll():
     quit()
 
-
 class MainScreen(Screen):
 
     def exitProgram(self):
@@ -129,8 +128,8 @@ class MainScreen(Screen):
     def clearAction(self):
         clear()
 
-   
-
+    def setToNewGameScreen(self):
+        screenManager.current = 'newGame'
 
     # ////////////////////////////////////////////////////////////////         # //														//
     # //						    POPUPS						                    //  		#   //															//
@@ -248,41 +247,57 @@ class MainScreen(Screen):
 
     def victoryPopup(self):  # victory POPUP
         victoryLay = FloatLayout(size_hint=(0.5, 0.5))
-        victoryPop = Popup(title='Win',
-                         content=Label(text='You Win!'),
-                         size_hint=(None, None),
-                         size=(400, 400),
-                         auto_dismiss=False,
-                         title_size=30,
-                         title_align='center',
-                         pos_hint={'x': 1401.5 / Window.width,
-                                   'y': 157 / Window.height},
-                         content=victoryLay)
+        victoryPop = Popup(title='VICTORY',
+                           size_hint=(0.3, 0.23),
+                           auto_dismiss=False,
+                           title_size=30,
+                           title_align='center',
+                           content=victoryLay)
+        quitButton = Button(text='Back To Main Menu',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(700, 425))
+        winLabel = Label(text='YOU WIN',
+                         pos=(685, 487.5),
+                         font_size=20)
+
+        quitButton.bind(on_release=victoryPop.dismiss)
+        quitButton.bind(on_release=MainScreen.setToNewGameScreen)
+
+        victoryLay.add_widget(quitButton)
+        victoryLay.add_widget(winLabel)
         victoryPop.open()
 
 
     def defeatPopup(self):  # defeat POPUP
         defeatLay = FloatLayout(size_hint=(0.5, 0.5))
-        defeatPop = Popup(title='Lose',
-                           content=Label(text='You Lose!'),
-                           size_hint=(None, None),
-                           size=(400, 400),
-                           auto_dismiss=False,
-                           title_size=30,
-                           title_align='center',
-                           pos_hint={'x': 1401.5 / Window.width,
-                                     'y': 157 / Window.height},
-                           content=defeatLay)
+        defeatPop = Popup(title='DEFEAT',
+                          size_hint=(0.3, 0.23),
+                          auto_dismiss=False,
+                          title_size=30,
+                          title_align='center',
+                          content=defeatLay)
+        quitButton = Button(text='Back To Main Menu',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(700, 425))
+        loseLabel = Label(text='YOU LOSE',
+                          pos=(685, 487.5),
+                          font_size=20)
+
+        quitButton.bind(on_release=defeatPop.dismiss)
+        quitButton.bind(on_release=MainScreen.setToNewGameScreen)
+
+        defeatLay.add_widget(quitButton)
+        defeatLay.add_widget(loseLabel)
         defeatPop.open()
 
-
-<<<<<<< Updated upstream
-#creates the different screens
 
 
 mainImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
 mainImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .85})
 newGameImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+#newGameImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .85})
 
 
 #border = Image(source='images/rectangle.png', allow_stretch=True, keep_ratio=False,
@@ -293,10 +308,25 @@ newGameImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, po
 
 class NewGame(Screen):
 
-    def setDif(self):
+    def setMainScreen(self):
         screenManager.current = 'main'
         #setDifficulty(difficulty)
 
+'''
+main = MainScreen(name='main')
+
+newGame = NewGame(name='newGame')
+
+newGame.add_widget(newGameImageQueue)
+
+newGame.add_widget(newGameImageQueue2)
+main.add_widget(mainImageQueue)
+
+screenManager.add_widget(main)
+screenManager.add_widget(newGame)
+
+screenManager.current = 'main'
+'''
 main = MainScreen(name='main')
 
 newGame = NewGame(name='newGame')
