@@ -129,8 +129,11 @@ class MainScreen(Screen):
     def clearAction(self):
         clear()
 
-    def setToNewGameScreen(self):
+    def setNewGameScreen(self):
         screenManager.current = 'newGame'
+
+    def setTitleScreen(self):
+        screenManager.current = 'title'
 
     # ////////////////////////////////////////////////////////////////         # //														//
     # //						    POPUPS						                    //  		#   //															//
@@ -258,15 +261,23 @@ class MainScreen(Screen):
                              keep_ratio=True,
                              size_hint=(1.5, 1.945),
                              pos=(575, 525))
-        quitButton = Button(text='Back To Main Menu',
+        playAgainButton = Button(text='Play Again',
                             size_hint=(0.46, 0.8),
                             font_size=20,
-                            pos=(875, 425))
+                            pos=(725, 425))
+        quitButton = Button(text='Quit',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(1025, 425))
+
+        playAgainButton.bind(on_release=victoryPop.dismiss)
+        playAgainButton.bind(on_release=MainScreen.setNewGameScreen)
 
         quitButton.bind(on_release=victoryPop.dismiss)
-        quitButton.bind(on_release=MainScreen.setToNewGameScreen)
+        quitButton.bind(on_release=MainScreen.setTitleScreen)
 
         victoryLay.add_widget(quitButton)
+        victoryLay.add_widget(playAgainButton)
         victoryLay.add_widget(victoryImage)
         victoryPop.open()
 
@@ -283,30 +294,38 @@ class MainScreen(Screen):
                             keep_ratio=True,
                             size_hint=(1.5, 1.945),
                             pos=(575, 525))
-        quitButton = Button(text='Back To Main Menu',
+        playAgainButton = Button(text='Play Again',
                             size_hint=(0.46, 0.8),
                             font_size=20,
-                            pos=(875, 425))
+                            pos=(725, 425))
+        quitButton = Button(text='Quit',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(1025, 425))
+
+        playAgainButton.bind(on_release=defeatPop.dismiss)
+        playAgainButton.bind(on_release=MainScreen.setNewGameScreen)
 
         quitButton.bind(on_release=defeatPop.dismiss)
-        quitButton.bind(on_release=MainScreen.setToNewGameScreen)
+        quitButton.bind(on_release=MainScreen.setTitleScreen)
 
         defeatLay.add_widget(quitButton)
+        defeatLay.add_widget(playAgainButton)
         defeatLay.add_widget(defeatImage)
         defeatPop.open()
 
 
 
+titleImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+instructionImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+newGameImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
 mainImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
 mainImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .85})
-newGameImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
-#newGameImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .85})
 
 
 #border = Image(source='images/rectangle.png', allow_stretch=True, keep_ratio=False,
             #   pos=(Window.width * 0, Window.height * 1.4), size_hint_y=None, height=Window.height * .3,
              #  size_hint_x=None, width=Window.width * 1.975)
-
 
 
 class NewGame(Screen):
@@ -315,35 +334,62 @@ class NewGame(Screen):
         screenManager.current = 'main'
         #setDifficulty(difficulty)
 
-'''
-main = MainScreen(name='main')
+    def instructionPopup(self):  # instruction POPUP
+        #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
+        instruction = FloatLayout()
+        instructionPop = Popup(title='Instructions',
+                               size_hint=(0.3, 0.23),
+                               auto_dismiss=False,
+                               title_size=30,
+                               title_align='center',
+                               content=instruction)
+        quitButton = Button(text='Dismiss',
+                            size_hint=(0.23, 0.4),
+                            font_size=20,
+                            pos=(950, 425))
+        instructionLabel = Label(text='the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose',
+                                 pos=(725, 600),
+                                 font_size=25)
+
+        quitButton.bind(on_release=instructionPop.dismiss)
+        instruction.add_widget(quitButton)
+        instruction.add_widget(instructionLabel)
+        instructionPop.open()
+
+
+class TitleScreen(Screen):
+
+    def setInstructionScreen(self):
+        screenManager.current = 'instruction'
+        #setDifficulty(difficulty)
+
+class InstructionScreen(Screen):
+
+    def setNewScreen(self):
+        screenManager.current = 'newGame'
+        #setDifficulty(difficulty)
+
+title = TitleScreen(name='title')
+
+instruction = InstructionScreen(name='instruction')
 
 newGame = NewGame(name='newGame')
 
-newGame.add_widget(newGameImageQueue)
-
-newGame.add_widget(newGameImageQueue2)
-main.add_widget(mainImageQueue)
-
-screenManager.add_widget(main)
-screenManager.add_widget(newGame)
-
-screenManager.current = 'main'
-'''
 main = MainScreen(name='main')
 
-newGame = NewGame(name='newGame')
-
+title.add_widget(titleImageQueue)
+instruction.add_widget(instructionImageQueue)
 main.add_widget(mainImageQueue)
-
 main.add_widget(mainImageQueue2)
 newGame.add_widget(newGameImageQueue)
 
-
-screenManager.add_widget(main)
+screenManager.add_widget(title)
+screenManager.add_widget(instruction)
 screenManager.add_widget(newGame)
+screenManager.add_widget(main)
 
-screenManager.current= 'newGame'
+screenManager.current= 'title'
+#screenManager.current= 'newGame'
 
 #main.add_widget(border)
 
