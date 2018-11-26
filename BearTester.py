@@ -1,27 +1,35 @@
-mock_grid = range(1,92)
+#This file was created to test the goToward function in display.py.
+import networkx as nx
+G = nx.Graph()
 
-player_loc = 17
-bear_loc = 43
+mock_grid = list(range(1,92))#1-91
 
-transformations = ()
-player_row = (player_loc-1)//13
-bear_row = (bear_loc-1)//13
-player_col = //
-# Determining which location is closest to the player
-if bear_row != player_row:
-    #Transformations is a list of all possible grid locations to move to. Any locations that aren't between 1
-    # and 91 are invalid
-    transformations = (bear_loc-12,bear_loc-13,bear_loc-14,bear_loc+12,bear_loc+13,bear_loc+14)
-    transformations = tuple((x for x in transformations if (x > 1 and x < 91)))
-    closest_loc = 100 #arbitrary large number
-    if bear_row > player_row:
-        for j in transformations:
-            if (j - player_loc) < closest_loc:
-                closest_loc = j
+player_loc = 5
+bear_loc = 30
 
-    if bear_row < player_row:
-        for j in transformations:
-            if (j - player_loc) > closest_loc:
-                closest_loc = (j - player_loc) + 1
+#Creates a node for each across each row
+G.add_nodes_from([1, 13])
+G.add_nodes_from([14, 26])
+G.add_nodes_from([27, 39])
+G.add_nodes_from([40, 52])
+G.add_nodes_from([53, 65])
+G.add_nodes_from([66, 78])
+G.add_nodes_from([79, 91])
 
-    print(closest_loc)
+#start of each row
+row_starters = (1, 14, 27, 40, 53, 66, 79)
+
+#connects all the nodes with edges
+for r in row_starters:
+    for x in range(r, (r+12)):
+        G.add_edge(x, x+1)
+
+for x in range(1,54,26):
+    for j in range(x, x+14):
+        G.add_edge(j, j+13)
+
+for x in range(66,79):
+    G.add_edge(x, x+13)
+
+#finds shortest path
+print(nx.shortest_path(G, source=player_loc, target=bear_loc))
