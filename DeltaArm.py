@@ -2,8 +2,9 @@ import Slush
 import math
 import time
 import sys
-sys.path.insert(0, "/home/pi/Documents/RaspberryPiCommon/pidev")
-from stepper import stepper
+
+#sys.path.insert(0, "/home/pi/Documents/RaspberryPiCommon/pidev")
+import stepper
 #sys.path.insert(0,'Adafruit_Python_PCA9685/Adafruit_PCA9685')
 #import PCA9685
 
