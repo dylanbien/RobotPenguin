@@ -260,13 +260,14 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         print('pressed' + str(self.id))
         
         if ('90' in self.id):
-            print('hallo')
             main.playerForward()
-            sleep(2)
-            main.playerRotate('left')
-            sleep(2)
-            main.playerForward()
-            sleep(2)
+        if ('91' in self.id):
+            main.playerRotate('right')
+        if ('89' in self.id):
+           main.playerRotate('left')
+        if ('77' in self.id):
+            main.playerBackward()
+            
 
     
 
@@ -407,7 +408,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
     
     def moveRight(self):  # strafe
         if (sm.current != 'main'): return
-        next = int(self.id.strip(string.ascii_letters)) + 1
+        next = int(self.id.strip(string.ascii_letters)) + 1  #11/26 check goes backwards sometimes
         if (next % main.children[0].cols == 1):
             return
         else:
