@@ -27,13 +27,11 @@ from kivy.uix.widget import Widget
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
+
 difficulty = 'easy'
-canWin = False
-turn = 0
-justGeared = False
-gears = []
-highScore = 2
-score = 0
+locPenguin = 1 #sets starting location of the penguin
+locGoal = [85,88,91] #location of the fish
+
 sm = ScreenManager()
 Window.size = (1920, 1080)
 Window.fullscreen = True
@@ -58,32 +56,14 @@ def quitAll():
 
 
 def reset(dif):
-    global turn
-    global difficulty
-    global canWin
-    global score
-    global justGeared
-    canWin = False
-    justGeared = False
-    print('difficulty was ' + difficulty)
+   
+    
     difficulty = dif
     print('now is ' + difficulty)
-    turn = 0
-    testIndex = 0
-    score = 0
-    grid.clear_widgets()
-    possible = []
-    test = random.sample(range(1, 82), 81)
-    locPenguin = 1 #sets starting location of the penguin
-    locGoal = [85,88,91] #location of the fish
     
-  # banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10,     locs[0] + 8,
-          #    locs[0]] #8 spots around the penguin needs to be fixe
-
-
-    edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 28, 37, 46, 55, 64, 73, 74, 75, 76, 77, 78, 79, 80, 81, 18, 27, 36, 45,
-             54, 63, 72]  # will sometimes contain locations of other things
-
+    grid.clear_widgets()
+    
+   
     #sets possible locations of the obstacles
     allObstacles = [
     [3,4, 5, 6],
@@ -122,33 +102,29 @@ def reset(dif):
         assignedGoal = locGoal[1]
     elif (dif == 'hard'):
         assignedGoal = locGoal[2]
+    
+    actorGoal =   main.findActor(assignedGoal) # assigns goal id
+    print('goal is ' + str((assignedGoal)))
+    actorGoal.source = 'icons/ICON_Goal.jpg'
 
-
-    #for actor in main.children[0].children:
         
     actorPenguin = main.findActor(locPenguin)   #places penguin                
     print('player is ' + str(locPenguin))
     actorPenguin.source = 'players/ICON_Player_180.jpg'
 
-    actorGoal =   main.findActor(assignedGoal) # assigns goal id to actor + obstacle
-    print('goal is ' + str((assignedGoal)))
-    actorGoal.source = 'icons/ICON_Goal.jpg'
-
+    
 
     for i in assignedObstacleLocations:
+        
         tempActor = main.findActor(i) #assigns jewels id to actor + obstacle
-        #print('jewel/igloo is ' + str(i))
+        
         if (i%2 == 0):
             tempActor.source = 'icons/ICON_Igloo.jpg'
         else:
             tempActor.source = 'icons/ICON_Jewel.jpg'
 
-
-
-
-
 #Combined hardware.py functions
-def obey_paul(data):
+    def obey_paul(data):
     
     #if (date =='easy'):
         #self.reset('easy')
@@ -157,23 +133,23 @@ def obey_paul(data):
     #elif (date == 'hard'):
         #self.reset('hard')
     
-    if (data == 'forward '):
+        if (data == 'forward '):
                 
-        main.playerForward()
+            main.playerForward()
 
-    elif (data == 'backward '): #recieves backwards
+        elif (data == 'backward '): #recieves backwards
       
-        main.playerBackward()
+           main.playerBackward()
 
-    elif (data == 'left '): #receives left
-        main.playerRotate('left')
+        elif (data == 'left '): #receives left
+            main.playerRotate('left')
 
-    elif (data == 'right '): #revieves right
-        main.playerRotate('right')
+        elif (data == 'right '): #revieves right
+            main.playerRotate('right')
 
-    else:
-        print('fail')
-        return
+        else:
+            print('fail')
+            return
 #// DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//
 # # ////////////////////////////////////////////////////////////////////////////
 # # //	D						LOAD KIVY FILE								//
@@ -184,7 +160,9 @@ def obey_paul(data):
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.jpg', 'ICON_Wrench.jpg', etc.]
 
 class MainScreen(Screen):
-    def __init__(self, **kwargs):
+   
+   #for keyboard testing
+   def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         self._keyboard = Window.request_keyboard(
             self._keyboard_closed, self, 'text')
@@ -201,6 +179,7 @@ class MainScreen(Screen):
         print('My keyboard have been closed!')
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
         self._keyboard = None
+        
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         #print('The key', keycode, 'have been pressed')
        # print(' - text is %r' % text)
@@ -217,14 +196,9 @@ class MainScreen(Screen):
         elif keycode[1] == 'right':
             self.playerRotate('right')
             
-       
-        # Return True to accept the key. Otherwise, it will be used by
-        # the system.
-        #return True
     
     def findActor(self, ActorIndex):
         return self.children[0].children[len(self.children[0].children) - ActorIndex]
-    
     
     def exitProgram(self):
         App.get_running_app().stop()
@@ -254,9 +228,7 @@ class MainScreen(Screen):
         print('you have moved the player forwards')
         for actor in main.children[0].children: #loops through all actors
             if ('Player' in actor.source): #if an actors source has the word plater in it
-                              #(players/ICON_Player.jpg) > name of player
-                actor.moveForward()
-                
+                actor.moveForward() #(players/ICON_Player.jpg) > name of player
                 return
 
     def playerBackward(self):
@@ -272,6 +244,8 @@ class MainScreen(Screen):
             if ('Player' in actor.source):
                 actor.rotateDirection(direction)
                 return
+            
+            
    #done with calls to actor
 
 
@@ -298,7 +272,6 @@ class Actor(ButtonBehavior, Image): #creates an actor class
     def on_press(self): #when button is pressed
         print('pressed' + str(self.id))
         
-
     #below are called above in the main class
 
     def moveForward(self): #find out which image is on the screen
@@ -383,48 +356,6 @@ class Actor(ButtonBehavior, Image): #creates an actor class
                     self.source = 'players/ICON_Player_' + angle + '.jpg'
                 
             
-
-
-    #gets called in all the directional moves
-    def move(self, next):
-        
-        actor = main.findActor(next) #gets the with id value next
-        print(actor.id)
-        assert actor.id == "actor" + str(next)
-        
-        print(actor.id+ 'pt 2')
-        
-        if (actor.source == TransparentId):
-            print('can move') #if next spot is clear
-            temp = self.source
-            self.source = actor.source
-            actor.source = temp
-            #arm.move() move the arm based on how its facing...find in source name
-            return
-            
-        elif ('Goal' in actor.source and 'Player' in self.source): #if you next location is the fish
-            actor.source = self.source
-            self.source = TransparentId
-            print('you win')
-            return 
-                
-                
-        elif ('Player' in self.source and 'Igloo' in actor.source ):
-            print('you hit an obstacle')
-            return #can't move...you lose
-            
-            #elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
-               # if (justGoaled): self.clearGoal()
-               # justGoaled = False
-               # self.source = actor.source;
-                #actor.source = TransparentId
-                #print('you are a failure')
-                #Clock.schedule_once(self.loser, 1)
-           
-    
-    #get called in move forward and move backwards
-
-    
     def moveRight(self):  # strafe
         if (sm.current != 'main'): return
         
@@ -475,6 +406,38 @@ class Actor(ButtonBehavior, Image): #creates an actor class
             self.move(next)
 
 
+    #gets called in all the directional moves
+    def move(self, next):
+        
+        actor = main.findActor(next) #gets the with id value next
+        print(actor.id)
+        assert actor.id == "actor" + str(next)
+        
+        print(actor.id+ 'pt 2')
+        
+        if (actor.source == TransparentId):
+            print('can move') #if next spot is clear
+            temp = self.source
+            self.source = actor.source
+            actor.source = temp
+            #arm.move() move the arm based on how its facing...find in source name
+            return
+            
+        elif ('Goal' in actor.source and 'Player' in self.source): #if you next location is the fish
+            actor.source = self.source
+            self.source = TransparentId
+            print('you win')
+            return 
+                
+                
+        elif ('Player' in self.source and 'Igloo' in actor.source ):
+            print('you hit an obstacle')
+            return #can't move...you lose
+    
+
+    
+    
+
 #needs to be fixed for harder levels
     #def goTowards(self):  # if anyone wants to fix please feel free
                
@@ -488,7 +451,6 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 
 #creates a 9 * 9 grid
 grid = GridLayout(id='grid', cols=13, rows=7, padding=15, spacing=1.5) 
-
 
 #sets the background image
 bg = Image(source='images/BG.jpg', size_hint=[1.1, 2])
