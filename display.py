@@ -20,6 +20,8 @@ from kivy.clock import Clock
 from time import sleep
 from kivy.uix.behaviors import ButtonBehavior
 
+from kivy.uix.widget import Widget
+
 
 # ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
@@ -35,7 +37,8 @@ score = 0
 sm = ScreenManager()
 Window.size = (1920, 1080)
 Window.fullscreen = True
-TransparentId = 'icons/ICON_Transparent.png'
+TransparentId = ''
+#'icons/ICON_Transparent.png'
 
 
 '''
@@ -107,7 +110,9 @@ def reset(dif):
         y = random.randint(0, len(temp)-1) #get random in in each array
         saved = temp[y]
         assignedObstacleLocations.append(saved)
-        print(assignedObstacleLocations)
+        
+    print('obstacles at')
+    print(assignedObstacleLocations)
 
     assignedGoal = 0
 
@@ -132,7 +137,7 @@ def reset(dif):
 
     for i in assignedObstacleLocations:
         tempActor = main.findActor(i) #assigns jewels id to actor + obstacle
-        print('jewel/igloo is ' + str(i))
+        #print('jewel/igloo is ' + str(i))
         if (i%2 == 0):
             tempActor.source = 'icons/ICON_Igloo.jpg'
         else:
@@ -179,6 +184,43 @@ def obey_paul(data):
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.jpg', 'ICON_Wrench.jpg', etc.]
 
 class MainScreen(Screen):
+    def __init__(self, **kwargs):
+        super(MainScreen, self).__init__(**kwargs)
+        self._keyboard = Window.request_keyboard(
+            self._keyboard_closed, self, 'text')
+        print('hi')
+        if self._keyboard.widget:
+            # If it exists, this widget is a VKeyboard object which you can use
+            # to change the keyboard layout.
+            pass
+        self._keyboard.bind(on_key_down=self._on_keyboard_down)
+
+        # Keycode is composed of an integer + a string
+        # If we hit escape, release the keyboard
+    def _keyboard_closed(self):
+        print('My keyboard have been closed!')
+        self._keyboard.unbind(on_key_down=self._on_keyboard_down)
+        self._keyboard = None
+    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        #print('The key', keycode, 'have been pressed')
+       # print(' - text is %r' % text)
+        #print(' - modifiers are %r' % modifiers
+       
+        
+        if keycode[1] == 'up':
+            self.playerForward()
+            
+        elif keycode[1] == 'down':
+            self.playerBackward()
+        elif keycode[1] == 'left':
+            self.playerRotate('left')
+        elif keycode[1] == 'right':
+            self.playerRotate('right')
+            
+       
+        # Return True to accept the key. Otherwise, it will be used by
+        # the system.
+        #return True
     
     def findActor(self, ActorIndex):
         return self.children[0].children[len(self.children[0].children) - ActorIndex]
@@ -202,18 +244,11 @@ class MainScreen(Screen):
         for actor in self.children[0].children:
             if (actor.id == location):
                 actor.source = TransparentId
-
-    def test(self):
-        for actor in self.children[0].children:
-            if (actor.source != TransparentId):
-                actor.random()
     
 
    #the below move the actor
    #they get called in the obey function
    #tehy call functions in the actor class
-
- 
 
     def playerForward(self): #just find the location of the player
         print('you have moved the player forwards')
@@ -263,37 +298,15 @@ class Actor(ButtonBehavior, Image): #creates an actor class
     def on_press(self): #when button is pressed
         print('pressed' + str(self.id))
         
-        if ('90' in self.id):
-            main.playerForward()
-        if ('91' in self.id):
-            main.playerRotate('right')
-        if ('89' in self.id):
-           main.playerRotate('left')
-        if ('77' in self.id):
-            main.playerBackward()
-            
 
-    
-
-    def test(self):
-        if ('Player' not in self.source): return
-        self.rotate(self.id, 90 * random.randint(0, 3))
-        self.moveForward()
-
-
-  
     #below are called above in the main class
 
-    
     def moveForward(self): #find out which image is on the screen
-        #there are different images for the player based on the direction they are facing
-        
-        
+        #there are different images for the player based on the direction they are facing 
         
         if ('90' in self.source): #right
             self.moveRight()
             #main.huntPlayer()
-            #arm.move() move the arm based on how its facing...find in source name
             
             return
         elif ('180' in self.source): #down
@@ -326,22 +339,6 @@ class Actor(ButtonBehavior, Image): #creates an actor class
             self.moveDown()
             #main.huntPlayer()
             return
-
-
-
-    def random(self):
-        if ('Player' not in self.source):
-            return
-        index = random.randint(1, 4)
-        if index == 1:
-            self.moveRight()
-        elif index == 2:
-            self.moveLeft()
-        elif index == 3:
-            self.moveUp()
-        else:
-            self.moveDown()
-   
    
     def rotateDegrees(self, location, degrees):
         if (sm.current != 'main'): return
@@ -356,12 +353,14 @@ class Actor(ButtonBehavior, Image): #creates an actor class
     
     def rotateDirection(self, direction):
         if (sm.current != 'main'): return
+        
         print( 'direction = '  + direction)
-        if (direction == 'left' and self.source == 'icons/ICON_Player.jpg'): #if main icon
+        print( 'source = ' + self.source)
+        if (direction == 'left' and self.source == 'players/ICON_Player.jpg'): #if main icon
             self.source = 'players/ICON_Player_270.jpg'
             print ('degree = 270')
             return
-        elif (direction == 'right' and self.source == 'icons/ICON_Player.jpg'): #if main icon
+        elif (direction == 'right' and self.source == 'players/ICON_Player.jpg'): #if main icon
             self.source = 'players/ICON_Player_90.jpg'
             print ('degree = 90')
             return
@@ -371,38 +370,47 @@ class Actor(ButtonBehavior, Image): #creates an actor class
             if (direction == 'left'):
                 angle = str(((degree + 270) % 360))
                 print('new angle = ' + angle)
-                self.source = 'players/ICON_Player_' + angle + '.jpg'
+                if (angle == '0'):
+                    self.source = 'players/ICON_Player.jpg'
+                else: 
+                    self.source = 'players/ICON_Player_' + angle + '.jpg'
             else:
-                self.source = 'players/ICON_Player_' + str(((degree + 90) % 360)) + '.jpg'
+                angle = str(((degree + 90) % 360))
                 print('new angle = ' + angle)
+                if (angle == '0'):
+                    self.source = 'players/ICON_Player.jpg'
+                else: 
+                    self.source = 'players/ICON_Player_' + angle + '.jpg'
                 
-            if (self.source == 'players/ICON_Player_0.jpg'):
-                self.source = 'players/ICON_Player.jpg'
+            
 
 
     #gets called in all the directional moves
     def move(self, next):
         
         actor = main.findActor(next) #gets the with id value next
+        print(actor.id)
         assert actor.id == "actor" + str(next)
         
+        print(actor.id+ 'pt 2')
         
-        print(actor.id)
-        
-        if (actor.source == TransparentId): #if next spot is clear
+        if (actor.source == TransparentId):
+            print('can move') #if next spot is clear
             temp = self.source
             self.source = actor.source
             actor.source = temp
+            #arm.move() move the arm based on how its facing...find in source name
             return
             
         elif ('Goal' in actor.source and 'Player' in self.source): #if you next location is the fish
-            actor.source = self.source;
+            actor.source = self.source
             self.source = TransparentId
+            print('you win')
             return 
                 
                 
         elif ('Player' in self.source and 'Igloo' in actor.source ):
-            print('you are a failure')
+            print('you hit an obstacle')
             return #can't move...you lose
             
             #elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
@@ -424,6 +432,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         print(str(next))
         
         if (next % main.children[0].cols == 1):
+            print('cant move, at the right wall')
             return
         else:
             self.move(next)
@@ -435,6 +444,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         print(str(next))
         
         if (next % main.children[0].cols == 0):
+            print('cant move, at the left wall')
             return
         else:
             self.move(next)
@@ -446,6 +456,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         print(next)
         
         if (next < 0):
+            print('cant move, at the top wall')
             return
         else:
             self.move(next)
@@ -458,6 +469,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
 
         
         if (next > main.children[0].rows * main.children[0].cols):
+            print('cant move, at the bottom wall')
             return
         else:
             self.move(next)
@@ -490,8 +502,6 @@ main.add_widget(bg) #adds background to the screen
 main.add_widget(grid) #adds grid to the scren
 
 sm.add_widget(main)
-
-
 
 reset('easy')
 
