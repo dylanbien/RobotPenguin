@@ -1,3 +1,77 @@
+<TitleScreen>:
+    name: 'title'
+    FloatLayout:
+        size_hint: None, None
+
+# BUTTONS
+        Button:
+            size_hint: None,None
+            font_size: 65
+            size: root.width * 0.2, root.height * 0.15
+            x: root.width * 0.4
+            y: root.height * 0.35
+            text: 'Start'
+            background_normal: ''
+            background_color: 0.6, 0.6, 1.0, 1.0
+            on_release: root.setInstructionScreen()
+
+        Label:
+            text: 'Robot Penguin'
+            font_size: 175
+            size: root.width * 0.75, root.height * 0.4
+            x: root.width * 0.47
+            y: root.height * 0.65
+
+        Screen:
+            Image:
+                source: 'images/DPEA.jpeg'
+                keep_ratio: True
+                opacity: 1
+                size_hint: 4.3, 7.5
+                x: root.width * 0.825
+                y: root.height * 0.6
+
+<InstructionScreen>:
+    name: 'instruction'
+    FloatLayout:
+        size_hint: None, None
+
+# BUTTONS
+        Button:
+            size_hint: None,None
+            font_size: 65
+            size: root.width * 0.2, root.height * 0.15
+            x: root.width * 0.75
+            y: root.height * 0.085
+            text: 'Ready'
+            background_normal: ''
+            background_color: 0.4, 0.4, 0.4, 1.0
+            on_release: root.setNewScreen()
+
+        Label:
+            text: 'Instructions'
+            font_size: 175
+            size: root.width * 0.75, root.height * 0.4
+            x: root.width * 0.47
+            y: root.height * 0.8
+
+        Label:
+            text: 'the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose'
+            font_size: 45
+            size: root.width * 0.25, root.height * 0.125
+            x: root.width * 0.35
+            y: root.height * 0.5
+
+        Screen:
+            Image:
+                source: 'images/DPEA.jpeg'
+                keep_ratio: True
+                opacity: 1
+                size_hint: 4.3, 7.5
+                x: root.width * 0.825
+                y: root.height * 0.6
+
+
 <MainScreen>:
     name: 'main'
     FloatLayout:
@@ -8,11 +82,11 @@
             text: 'X'
             font_size: 23
             size_hint: None,None
-            size: root.width * 0.017, root.width * 0.015
+            size: root.width * (1.5*0.017), root.width * (1.5*0.015)
             x: root.width * 0.972
             y: root.height * 0.945
             background_color: 0.7, 0.7, 0.7, 1
-            on_release: root.quitPopup()
+            on_release: root.defeatPopup()
 
         Button: # LEFT BUTTON
             text: 'TURN LEFT'
@@ -106,6 +180,16 @@
         size_hint: None, None
         
 # BUTTONS
+        Button: #help button
+            text: '?'
+            font_size: 23
+            size_hint: None,None
+            size: root.width * (1.5*0.017), root.width * (1.5*0.015)
+            x: root.width * (1-0.972)
+            y: root.height * 0.945
+            background_color: 0.7, 0.7, 0.7, 1
+            on_release: root.instructionPopup()
+
         Button: #EASY BUTTON
             size_hint: None,None
             font_size: 65
@@ -114,8 +198,8 @@
             y: root.height * 0.45
             text: 'EASY'
             background_normal: ''
-            background_color: 0.0, 1.0, 0.0, 1.0
-            on_release: root.setDif()
+            background_color: 0.0, 1.0, 0.0, 0.85
+            on_release: root.setMainScreen()
 
         Button: #MEDIUM BUTTON
             size_hint: None,None
@@ -127,8 +211,8 @@
             outline_color: 0.0, 0.0, 0.0
             text: 'MEDIUM'
             background_normal: ''
-            background_color: 1.0, 1.0, 0.0, 1.0
-            on_release: root.setDif()
+            background_color: 1.0, 1.0, 0.0, 0.925
+            on_release: root.setMainScreen()
 
 
         Button: #HARD BUTTON
@@ -139,8 +223,8 @@
             y: root.height * 0.45
             text: 'HARD'
             background_normal: ''
-            background_color: 1.0, 0.0, 0.0, 1.0
-            on_release: root.setDif()
+            background_color: 1.0, 0.0, 0.0, 0.85
+            on_release: root.setMainScreen()
 
 # LABELS
 
@@ -162,14 +246,6 @@
 
 # IMAGES
         Screen:
-            Image:
-                source: 'images/DPEA.jpeg'
-                keep_ratio: True
-                opacity: 1
-                size_hint: 4.3, 7.5
-                x: root.width * 0.825
-                y: root.height * 0.6
-
             Image:
                 source: 'images/penguins3.jpg'
                 keep_ratio: True
