@@ -35,7 +35,7 @@ score = 0
 sm = ScreenManager()
 Window.size = (1920, 1080)
 Window.fullscreen = True
-
+TransparentId = 'icons/ICON_Transparent.png'
 
 
 '''
@@ -100,7 +100,7 @@ def reset(dif):
     assignedObstacleLocations = []
 
     for i in range(0, grid.cols * grid.rows): #resets all 81 grids to transparent
-        b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
+        b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
         grid.add_widget(b)
 
     for temp in allObstacles:
@@ -119,25 +119,24 @@ def reset(dif):
         assignedGoal = locGoal[2]
 
 
-    for actor in main.children[0].children:
-        if (actor.id == 'actor' + str(locPenguin)): #places penguin
-            print('player is ' + str(locPenguin))
-            actor.source = 'players/ICON_Player_180.jpg'
+    #for actor in main.children[0].children:
+        
+    actorPenguin = main.findActor(locPenguin)   #places penguin                
+    print('player is ' + str(locPenguin))
+    actorPenguin.source = 'players/ICON_Player_180.jpg'
 
-        if (actor.id == 'actor' + str(assignedGoal)):  # assigns goal id to actor + obstacle
-            print('goal is ' + str((locGoal)))
-            actor.source = 'icons/ICON_Goal.jpg'
+    actorGoal =   main.findActor(assignedGoal) # assigns goal id to actor + obstacle
+    print('goal is ' + str((assignedGoal)))
+    actorGoal.source = 'icons/ICON_Goal.jpg'
 
-    for actor in main.children[0].children:
 
-        for i in assignedObstacleLocations:
-
-            if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
-                print('jewel/igloo is ' + str(i))
-                if (i%2 == 0):
-                    actor.source = 'icons/ICON_Igloo.jpg'
-                else:
-                    actor.source = 'icons/ICON_Jewel.jpg'
+    for i in assignedObstacleLocations:
+        tempActor = main.findActor(i) #assigns jewels id to actor + obstacle
+        print('jewel/igloo is ' + str(i))
+        if (i%2 == 0):
+            tempActor.source = 'icons/ICON_Igloo.jpg'
+        else:
+            tempActor.source = 'icons/ICON_Jewel.jpg'
 
 
 
@@ -180,6 +179,11 @@ def obey_paul(data):
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.jpg', 'ICON_Wrench.jpg', etc.]
 
 class MainScreen(Screen):
+    
+    def findActor(self, ActorIndex):
+        return self.children[0].children[len(self.children[0].children) - ActorIndex]
+    
+    
     def exitProgram(self):
         App.get_running_app().stop()
         Window.close()
@@ -187,7 +191,7 @@ class MainScreen(Screen):
     #Replaces every image with a blank image
     def resetBoard(self):
         for actor in self.children[0].children:
-            actor.source = 'icons/ICON_Transparent.png'
+            actor.source = TransparentId
 
     def addActor(self, location, type):
         for actor in self.children[0].children:
@@ -197,11 +201,11 @@ class MainScreen(Screen):
     def removeActor(self, location):
         for actor in self.children[0].children:
             if (actor.id == location):
-                actor.source = 'icons/ICON_Transparent.png'
+                actor.source = TransparentId
 
     def test(self):
         for actor in self.children[0].children:
-            if (actor.source != 'icons/ICON_Transparent.png'):
+            if (actor.source != TransparentId):
                 actor.random()
     
 
@@ -212,16 +216,16 @@ class MainScreen(Screen):
  
 
     def playerForward(self): #just find the location of the player
-        print('you have moved the player forwards or something')
+        print('you have moved the player forwards')
         for actor in main.children[0].children: #loops through all actors
             if ('Player' in actor.source): #if an actors source has the word plater in it
-                                           #(players/ICON_Player.jpg) > name of player
+                              #(players/ICON_Player.jpg) > name of player
                 actor.moveForward()
                 
                 return
 
     def playerBackward(self):
-        print('you have moved the player backwards or something')
+        print('you have moved the player backwards')
         for actor in self.children[0].children:
             if ('Player' in actor.source):
                 actor.moveBackward()
@@ -355,12 +359,13 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         print( 'direction = '  + direction)
         if (direction == 'left' and self.source == 'icons/ICON_Player.jpg'): #if main icon
             self.source = 'players/ICON_Player_270.jpg'
+            print ('degree = 270')
             return
         elif (direction == 'right' and self.source == 'icons/ICON_Player.jpg'): #if main icon
             self.source = 'players/ICON_Player_90.jpg'
+            print ('degree = 90')
             return
         else:
-            print ('WUZ UP')
             degree = int(self.source.strip(string.ascii_letters + string.punctuation))
             print ('degree = ' + str(degree))
             if (direction == 'left'):
@@ -369,6 +374,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
                 self.source = 'players/ICON_Player_' + angle + '.jpg'
             else:
                 self.source = 'players/ICON_Player_' + str(((degree + 90) % 360)) + '.jpg'
+                print('new angle = ' + angle)
                 
             if (self.source == 'players/ICON_Player_0.jpg'):
                 self.source = 'players/ICON_Player.jpg'
@@ -377,28 +383,33 @@ class Actor(ButtonBehavior, Image): #creates an actor class
     #gets called in all the directional moves
     def move(self, next):
         
-        for actor in main.children[0].children:
-            if (actor.id == 'actor' + str(next) and actor.source == 'icons/ICON_Transparent.png'): #if next spot is clear
-                temp = self.source
-                self.source = actor.source
-                actor.source = temp
-                return
+        actor = main.findActor(next) #gets the with id value next
+        assert actor.id == "actor" + str(next)
+        
+        
+        print(actor.id)
+        
+        if (actor.source == TransparentId): #if next spot is clear
+            temp = self.source
+            self.source = actor.source
+            actor.source = temp
+            return
             
-            elif (actor.id == 'actor' + str(next) and 'Goal' in actor.source and 'Player' in self.source): #if you next location is the fish
-                actor.source = self.source;
-                self.source = 'icons/ICON_Transparent.png'
-                return 
+        elif ('Goal' in actor.source and 'Player' in self.source): #if you next location is the fish
+            actor.source = self.source;
+            self.source = TransparentId
+            return 
                 
                 
-            elif (actor.id == 'actor' + str(next) and 'Player' in self.source and 'Igloo' in actor.source ):
-                print('you are a failure')
-                return #can't move...you lose
+        elif ('Player' in self.source and 'Igloo' in actor.source ):
+            print('you are a failure')
+            return #can't move...you lose
             
             #elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
                # if (justGoaled): self.clearGoal()
                # justGoaled = False
                # self.source = actor.source;
-                #actor.source = 'icons/ICON_Transparent.png'
+                #actor.source = TransparentId
                 #print('you are a failure')
                 #Clock.schedule_once(self.loser, 1)
            
@@ -408,7 +419,10 @@ class Actor(ButtonBehavior, Image): #creates an actor class
     
     def moveRight(self):  # strafe
         if (sm.current != 'main'): return
-        next = int(self.id.strip(string.ascii_letters)) + 1  #11/26 check goes backwards sometimes
+        
+        next = int(self.id.strip(string.ascii_letters)) + 1
+        print(str(next))
+        
         if (next % main.children[0].cols == 1):
             return
         else:
@@ -416,7 +430,10 @@ class Actor(ButtonBehavior, Image): #creates an actor class
 
     def moveLeft(self):  # strafe
         if (sm.current != 'main'): return
+        
         next = int(self.id.strip(string.ascii_letters)) - 1
+        print(str(next))
+        
         if (next % main.children[0].cols == 0):
             return
         else:
@@ -424,8 +441,10 @@ class Actor(ButtonBehavior, Image): #creates an actor class
 
     def moveUp(self):
         if (sm.current != 'main'): return
+        
         next = int(self.id.strip(string.ascii_letters)) - main.children[0].cols
         print(next)
+        
         if (next < 0):
             return
         else:
@@ -433,7 +452,11 @@ class Actor(ButtonBehavior, Image): #creates an actor class
 
     def moveDown(self):
         if (sm.current != 'main'): return
+        
         next = int(self.id.strip(string.ascii_letters)) + main.children[0].cols
+        print(next)
+
+        
         if (next > main.children[0].rows * main.children[0].cols):
             return
         else:
@@ -459,7 +482,7 @@ grid = GridLayout(id='grid', cols=13, rows=7, padding=15, spacing=1.5)
 bg = Image(source='images/BG.jpg', size_hint=[1.1, 2])
 
 for i in range(0, grid.cols * grid.rows): #adds the transparent image to all 81 boxes
-    b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
+    b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
     grid.add_widget(b)
 
 main = MainScreen(name='main') #creates a main screen
@@ -467,6 +490,7 @@ main.add_widget(bg) #adds background to the screen
 main.add_widget(grid) #adds grid to the scren
 
 sm.add_widget(main)
+
 
 
 reset('easy')
