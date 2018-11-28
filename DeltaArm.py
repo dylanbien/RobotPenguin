@@ -14,6 +14,7 @@ class DeltaArm:
     #Static constants
     #angles of each effector arm relative to coordinate axis
     phi_vals = [math.radians(210), math.radians(90), math.radians(330)]
+    
     #feet
     fixed_edge = 2.1651
     effector_edge = 1.775
@@ -26,7 +27,6 @@ class DeltaArm:
 
     def __init__(self, c1, c2, c3):
         self.board = Slush.sBoard()
-        print("wuz up")
         self.motors = [stepper(port = c1, micro_steps = 32, speed = 20),
                    stepper(port = c2, micro_steps = 32, speed = 20),
                     stepper(port = c3, micro_steps = 32, speed = 20)]
@@ -38,6 +38,7 @@ class DeltaArm:
     def home_all(self):
         for mtr in self.motors:
             mtr.goUntilPress(0,1,5000)
+            
             print(self.get_position(0))
             print(self.get_position(1))
             print(self.get_position(2))
@@ -181,9 +182,11 @@ class DeltaArm:
         return (thetas[0], thetas[1], thetas[2])
 
     def move_to_point(self,x,y,z):
+        print('start move arm to point')
         (a1,a2,a3) = DeltaArm.compute_triple_inverse_kinematics(x,y,z)
+        print('end move arm to point' + str(a1) + str(a2) + str(a3) )
         self.set_all_to_different_angle(a1,a2,a3)
-    
+         
     @staticmethod
     def forward_kinematics(theta1, theta2, theta3):
         rf = DeltaArm.upper_len
@@ -253,22 +256,14 @@ class DeltaArm:
         rCurr = 0
 
         while rCurr < rGoal:
-            rGoal_local = rCurr + dr
-            (xCurr,yCurr,zCurr) = tuple([w+q for (w,q) in zip((x0,y0,z0),tuple([a*rGoal_local/rGoal for a in delta]))])
-            (agoal1,agoal2,agoal3) = DeltaArm.compute_triple_inverse_kinematics(xCurr,yCurr,zCurr)
-            (acurr1,acurr2,acurr3) = [self.get_angle(i) for i in range(3)] 
-            delta_angle = (agoal1 - acurr1, agoal2 - acurr2, agoal3 - acurr3)
-            abs_delta = [abs(d) for d in delta_angle]
-            scale = max(abs_delta)
-            (s1,s2,s3) = [d/scale * 750 for d in delta_angle]
-            self.set_all_to_different_velocity(s1,s2,s3)
-            while abs(rCurr - rGoal_local) > dr/2:
-                print(abs(rCurr - rGoal_local))
-                (atemp1,atemp2,atemp3) = [self.get_angle(i) for i in range(3)] 
-                (xtemp,ytemp,ztemp) = DeltaArm.forward_kinematics(atemp1,atemp2,atemp3)
-                deltatemp = tuple([a-b for (a,b) in zip((xtemp,ytemp,ztemp),(x0,y0,z0))])
-                rCurr =  math.sqrt(deltatemp[0]**2 + deltatemp[1]**2 + deltatemp[2]**2)
-        #~ print("XYZ: " + str(x) + " : " + str(y) + " : " + str(z))
+            rCurr += dr
+            (xCurr,yCurr,zCurr) = tuple([w+q for (w,q) in zip((x0,y0,z0),tuple([a*float(rCurr)/float(rGoal) for a in delta]))])
+            print(xCurr,yCurr,zCurr)
+            self.move_to_point(xCurr,yCurr,zCurr)
+            advance_time = time.time() + dt
+            while time.time() < advance_time:
+                pass 
+           #~ print("XYZ: " + str(x) + " : " + str(y) + " : " + str(z))
         self.move_to_point(x,y,z)
 
 

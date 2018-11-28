@@ -8,7 +8,7 @@ sleep(5)
 print("Done homing")
 
 #arm.move_to_point_in_straight_line(0.1, 0.1, 0.1, 1)
-arm.move_to_point(0, 0, 8)
+arm.move_to_point(-3.2, 0, 0)
 
 #arm.set_single_position_steps(0, -25)
 #arm.set_single_position_steps(1, -25)
