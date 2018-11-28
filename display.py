@@ -22,22 +22,23 @@ from kivy.uix.behaviors import ButtonBehavior
 import networkx as nx
 G = nx.Graph()
 
+from kivy.uix.widget import Widget
+
 
 # ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
 # ////////////////////////////////////////////////////////////////
+
 difficulty = 'easy'
-canWin = False
-turn = 0
-justGeared = False
-gears = []
-highScore = 2
-score = 0
+locPenguin = 1 #sets starting location of the penguin
+locGoal = [85,88,91] #location of the fish
+
 sm = ScreenManager()
 Window.size = (1920, 1080)
 Window.fullscreen = True
-
+TransparentId = ''
+#'icons/ICON_Transparent.png'
 
 
 '''
@@ -47,42 +48,15 @@ current = (0, 0, 0)
 direction = 0
 '''
 
-class MyApp(App):
-    def build(self):
-       #Clock.schedule_interval(obey, .1)
-        return sm
-
-def quitAll():
-    quit()
-
-
 def reset(dif):
-    global turn
-    global difficulty
-    global canWin
-    global score
-    global justGeared
-    canWin = False
-    justGeared = False
-    print('difficulty was ' + difficulty)
+   
+    
     difficulty = dif
     print('now is ' + difficulty)
-    turn = 0
-    testIndex = 0
-    score = 0
-    grid.clear_widgets()
-    possible = []
-    test = random.sample(range(1, 82), 81)
-    locPenguin = 1 #sets starting location of the penguin
-    locGoal = [85,88,91] #location of the fish
     
-  # banned = [locs[0] + 1, locs[0] - 1, locs[0] + 9, locs[0] - 9, locs[0] - 10, locs[0] - 8, locs[0] + 10,     locs[0] + 8,
-          #    locs[0]] #8 spots around the penguin needs to be fixe
-
-
-    edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 19, 28, 37, 46, 55, 64, 73, 74, 75, 76, 77, 78, 79, 80, 81, 18, 27, 36, 45,
-             54, 63, 72]  # will sometimes contain locations of other things
-
+    grid.clear_widgets()
+    
+   
     #sets possible locations of the obstacles
     allObstacles = [
     [3,4, 5, 6],
@@ -102,14 +76,16 @@ def reset(dif):
     assignedObstacleLocations = []
 
     for i in range(0, grid.cols * grid.rows): #resets all 81 grids to transparent
-        b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
+        b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
         grid.add_widget(b)
 
     for temp in allObstacles:
         y = random.randint(0, len(temp)-1) #get random in in each array
         saved = temp[y]
         assignedObstacleLocations.append(saved)
-        print(assignedObstacleLocations)
+        
+    print('obstacles at')
+    print(assignedObstacleLocations)
 
 
     assignedGoal = 0
@@ -121,6 +97,15 @@ def reset(dif):
         assignedGoal = locGoal[1]
     elif (dif == 'hard'):
         assignedGoal = locGoal[2]
+    
+    actorGoal =   main.findActor(assignedGoal) # assigns goal id
+    print('goal is ' + str((assignedGoal)))
+    actorGoal.source = 'icons/ICON_Goal.jpg'
+
+        
+    actorPenguin = main.findActor(locPenguin)   #places penguin                
+    print('player is ' + str(locPenguin))
+    actorPenguin.source = 'players/ICON_Player_180.jpg'
 
 
     for actor in main.children[0].children:
@@ -166,25 +151,23 @@ def reset(dif):
 
 
 
-
-
 #Combined hardware.py functions
 def obey_paul(data):
-    
-    #if (date =='easy'):
-        #self.reset('easy')
-    #elif(date == 'medium'):
-      #  self.reset('medium')
-    #elif (date == 'hard'):
-        #self.reset('hard')
-    
+
+#if (date =='easy'):
+    #self.reset('easy')
+#elif(date == 'medium'):
+  #  self.reset('medium')
+#elif (date == 'hard'):
+    #self.reset('hard')
+
     if (data == 'forward '):
-                
+            
         main.playerForward()
 
     elif (data == 'backward '): #recieves backwards
-      
-        main.playerBackward()
+  
+       main.playerBackward()
 
     elif (data == 'left '): #receives left
         main.playerRotate('left')
@@ -195,6 +178,16 @@ def obey_paul(data):
     else:
         print('fail')
         return
+    
+class MyApp(App):
+    
+    def build(self):
+       #Clock.schedule_interval(obey, .1)
+        return sm
+
+    def quitAll():
+        quit()
+
 #// DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//
 # # ////////////////////////////////////////////////////////////////////////////
 # # //	D						LOAD KIVY FILE								//
@@ -205,6 +198,45 @@ def obey_paul(data):
 # all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.jpg', 'ICON_Wrench.jpg', etc.]
 
 class MainScreen(Screen):
+   
+   #for keyboard testing
+    def __init__(self, **kwargs):
+        super(MainScreen, self).__init__(**kwargs)
+        self._keyboard = Window.request_keyboard(
+            self._keyboard_closed, self, 'text')
+        if self._keyboard.widget:
+            # If it exists, this widget is a VKeyboard object which you can use
+            # to change the keyboard layout.
+            pass
+        self._keyboard.bind(on_key_down=self._on_keyboard_down)
+
+        # Keycode is composed of an integer + a string
+        # If we hit escape, release the keyboard
+    def _keyboard_closed(self):
+        print('My keyboard have been closed!')
+        self._keyboard.unbind(on_key_down=self._on_keyboard_down)
+        self._keyboard = None
+        
+    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        #print('The key', keycode, 'have been pressed')
+       # print(' - text is %r' % text)
+        #print(' - modifiers are %r' % modifiers
+       
+        
+        if keycode[1] == 'up':
+            self.playerForward()
+            
+        elif keycode[1] == 'down':
+            self.playerBackward()
+        elif keycode[1] == 'left':
+            self.playerRotate('left')
+        elif keycode[1] == 'right':
+            self.playerRotate('right')
+            
+    
+    def findActor(self, ActorIndex):
+        return self.children[0].children[len(self.children[0].children) - ActorIndex]
+    
     def exitProgram(self):
         App.get_running_app().stop()
         Window.close()
@@ -212,7 +244,7 @@ class MainScreen(Screen):
     #Replaces every image with a blank image
     def resetBoard(self):
         for actor in self.children[0].children:
-            actor.source = 'icons/ICON_Transparent.png'
+            actor.source = TransparentId
 
     def addActor(self, location, type):
         for actor in self.children[0].children:
@@ -222,31 +254,22 @@ class MainScreen(Screen):
     def removeActor(self, location):
         for actor in self.children[0].children:
             if (actor.id == location):
-                actor.source = 'icons/ICON_Transparent.png'
-
-    def test(self):
-        for actor in self.children[0].children:
-            if (actor.source != 'icons/ICON_Transparent.png'):
-                actor.random()
+                actor.source = TransparentId
     
 
    #the below move the actor
    #they get called in the obey function
    #tehy call functions in the actor class
 
- 
-
     def playerForward(self): #just find the location of the player
-        print('you have moved the player forwards or something')
+        print('you have moved the player forwards')
         for actor in main.children[0].children: #loops through all actors
             if ('Player' in actor.source): #if an actors source has the word plater in it
-                                           #(players/ICON_Player.jpg) > name of player
-                actor.moveForward()
-                
+                actor.moveForward() #(players/ICON_Player.jpg) > name of player
                 return
 
     def playerBackward(self):
-        print('you have moved the player backwards or something')
+        print('you have moved the player backwards')
         for actor in self.children[0].children:
             if ('Player' in actor.source):
                 actor.moveBackward()
@@ -258,6 +281,8 @@ class MainScreen(Screen):
             if ('Player' in actor.source):
                 actor.rotateDirection(direction)
                 return
+            
+            
    #done with calls to actor
 
 
@@ -296,36 +321,14 @@ class Actor(ButtonBehavior, Image): #creates an actor class
     def on_press(self): #when button is pressed
         print('pressed' + str(self.id))
         
-        if ('90' in self.id):
-            print('hallo')
-            main.playerForward()
-            sleep(2)
-            main.playerRotate('left')
-            sleep(2)
-            main.playerForward()
-            sleep(2)
-
-    
-
-    def test(self):
-        if ('Player' not in self.source): return
-        self.rotate(self.id, 90 * random.randint(0, 3))
-        self.moveForward()
-
-
-  
     #below are called above in the main class
 
-    
     def moveForward(self): #find out which image is on the screen
-        #there are different images for the player based on the direction they are facing
-        
-        
+        #there are different images for the player based on the direction they are facing 
         
         if ('90' in self.source): #right
             self.moveRight()
             #main.huntPlayer()
-            #arm.move() move the arm based on how its facing...find in source name
             
             return
         elif ('180' in self.source): #down
@@ -358,22 +361,6 @@ class Actor(ButtonBehavior, Image): #creates an actor class
             self.moveDown()
             #main.huntPlayer()
             return
-
-
-
-    def random(self):
-        if ('Player' not in self.source):
-            return
-        index = random.randint(1, 4)
-        if index == 1:
-            self.moveRight()
-        elif index == 2:
-            self.moveLeft()
-        elif index == 3:
-            self.moveUp()
-        else:
-            self.moveDown()
-   
    
     def rotateDegrees(self, location, degrees):
         if (sm.current != 'main'): return
@@ -388,93 +375,117 @@ class Actor(ButtonBehavior, Image): #creates an actor class
     
     def rotateDirection(self, direction):
         if (sm.current != 'main'): return
+        
         print( 'direction = '  + direction)
-        if (direction == 'left' and self.source == 'icons/ICON_Player.jpg'): #if main icon
+        print( 'source = ' + self.source)
+        if (direction == 'left' and self.source == 'players/ICON_Player.jpg'): #if main icon
             self.source = 'players/ICON_Player_270.jpg'
+            print ('degree = 270')
             return
-        elif (direction == 'right' and self.source == 'icons/ICON_Player.jpg'): #if main icon
+        elif (direction == 'right' and self.source == 'players/ICON_Player.jpg'): #if main icon
             self.source = 'players/ICON_Player_90.jpg'
+            print ('degree = 90')
             return
         else:
-            print ('WUZ UP')
             degree = int(self.source.strip(string.ascii_letters + string.punctuation))
             print ('degree = ' + str(degree))
             if (direction == 'left'):
                 angle = str(((degree + 270) % 360))
                 print('new angle = ' + angle)
-                self.source = 'players/ICON_Player_' + angle + '.jpg'
+                if (angle == '0'):
+                    self.source = 'players/ICON_Player.jpg'
+                else: 
+                    self.source = 'players/ICON_Player_' + angle + '.jpg'
             else:
-                self.source = 'players/ICON_Player_' + str(((degree + 90) % 360)) + '.jpg'
+                angle = str(((degree + 90) % 360))
+                print('new angle = ' + angle)
+                if (angle == '0'):
+                    self.source = 'players/ICON_Player.jpg'
+                else: 
+                    self.source = 'players/ICON_Player_' + angle + '.jpg'
                 
-            if (self.source == 'players/ICON_Player_0.jpg'):
-                self.source = 'players/ICON_Player.jpg'
-
-
-    #gets called in all the directional moves
-    def move(self, next):
-        
-        for actor in main.children[0].children:
-            if (actor.id == 'actor' + str(next) and actor.source == 'icons/ICON_Transparent.png'): #if next spot is clear
-                temp = self.source
-                self.source = actor.source
-                actor.source = temp
-                return
             
-            elif (actor.id == 'actor' + str(next) and 'Goal' in actor.source and 'Player' in self.source): #if you next location is the fish
-                actor.source = self.source;
-                self.source = 'icons/ICON_Transparent.png'
-                return 
-                
-                
-            elif (actor.id == 'actor' + str(next) and 'Player' in self.source and 'Igloo' in actor.source ):
-                print('you are a failure')
-                return #can't move...you lose
-            
-            #elif (actor.id == 'actor' + str(next) and 'Bear' in actor.source and 'Player' in self.source and sm.current != 'Winner'):
-               # if (justGoaled): self.clearGoal()
-               # justGoaled = False
-               # self.source = actor.source;
-                #actor.source = 'icons/ICON_Transparent.png'
-                #print('you are a failure')
-                #Clock.schedule_once(self.loser, 1)
-           
-    
-    #get called in move forward and move backwards
-
-    
     def moveRight(self):  # strafe
         if (sm.current != 'main'): return
+        
         next = int(self.id.strip(string.ascii_letters)) + 1
+        print(str(next))
+        
         if (next % main.children[0].cols == 1):
+            print('cant move, at the right wall')
             return
         else:
             self.move(next)
 
     def moveLeft(self):  # strafe
         if (sm.current != 'main'): return
+        
         next = int(self.id.strip(string.ascii_letters)) - 1
+        print(str(next))
+        
         if (next % main.children[0].cols == 0):
+            print('cant move, at the left wall')
             return
         else:
             self.move(next)
 
     def moveUp(self):
         if (sm.current != 'main'): return
+        
         next = int(self.id.strip(string.ascii_letters)) - main.children[0].cols
         print(next)
+        
         if (next < 0):
+            print('cant move, at the top wall')
             return
         else:
             self.move(next)
 
     def moveDown(self):
         if (sm.current != 'main'): return
+        
         next = int(self.id.strip(string.ascii_letters)) + main.children[0].cols
+        print(next)
+
+        
         if (next > main.children[0].rows * main.children[0].cols):
+            print('cant move, at the bottom wall')
             return
         else:
             self.move(next)
 
+
+    #gets called in all the directional moves
+    def move(self, next):
+        
+        actor = main.findActor(next) #gets the with id value next
+        print(actor.id)
+        assert actor.id == "actor" + str(next)
+        
+        print(actor.id+ 'pt 2')
+        
+        if (actor.source == TransparentId):
+            print('can move') #if next spot is clear
+            temp = self.source
+            self.source = actor.source
+            actor.source = temp
+            #arm.move() move the arm based on how its facing...find in source name
+            return
+            
+        elif ('Goal' in actor.source and 'Player' in self.source): #if you next location is the fish
+            actor.source = self.source
+            self.source = TransparentId
+            print('you win')
+            return 
+                
+                
+        elif ('Player' in self.source and 'Igloo' in actor.source ):
+            print('you hit an obstacle')
+            return #can't move...you lose
+    
+
+    
+    
 
 #needs to be fixed for harder levels
     #def goTowards(self):  # if anyone wants to fix please feel free
@@ -490,12 +501,11 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 #creates a 9 * 9 grid
 grid = GridLayout(id='grid', cols=13, rows=7, padding=15, spacing=1.5) 
 
-
 #sets the background image
 bg = Image(source='images/BG.jpg', size_hint=[1.1, 2])
 
 for i in range(0, grid.cols * grid.rows): #adds the transparent image to all 81 boxes
-    b = Actor(id='actor' + str(i + 1), source='icons/ICON_Transparent.png', size_hint=[1, 1])
+    b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
     grid.add_widget(b)
 
 main = MainScreen(name='main') #creates a main screen
@@ -504,9 +514,7 @@ main.add_widget(grid) #adds grid to the scren
 
 sm.add_widget(main)
 
-
 reset('easy')
-print("nodes are" + str(G.nodes))
 
 if __name__ == "__main__":
     MyApp().run()
