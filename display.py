@@ -19,6 +19,8 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from time import sleep
 from kivy.uix.behaviors import ButtonBehavior
+import networkx as nx
+G = nx.Graph()
 
 from kivy.uix.widget import Widget
 
@@ -66,8 +68,8 @@ def reset(dif):
     [10, 23, 36],
     [61,62,74,75],
     [86,87],
-    [25, 38, 51],
-    [52, 65, 78 ],
+    [25, 38, 51]#,
+    #[52, 65, 78 ],
 
     ]
 
@@ -85,7 +87,9 @@ def reset(dif):
     print('obstacles at')
     print(assignedObstacleLocations)
 
+
     assignedGoal = 0
+    not_obstacles = [i for i in main.children[0].children if (i.number_as_int() not in assignedObstacleLocations)]
 
     if (dif == 'easy'):
         assignedGoal = locGoal[0]
@@ -103,16 +107,49 @@ def reset(dif):
     print('player is ' + str(locPenguin))
     actorPenguin.source = 'players/ICON_Player_180.jpg'
 
-    
 
-    for i in assignedObstacleLocations:
-        
-        tempActor = main.findActor(i) #assigns jewels id to actor + obstacle
-        
-        if (i%2 == 0):
-            tempActor.source = 'icons/ICON_Igloo.jpg'
-        else:
-            tempActor.source = 'icons/ICON_Jewel.jpg'
+    for actor in main.children[0].children:
+        if (actor.id == 'actor' + str(locPenguin)): #places penguin
+            print('player is ' + str(locPenguin))
+            actor.source = 'players/ICON_Player_180.jpg'
+
+        if (actor.id == 'actor' + str(assignedGoal)):  # assigns goal id to actor + obstacle
+            print('goal is ' + str((locGoal)))
+            actor.source = 'icons/ICON_Goal.jpg'
+
+
+    actors = list(main.children[0].children)[::-1]#reverses in correct order
+    for x in range(1, 91):
+        if actors[x].number_as_int() in [79,66,53,40,27,14,1]:  # edge numbers
+            x = x + 1
+        G.add_edge(actors[x-1].number_as_int(), actors[x].number_as_int())
+
+    for j in range(1, 65):
+        if actors[j].number_as_int() in [13, 39, 65]:  # edge numbers
+            j = j + 13
+        G.add_edge(actors[j].number_as_int(), actors[j+13].number_as_int())
+
+    for k in range(65,78):
+        G.add_edge(actors[k].number_as_int(), actors[k+13].number_as_int())
+
+    print("Test: Finding shortest path from 1 to 29 -  " + str(nx.shortest_path(G, source=1, target=29)))
+
+
+
+    for actor in main.children[0].children:
+
+        for i in assignedObstacleLocations:
+
+            if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
+                print('jewel/igloo is ' + str(i))
+                if (i%2 == 0):
+                    actor.source = 'icons/ICON_Igloo.jpg'
+
+                else:
+                    actor.source = 'icons/ICON_Jewel.jpg'
+                actor.remove_node()
+
+
 
 #Combined hardware.py functions
 def obey_paul(data):
@@ -268,6 +305,18 @@ class MainScreen(Screen):
 
 
 class Actor(ButtonBehavior, Image): #creates an actor class
+
+    def __init__(self,*args,**kwargs):
+        Image.__init__(self,*args,**kwargs)
+        self.number = ''.join(i for i in self.id if i.isdigit())
+        if(('Transparent' in self.source) or ('Player' in self.source)):
+            G.add_node(self.number)
+
+    def remove_node(self):
+        G.remove_node(self.number)
+
+    def number_as_int(self):
+        return int(self.number)
 
     def on_press(self): #when button is pressed
         print('pressed' + str(self.id))
@@ -466,7 +515,6 @@ main.add_widget(grid) #adds grid to the scren
 sm.add_widget(main)
 
 reset('easy')
-#main.resetBoard()
 
 if __name__ == "__main__":
     MyApp().run()
