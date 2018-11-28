@@ -3,8 +3,8 @@ import math
 import time
 import sys
 
-#sys.path.insert(0, "/home/pi/Documents/RaspberryPiCommon/pidev")
-import stepper
+sys.path.insert(0, "/home/pi/packages/RaspberryPiCommon/pidev")
+from stepper import stepper
 #sys.path.insert(0,'Adafruit_Python_PCA9685/Adafruit_PCA9685')
 #import PCA9685
 
@@ -15,11 +15,11 @@ class DeltaArm:
     #angles of each effector arm relative to coordinate axis
     phi_vals = [math.radians(210), math.radians(90), math.radians(330)]
     #feet
-    fixed_edge = .8828
-    effector_edge = .28867
-    upper_len = 1.438
-    lower_len = 2.90188
-    end_effector_z_offset = .083
+    fixed_edge = 2.1651
+    effector_edge = 1.775
+    upper_len = 12.5
+    lower_len = 17.778
+    end_effector_z_offset = 5.459
     #Position constants in steps
     zero_vals = [-2000, -2000, -2000]
     ninety_vals = [64000, 64000 ,64000]

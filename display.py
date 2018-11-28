@@ -46,15 +46,6 @@ current = (0, 0, 0)
 direction = 0
 '''
 
-class MyApp(App):
-    def build(self):
-       #Clock.schedule_interval(obey, .1)
-        return sm
-
-def quitAll():
-    quit()
-
-
 def reset(dif):
    
     
@@ -124,32 +115,42 @@ def reset(dif):
             tempActor.source = 'icons/ICON_Jewel.jpg'
 
 #Combined hardware.py functions
-    def obey_paul(data):
+def obey_paul(data):
+
+#if (date =='easy'):
+    #self.reset('easy')
+#elif(date == 'medium'):
+  #  self.reset('medium')
+#elif (date == 'hard'):
+    #self.reset('hard')
+
+    if (data == 'forward '):
+            
+        main.playerForward()
+
+    elif (data == 'backward '): #recieves backwards
+  
+       main.playerBackward()
+
+    elif (data == 'left '): #receives left
+        main.playerRotate('left')
+
+    elif (data == 'right '): #revieves right
+        main.playerRotate('right')
+
+    else:
+        print('fail')
+        return
     
-    #if (date =='easy'):
-        #self.reset('easy')
-    #elif(date == 'medium'):
-      #  self.reset('medium')
-    #elif (date == 'hard'):
-        #self.reset('hard')
+class MyApp(App):
     
-        if (data == 'forward '):
-                
-            main.playerForward()
+    def build(self):
+       #Clock.schedule_interval(obey, .1)
+        return sm
 
-        elif (data == 'backward '): #recieves backwards
-      
-           main.playerBackward()
+    def quitAll():
+        quit()
 
-        elif (data == 'left '): #receives left
-            main.playerRotate('left')
-
-        elif (data == 'right '): #revieves right
-            main.playerRotate('right')
-
-        else:
-            print('fail')
-            return
 #// DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//
 # # ////////////////////////////////////////////////////////////////////////////
 # # //	D						LOAD KIVY FILE								//
@@ -162,11 +163,10 @@ def reset(dif):
 class MainScreen(Screen):
    
    #for keyboard testing
-   def __init__(self, **kwargs):
+    def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         self._keyboard = Window.request_keyboard(
             self._keyboard_closed, self, 'text')
-        print('hi')
         if self._keyboard.widget:
             # If it exists, this widget is a VKeyboard object which you can use
             # to change the keyboard layout.
@@ -466,6 +466,7 @@ main.add_widget(grid) #adds grid to the scren
 sm.add_widget(main)
 
 reset('easy')
+#main.resetBoard()
 
 if __name__ == "__main__":
     MyApp().run()
