@@ -23,19 +23,19 @@ class DeltaArm:
     #inches (can change)
     fixed_edge = 2.1651
     effector_edge = 1.775
-    upper_len = 12.5
+    upper_len = 13.00#12.5
     lower_len = 17.778
     end_effector_z_offset = 5.459
     #Position constants in steps
-    zero_vals = [-7.5,-4,-6.5] #[-26, -26, -26] #number of steps required for bar to be horizontal
-    ninety_vals = [-107.5,-104,-106.5] #[-425, -425 ,-425] #number of steps required for bar to be vertical
+    zero_vals = [-7.5,-4,-8] #[-26, -26, -26] #number of steps required for bar to be horizontal
+    ninety_vals = [-107.5,-104,-108] #[-425, -425 ,-425] #number of steps required for bar to be vertical
 
     def __init__(self, c1, c2, c3):
         self.board = Slush.sBoard()
         print("wuz up")
-        self.motors = [stepper(port = c1, micro_steps = 32, speed = 20),
-                   stepper(port = c2, micro_steps = 32, speed = 20),
-                    stepper(port = c3, micro_steps = 32, speed = 20)]
+        self.motors = [stepper(port = c1, micro_steps = 32, speed = 30),
+                   stepper(port = c2, micro_steps = 32, speed = 30),
+                    stepper(port = c3, micro_steps = 32, speed = 30)]
         self.constantMultiplier = self.motors[0].get_micro_steps() * (200/25.4)
         print(self.constantMultiplier)
       #  self.rotator = stepper(port = 3, micro_steps = 128, speed = 1000)
@@ -88,7 +88,8 @@ class DeltaArm:
         _thread.start_new_thread(self.set_single_position_steps, (2, pos2))
 
     def set_single_angle(self,num,ang):
-        val = int(self.angle_to_position(num, ang))
+        val = self.angle_to_position(num, ang)
+        print(val)
         self.set_single_position_steps(num,val)
         return
     
@@ -100,10 +101,12 @@ class DeltaArm:
         #    self.set_single_angle(i,ang)
 
     def set_all_to_different_angle(self,a1,a2,a3):
-       # _thread.start_new_thread(self.set_single_angle, (0, a1))
-       # _thread.start_new_thread(self.set_single_angle, (1, a2))
-      #  _thread.start_new_thread(self.set_single_angle, (2, a3))
         angs = [a1,a2,a3]
+        for i in range(3):
+            val = int(self.angle_to_position(i, angs[i]))
+            if val > 0:
+                print('cant move')
+                return 'no bueno'
         for i in range(3):
             self.set_single_angle(i,angs[i])
     
@@ -143,9 +146,11 @@ class DeltaArm:
     
     @staticmethod
     def angle_to_position(num, ang):
-        print('anglet to position: ')
-        print((ang)*(DeltaArm.ninety_vals[num] - DeltaArm.zero_vals[num])/90.0 + DeltaArm.zero_vals[num])
-        return (ang)*(DeltaArm.ninety_vals[num] - DeltaArm.zero_vals[num])/90.0 + DeltaArm.zero_vals[num]
+        print('angle to position: ')
+        print((ang)*((DeltaArm.ninety_vals[num] - DeltaArm.zero_vals[num])/90.0 )+ DeltaArm.zero_vals[num])
+        print('steps')
+        return ((ang)*((DeltaArm.ninety_vals[num] - DeltaArm.zero_vals[num])/90.0 )+ DeltaArm.zero_vals[num])
+
 
     @staticmethod
     def wrap_angle_rad(theta):
@@ -195,7 +200,7 @@ class DeltaArm:
 
         theta = DeltaArm.wrap_angle_rad(math.atan(z/(y + f/(2*math.sqrt(3)))))
         print('ending inverse_kinematics_in_yz_plane, returning ' +
-              str(theta) + " " + str(math.degrees(theta)) + 'degrees')
+              str(theta) + ' = ' + str(math.degrees(theta)) + ' degrees')
         return math.degrees(theta)
 
     @staticmethod    
@@ -203,6 +208,7 @@ class DeltaArm:
         print('starting compute_triple_inverse_kinematics ')
         thetas = []
         for phi in DeltaArm.phi_vals:
+            print('phi is ' + str(phi))
             (x0,y0,z0) = DeltaArm.rotate_point_to_yz_plane(x,y,z,phi)
             theta = DeltaArm.inverse_kinematics_in_yz_plane(x0,y0,z0)
             if theta == -1:
@@ -216,7 +222,7 @@ class DeltaArm:
     def move_to_point(self,x,y,z):
         print('start move arm to point')
         (a1,a2,a3) = DeltaArm.compute_triple_inverse_kinematics(x,y,z)
-        print('end move arm to point' + str(a1) + str(a2) + str(a3) )
+        print('end move to point with angles ' + str(a1) + ' ' + str(a2) + ' ' + str(a3) )
         self.set_all_to_different_angle(a1,a2,a3)
     
     @staticmethod
@@ -305,6 +311,12 @@ class DeltaArm:
                 rCurr =  math.sqrt(deltatemp[0]**2 + deltatemp[1]**2 + deltatemp[2]**2)
         #~ print("XYZ: " + str(x) + " : " + str(y) + " : " + str(z))
         self.move_to_point(x,y,z)
+    @staticmethod
+
+    def delta_calcAngleYZ(x0, y0, z0, theta):
+        y1 = 
+
+
 
 
 
