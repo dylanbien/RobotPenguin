@@ -1,5 +1,5 @@
 # ////////////////////////////////////////////////////////////////
-# //					 IMPORT STATEMENTS	//
+# //					 IMPORT STATEMENTS	                    //
 # ////////////////////////////////////////////////////////////////
 from kivy.config import Config
 
@@ -16,6 +16,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from time import sleep
+from kivy.core.window import Window
+
 import socket
 from kivy.core.audio import SoundLoader
 #import ip
@@ -23,7 +25,7 @@ from kivy.core.audio import SoundLoader
 
 commands = []
 history = []
-
+Window.fullscreen = 'auto'
 
 def queue(command):
     if (len(commands) >= 22): return
@@ -259,16 +261,16 @@ class MainScreen(Screen):
                            content=victoryLay)
         victoryImage = Image(source='winner/winner.png',
                              keep_ratio=True,
-                             size_hint=(1.5, 1.945),
-                             pos=(575, 525))
+                             size_hint=(1.5*1.15, 1.945*1.15),
+                             pos=(545, 545))
         playAgainButton = Button(text='Play Again',
                             size_hint=(0.46, 0.8),
                             font_size=20,
-                            pos=(725, 425))
+                            pos=(760, 425))
         quitButton = Button(text='Quit',
                             size_hint=(0.46, 0.8),
                             font_size=20,
-                            pos=(1025, 425))
+                            pos=(1110, 425))
 
         playAgainButton.bind(on_release=victoryPop.dismiss)
         playAgainButton.bind(on_release=MainScreen.setNewGameScreen)
@@ -292,16 +294,16 @@ class MainScreen(Screen):
                           content=defeatLay)
         defeatImage = Image(source='loser/loser.png',
                             keep_ratio=True,
-                            size_hint=(1.5, 1.945),
-                            pos=(575, 525))
+                            size_hint=(1.5*1.3, 1.945*1.3),
+                            pos=(480, 530))
         playAgainButton = Button(text='Play Again',
                             size_hint=(0.46, 0.8),
                             font_size=20,
-                            pos=(725, 425))
+                            pos=(760, 425))
         quitButton = Button(text='Quit',
                             size_hint=(0.46, 0.8),
                             font_size=20,
-                            pos=(1025, 425))
+                            pos=(1110, 425))
 
         playAgainButton.bind(on_release=defeatPop.dismiss)
         playAgainButton.bind(on_release=MainScreen.setNewGameScreen)
@@ -313,6 +315,29 @@ class MainScreen(Screen):
         defeatLay.add_widget(playAgainButton)
         defeatLay.add_widget(defeatImage)
         defeatPop.open()
+
+    def instructionPopup(self):  # instruction POPUP
+            #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
+            instruction = FloatLayout()
+            instructionPop = Popup(title='Instructions',
+                                   size_hint=(0.3, 0.23),
+                                   auto_dismiss=False,
+                                   title_size=30,
+                                   title_align='center',
+                                   content=instruction)
+            quitButton = Button(text='Dismiss',
+                                size_hint=(0.23, 0.4),
+                                font_size=20,
+                                pos=(1005, 445))
+            instructionLabel = Label(
+                text='the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose',
+                pos=(830, 565),
+                font_size=25)
+
+            quitButton.bind(on_release=instructionPop.dismiss)
+            instruction.add_widget(quitButton)
+            instruction.add_widget(instructionLabel)
+            instructionPop.open()
 
 
 
@@ -346,9 +371,9 @@ class NewGame(Screen):
         quitButton = Button(text='Dismiss',
                             size_hint=(0.23, 0.4),
                             font_size=20,
-                            pos=(950, 425))
+                            pos=(1005, 445))
         instructionLabel = Label(text='the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose',
-                                 pos=(725, 600),
+                                 pos=(830, 565),
                                  font_size=25)
 
         quitButton.bind(on_release=instructionPop.dismiss)
