@@ -3,6 +3,7 @@ import DeltaArm
 
 arm = DeltaArm.DeltaArm(0,1,2)
 arm.home_all()
+
 sleep(2)
 #arm.set_all_to_same_angle(0)
 
@@ -45,4 +46,3 @@ for i in [x*.4 for x in range(0,20)]:
 
     arm.move_to_point(i-2,0,5)
     sleep(.3)
-

@@ -32,15 +32,17 @@ class DeltaArm:
     effector_edge = 6.1487
     upper_len = 12.5 #length of the upper arm
     lower_len = 17.778 #length of the lower arm
-    end_effector_z_offset = 5#.459
+    end_effector_z_offset = 5.459
     Sb = 24.6646
     Wb = 10.4591
     wp = 1.3313
     ub = 3.5522
 
     #Position constants in steps
+
     zero_vals = [-1750,-980,-2000]  #number of steps required for an arm to be horizontal
     ninety_vals = [-26750,-26800,-27000]  #number of steps required for an arm to be vertical
+
     
     sqrt3 = math.sqrt(3.0)
     pi = 3.141592653
@@ -55,7 +57,9 @@ class DeltaArm:
         self.motors = [stepper(port = c1, micro_steps = 32, speed = 30),
                    stepper(port = c2, micro_steps = 32, speed = 30),
                     stepper(port = c3, micro_steps = 32, speed = 30)]
-        self.constantMultiplier = self.motors[0].get_micro_steps() * (200/25.4)#####
+
+        self.constantMultiplier = self.motors[0].get_micro_steps() * (200/25.4)
+
         print(self.constantMultiplier)
       #  self.rotator = stepper(port = 3, micro_steps = 128, speed = 1000)
        # self.solenoid = PCA9685.PCA9685() 
@@ -80,7 +84,9 @@ class DeltaArm:
     def set_single_position_steps(self,num,pos):
         while self.motors[num].isBusy():
             continue
+
         self.motors[num].go_to(pos)
+
         
 
     def set_all_to_same_position(self,val):
@@ -102,7 +108,7 @@ class DeltaArm:
         _thread.start_new_thread(self.set_single_position_steps, (2, pos2))
 
     def set_single_angle(self,num,ang):
-        val = int(self.angle_to_position(num, ang))
+        val = self.angle_to_position(num, ang)
         self.set_single_position_steps(num,val)
         return
     
@@ -296,7 +302,9 @@ class DeltaArm:
         #Fudge z for end effector height
         z = z - DeltaArm.end_effector_z_offset
 
+
         print('ending forward kinematics: ' + str(x) + ' ' + str(y) + ' ' + str(z) )
+
         #GG EZ
         return (x,y,z)
 
