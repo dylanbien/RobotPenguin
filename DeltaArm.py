@@ -1,3 +1,4 @@
+#TODO determine if this version is correct with RoboticPenguinHW
 import Slush
 import math
 import time
@@ -52,14 +53,12 @@ class DeltaArm:
 
     def __init__(self, c1, c2, c3):
         self.board = Slush.sBoard()
-        self.motors = [stepper(port = c1, micro_steps = 32, speed = 30),
-                   stepper(port = c2, micro_steps = 32, speed = 30),
-                    stepper(port = c3, micro_steps = 32, speed = 30)]
+        self.motors = [stepper(port=c1, micro_steps = 32, speed=30),
+                   stepper(port=c2, micro_steps=32, speed=30),
+                    stepper(port=c3, micro_steps=32, speed=30)]
 
       #  self.rotator = stepper(port = 3, micro_steps = 128, speed = 1000)
        # self.solenoid = PCA9685.PCA9685() 
-        
-        
 
     def home_all(self):
         for mtr in self.motors:
@@ -359,16 +358,3 @@ class DeltaArm:
         C_zero = x**2 + y**2+z**2 + a**2
         L_zero = -z + math.sqrt(z**2-C_zero)
     '''
-
-
-
-
-
-
-
-
-
-
-
-     
-

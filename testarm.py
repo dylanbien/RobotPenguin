@@ -8,10 +8,11 @@ sleep(2)
 #arm.set_all_to_same_angle(0)
 
 sleep(2)
-a0, a1, a2 = arm.compute_triple_inverse_kinematics(2, 3, 5)
-print(a0)
-print('next')
-x, y, z = arm.forward_kinematics(a0, a1, a2)
+arm.move_to_point(0, 0, 1)
+#a0, a1, a2 = arm.compute_triple_inverse_kinematics(2, 3, 5)
+#print(a0)
+#print('next')
+#x, y, z = arm.forward_kinematics(a0, a1, a2)
 #arm.set_single_position_steps(2,-2000)
 '''
 x, y, z = arm.forward_kinematics(arm.get_angle(0), arm.get_angle(1), arm.get_angle(2))
@@ -42,7 +43,7 @@ while 1:
 
 '''
 
-for i in [x*.4 for x in range(0,20)]:
-
-    arm.move_to_point(i-2,0,5)
-    sleep(.3)
+# for i in [x*.4 for x in range(0,20)]:
+#
+#     arm.move_to_point(i-2,0,5)
+#     sleep(.3)
