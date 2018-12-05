@@ -1,11 +1,10 @@
 import Slush
 import math
 import time
-import _thread
 import sys
-import math
-sys.path.insert(0, "/home/pi/packages/RaspberryPiCommon/pidev")
-from stepper import stepper
+import _thread
+from pidev import stepper
+from apscheduler.schedulers.background import BackgroundScheduler
 #sys.path.insert(0,'Adafruit_Python_PCA9685/Adafruit_PCA9685')
 #import PCA9685
 
@@ -28,11 +27,11 @@ class DeltaArm:
     
     #inches (can change)
     #An image in the delta arm readme will show what each of these values correlates to
-    fixed_edge = 7.5
-    effector_edge = 6.1487
-    upper_len = 12.5 #length of the upper arm
-    lower_len = 17.778 #length of the lower arm
-    end_effector_z_offset = 5.459
+    fixed_edge = 3.76/12.0
+    effector_edge = 3.074/12.0
+    upper_len = 12.5/12.0 #length of the upper arm
+    lower_len = 17.8/12.0#length of the lower arm
+    end_effector_z_offset = 0
     Sb = 24.6646
     Wb = 10.4591
     wp = 1.3313
@@ -40,10 +39,9 @@ class DeltaArm:
 
     #Position constants in steps
 
-    zero_vals = [-1750,-980,-2000]  #number of steps required for an arm to be horizontal
-    ninety_vals = [-26750,-26800,-27000]  #number of steps required for an arm to be vertical
+    zero_vals = [-4000, -7000, -9500]  #number of steps required for an arm to be horizontal
+    ninety_vals = [-116000, -119000, -121500]  #number of steps required for an arm to be vertical
 
-    
     sqrt3 = math.sqrt(3.0)
     pi = 3.141592653
     sin120 = sqrt3 / 2.0
@@ -58,19 +56,12 @@ class DeltaArm:
                    stepper(port = c2, micro_steps = 32, speed = 30),
                     stepper(port = c3, micro_steps = 32, speed = 30)]
 
-        self.constantMultiplier = self.motors[0].get_micro_steps() * (200/25.4)
-
-        print(self.constantMultiplier)
       #  self.rotator = stepper(port = 3, micro_steps = 128, speed = 1000)
        # self.solenoid = PCA9685.PCA9685() 
         
         
 
     def home_all(self):
-        #_thread.start_new_thread(self.motors[0].goUntilPress, (0, 1, 5000))
-        #_thread.start_new_thread(self.motors[1].goUntilPress, (0, 1, 5000))
-        #_thread.start_new_thread(self.motors[2].goUntilPress, (0, 1, 5000))
-
         for mtr in self.motors:
             mtr.goUntilPress(0,1,5000)
             print('homing')
@@ -82,33 +73,48 @@ class DeltaArm:
         #self.solenoid.set_pwm(0,0,0)
 
     def set_single_position_steps(self,num,pos):
+       
         while self.motors[num].isBusy():
             continue
-
         self.motors[num].go_to(pos)
 
-        
-
     def set_all_to_same_position(self,val):
-        _thread.start_new_thread(self.set_single_position_steps, (0, val))
-        _thread.start_new_thread(self.set_single_position_steps, (1, val))
-        _thread.start_new_thread(self.set_single_position_steps, (2, val))
+        set_all_same_scheduler = BackgroundScheduler()
+
+        set_all_same_scheduler.add_job(self.set_single_position_steps(0, val))
+        set_all_same_scheduler.add_job(self.set_single_position_steps(1, val))
+        set_all_same_scheduler.add_job(self.set_single_position_steps(2, val))
+        try:
+            set_all_same_scheduler.start()
+        except KeyboardInterrupt:
+            set_all_same_scheduler.shutdown()
+            sys.exit("exiting")
+
+        # _thread.start_new_thread(self.set_single_position_steps, (0, val))
+        # _thread.start_new_thread(self.set_single_position_steps, (1, val))
+        # _thread.start_new_thread(self.set_single_position_steps, (2, val))
         #for i in range(3):
         #    self.set_single_position_steps(i,val)
 
-    #def rotator_home(self):
-      #  self.rotator.goUntilPress(0,1,1000)
-    
-  #  def rel_move(self, amount):
-     #   self.rotator.relative_move(amount)
-
     def set_all_to_different_position(self,pos0,pos1,pos2):
-        _thread.start_new_thread(self.set_single_position_steps, (0, pos0))
-        _thread.start_new_thread(self.set_single_position_steps, (1, pos1))
-        _thread.start_new_thread(self.set_single_position_steps, (2, pos2))
+        set_diff_pos_scheduler = BackgroundScheduler()
+
+        set_diff_pos_scheduler.add_job(self.set_single_position_steps(0, pos0))
+        set_diff_pos_scheduler.add_job(self.set_single_position_steps(1, pos1))
+        set_diff_pos_scheduler.add_job(self.set_single_position_steps(2, pos2))
+
+        try:
+            set_diff_pos_scheduler.start()
+        except KeyboardInterrupt:
+            set_diff_pos_scheduler.shutdown()
+            sys.exit("exiting")
+
+        # _thread.start_new_thread(self.set_single_position_steps, (0, pos0))
+        # _thread.start_new_thread(self.set_single_position_steps, (1, pos1))
+        # _thread.start_new_thread(self.set_single_position_steps, (2, pos2))
 
     def set_single_angle(self,num,ang):
-        val = self.angle_to_position(num, ang)
+        val = int(self.angle_to_position(num, ang))
         self.set_single_position_steps(num,val)
         return
     
@@ -122,8 +128,11 @@ class DeltaArm:
 
     def set_all_to_different_angle(self,a1,a2,a3):
         angs = [a1,a2,a3]
+        print('angs')
+        print(angs)
         print('testing values')
         for i in range(3):
+            
             val = int(self.angle_to_position(i, angs[i]))
             if val > 0:
                 return
@@ -153,8 +162,8 @@ class DeltaArm:
 
     def get_position(self,num):
         print('position of motor ' + str(num) + ' is:' +
-        str(self.motors[num].getPosition()/self.constantMultiplier))
-        return self.motors[num].getPosition()/self.constantMultiplier
+        str(self.motors[num].getPosition()))
+        return self.motors[num].getPosition()
     
     def get_angle(self, num):
         print('angle of motor ' + str(num) + ' is:v ' +
@@ -185,12 +194,15 @@ class DeltaArm:
     @staticmethod
     def rotate_point_to_yz_plane(x0,y0,z0,phi):
         #do rotation matrix
+    
         x = x0*math.cos(phi) + y0*math.sin(phi)
         y = -x0*math.sin(phi) + y0*math.cos(phi)
 
         #z is the same
-        z = z0
-        return (x,y,z)
+        
+        print(str(x )+ str(y) + str(z0))
+        
+        return (x,y,z0)
 
 
     @staticmethod
@@ -202,15 +214,17 @@ class DeltaArm:
         f = DeltaArm.fixed_edge
         e = DeltaArm.effector_edge
         z0 = z0 + DeltaArm.end_effector_z_offset
-
+        
+        print(str(rf) + str(re) + str(f) + str(e) + str(z0))
         #linear coefficients of EQN z = b*y + a
 
         a = (x0**2 + (y0-e/(2*math.sqrt(3)))**2 + z0**2 + rf**2 - re**2 - f**2/12)/(2*z0) 
         b = (-f/(2*math.sqrt(3)) - y0 + e/(2*math.sqrt(3)))/z0
-
+        print(str(a) + str(b))
         #plug line (z = b*y + a) into circle in yz w/ center (-f/2sqrt(3),0)
 
         disc = (f/math.sqrt(3) + 2*a*b) - 4*(b**2+1)*(f**2/12 + a**2 - rf**2)
+        print(str(disc))
         if disc < 0:
             #disciminate < 0 -> no solution
             return -1
@@ -218,8 +232,9 @@ class DeltaArm:
         #compute solution w/ lower y value
         y = (-(f/math.sqrt(3) + 2*a*b) - math.sqrt(disc))/(2*(b**2+1))
         z = b*y + a
-
+        print(str(y) + str(z))
         theta = DeltaArm.wrap_angle_rad(math.atan(z/(y + f/(2*math.sqrt(3)))))
+        print(str(theta))
         print('ending inverse_kinematics_in_yz_plane, returning ' +
               str(theta) + ' = ' + str(math.degrees(theta)) + ' degrees')
         return math.degrees(theta)
@@ -252,7 +267,7 @@ class DeltaArm:
         re = DeltaArm.lower_len
         f = DeltaArm.fixed_edge
         e = DeltaArm.effector_edge
-
+        
         #Finding J' points (centers of intersecting spheres)
         x1 = 0
         y1 = (f-e)/(2*math.sqrt(3)) + rf*math.cos(math.radians(theta1))
