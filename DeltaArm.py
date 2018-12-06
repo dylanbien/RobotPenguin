@@ -323,32 +323,23 @@ class DeltaArm:
         (a1,a2,a3) = [self.get_angle(i) for i in range(3)] #gets the current angles 
         (x0,y0,z0) = DeltaArm.forward_kinematics(a1,a2,a3) #gets the current XYZ position
         delta = tuple([a-b for (a,b) in zip((x,y,z),(x0,y0,z0))]) #for all points x-x0 **gets change in cartesisan for all points
-        rGoal =  math.sqrt(delta[0]**2 + delta[1]**2 + delta[2]**2) #distance between starting and ending point
+        print(delta)
 
+        rGoal =  math.sqrt(delta[0]**2 + delta[1]**2 + delta[2]**2
+        print(rGoal)
         (xCurr, yCurr, zCurr) = (x0,y0,z0) #where the arm starts
         rCurr = 0 #distance away from starting point
 
         while rCurr < rGoal: #while arm is not add ending point
-            rGoal_local = rCurr + dr #incirmenting by dr
-            (xCurr,yCurr,zCurr) = tuple([w+q for (w,q) in zip((x0,y0,z0),tuple([a*rGoal_local/rGoal for a in delta]))])
+            rCurr =+ dr #incirmenting by dr
+            (xCurr,yCurr,zCurr) = tuple([w+q for (w,q) in zip((x0,y0,z0),tuple([a*float(rCurr)/float(rGoal) for a in delta]))])
+            print(xCurr,yCurr,zCurr)
+            self.move_to_point(xCurr,yCurr,zCurr)
             
-            (agoal1,agoal2,agoal3) = DeltaArm.compute_triple_inverse_kinematics(xCurr,yCurr,zCurr) #angle arm is going to in this jump
-            (acurr1,acurr2,acurr3) = [self.get_angle(i) for i in range(3)] #current angle
-            delta_angle = (agoal1 - acurr1, agoal2 - acurr2, agoal3 - acurr3) #change in angle each arm will make
-            
-            abs_delta = [abs(d) for d in delta_angle] #absolute value of all cahnges i angles
-            scale = max(abs_delta) #reyurns largest angle change
-            
-            (s1,s2,s3) = [d/scale * 750 for d in delta_angle] #finds new velocity for all arms
-            self.set_all_to_different_velocity(s1,s2,s3) #sets these new velocities
-            
-            while abs(rCurr - rGoal_local) > dr/2:
-                print(abs(rCurr - rGoal_local))
-                (atemp1,atemp2,atemp3) = [self.get_angle(i) for i in range(3)] 
-                (xtemp,ytemp,ztemp) = DeltaArm.forward_kinematics(atemp1,atemp2,atemp3)
-                deltatemp = tuple([a-b for (a,b) in zip((xtemp,ytemp,ztemp),(x0,y0,z0))])
-                rCurr =  math.sqrt(deltatemp[0]**2 + deltatemp[1]**2 + deltatemp[2]**2)
-        #~ print("XYZ: " + str(x) + " : " + str(y) + " : " + str(z))
+            advance_time = time.time() + dt
+            while time.time() < advance_time:
+                pass
+           
         self.move_to_point(x,y,z)
 
 
