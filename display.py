@@ -6,7 +6,7 @@ import random
 import socket
 import sys
 import math
-#import DeltaArm
+import DeltaArm
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -41,12 +41,12 @@ TransparentId = ''
 #'icons/ICON_Transparent.png'
 
 
-'''
-da = DeltaArm.DeltaArm(0, 1, 2) #creates arm
-da.home_all() #homes it
-current = (0, 0, 0)
+
+arm = DeltaArm.DeltaArm(0, 1, 2) #creates arm
+arm.home_all() #homes it
+current = [-1,-.5, -1.2]
 direction = 0
-'''
+
 
 def reset(dif):
    
@@ -147,8 +147,8 @@ def reset(dif):
 
                 else:
                     actor.source = 'icons/ICON_Jewel.jpg'
-                actor.remove_node()
-
+                
+    arm.move_to_point(-1,-.5, -1.2)
 
 
 #Combined hardware.py functions
@@ -224,14 +224,20 @@ class MainScreen(Screen):
        
         
         if keycode[1] == 'up':
-            self.playerForward()
-            
+            current[1] = current[1] - .05
+            arm.move_to_point(current[0], current[1], current[2])
         elif keycode[1] == 'down':
-            self.playerBackward()
+            current[1] = current[1] + .05
+            arm.move_to_point(current[0], current[1], current[2])
+           # self.playerBackward()
         elif keycode[1] == 'left':
-            self.playerRotate('left')
+            #.playerRotate('left')
+            current[0] = current[0] - .05
+            arm.move_to_point(current)
         elif keycode[1] == 'right':
-            self.playerRotate('right')
+            current[0] = current[0] + .05
+            arm.move_to_point(current)
+           # self.playerRotate('right')
             
     
     def findActor(self, ActorIndex):

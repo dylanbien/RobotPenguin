@@ -24,7 +24,7 @@ class DeltaArm:
     #Will sometimes be changed besed on which ports the motors are plugged into
     #6 possible combnations so just trt different ones and see which one creates
     #desired XY plane
-    phi_vals = [math.radians(330), math.radians(210), math.radians(90)]
+    phi_vals = [math.radians(120), math.radians(240), math.radians(360)]
     
     #inches (can change)
     #An image in the delta arm readme will show what each of these values correlates to
@@ -32,16 +32,12 @@ class DeltaArm:
     effector_edge = 3.074/12.0
     upper_len = 12.5/12.0 #length of the upper arm
     lower_len = 17.8/12.0#length of the lower arm
-    end_effector_z_offset = 0
-    Sb = 24.6646
-    Wb = 10.4591
-    wp = 1.3313
-    ub = 3.5522
+    end_effector_z_offset = 0 # 5.459/12.0 **work on
 
     #Position constants in steps
 
-    zero_vals = [-4000, -7000, -9500]  #number of steps required for an arm to be horizontal
-    ninety_vals = [-116000, -119000, -121500]  #number of steps required for an arm to be vertical
+    zero_vals = [-1750,-980,-2000]   #number of steps required for an arm to be horizontal
+    ninety_vals = [-26750,-26800,-27000] #number of steps required for an arm to be vertical
 
     sqrt3 = math.sqrt(3.0)
     pi = 3.141592653
@@ -52,6 +48,7 @@ class DeltaArm:
     tan30 = 1 / sqrt3
 
     def __init__(self, c1, c2, c3):
+        print('hi')
         self.board = Slush.sBoard()
         self.motors = [stepper(port=c1, micro_steps = 32, speed=30),
                    stepper(port=c2, micro_steps=32, speed=30),
@@ -199,7 +196,7 @@ class DeltaArm:
 
         #z is the same
         
-        print(str(x )+ str(y) + str(z0))
+      
         
         return (x,y,z0)
 
@@ -214,16 +211,16 @@ class DeltaArm:
         e = DeltaArm.effector_edge
         z0 = z0 + DeltaArm.end_effector_z_offset
         
-        print(str(rf) + str(re) + str(f) + str(e) + str(z0))
+       
         #linear coefficients of EQN z = b*y + a
 
         a = (x0**2 + (y0-e/(2*math.sqrt(3)))**2 + z0**2 + rf**2 - re**2 - f**2/12)/(2*z0) 
         b = (-f/(2*math.sqrt(3)) - y0 + e/(2*math.sqrt(3)))/z0
-        print(str(a) + str(b))
+     
         #plug line (z = b*y + a) into circle in yz w/ center (-f/2sqrt(3),0)
 
         disc = (f/math.sqrt(3) + 2*a*b) - 4*(b**2+1)*(f**2/12 + a**2 - rf**2)
-        print(str(disc))
+    
         if disc < 0:
             #disciminate < 0 -> no solution
             return -1
@@ -231,9 +228,9 @@ class DeltaArm:
         #compute solution w/ lower y value
         y = (-(f/math.sqrt(3) + 2*a*b) - math.sqrt(disc))/(2*(b**2+1))
         z = b*y + a
-        print(str(y) + str(z))
+        
         theta = DeltaArm.wrap_angle_rad(math.atan(z/(y + f/(2*math.sqrt(3)))))
-        print(str(theta))
+ 
         print('ending inverse_kinematics_in_yz_plane, returning ' +
               str(theta) + ' = ' + str(math.degrees(theta)) + ' degrees')
         return math.degrees(theta)
@@ -323,24 +320,28 @@ class DeltaArm:
         return (x,y,z)
 
     def move_to_point_in_straight_line(self,x,y,z,dr):
-        (a1,a2,a3) = [self.get_angle(i) for i in range(3)] 
-        (x0,y0,z0) = DeltaArm.forward_kinematics(a1,a2,a3)
-        delta = tuple([a-b for (a,b) in zip((x,y,z),(x0,y0,z0))])
-        rGoal =  math.sqrt(delta[0]**2 + delta[1]**2 + delta[2]**2)
+        (a1,a2,a3) = [self.get_angle(i) for i in range(3)] #gets the current angles 
+        (x0,y0,z0) = DeltaArm.forward_kinematics(a1,a2,a3) #gets the current XYZ position
+        delta = tuple([a-b for (a,b) in zip((x,y,z),(x0,y0,z0))]) #for all points x-x0 **gets change in cartesisan for all points
+        rGoal =  math.sqrt(delta[0]**2 + delta[1]**2 + delta[2]**2) #distance between starting and ending point
 
-        (xCurr, yCurr, zCurr) = (x0,y0,z0)
-        rCurr = 0
+        (xCurr, yCurr, zCurr) = (x0,y0,z0) #where the arm starts
+        rCurr = 0 #distance away from starting point
 
-        while rCurr < rGoal:
-            rGoal_local = rCurr + dr
+        while rCurr < rGoal: #while arm is not add ending point
+            rGoal_local = rCurr + dr #incirmenting by dr
             (xCurr,yCurr,zCurr) = tuple([w+q for (w,q) in zip((x0,y0,z0),tuple([a*rGoal_local/rGoal for a in delta]))])
-            (agoal1,agoal2,agoal3) = DeltaArm.compute_triple_inverse_kinematics(xCurr,yCurr,zCurr)
-            (acurr1,acurr2,acurr3) = [self.get_angle(i) for i in range(3)] 
-            delta_angle = (agoal1 - acurr1, agoal2 - acurr2, agoal3 - acurr3)
-            abs_delta = [abs(d) for d in delta_angle]
-            scale = max(abs_delta)
-            (s1,s2,s3) = [d/scale * 750 for d in delta_angle]
-            self.set_all_to_different_velocity(s1,s2,s3)
+            
+            (agoal1,agoal2,agoal3) = DeltaArm.compute_triple_inverse_kinematics(xCurr,yCurr,zCurr) #angle arm is going to in this jump
+            (acurr1,acurr2,acurr3) = [self.get_angle(i) for i in range(3)] #current angle
+            delta_angle = (agoal1 - acurr1, agoal2 - acurr2, agoal3 - acurr3) #change in angle each arm will make
+            
+            abs_delta = [abs(d) for d in delta_angle] #absolute value of all cahnges i angles
+            scale = max(abs_delta) #reyurns largest angle change
+            
+            (s1,s2,s3) = [d/scale * 750 for d in delta_angle] #finds new velocity for all arms
+            self.set_all_to_different_velocity(s1,s2,s3) #sets these new velocities
+            
             while abs(rCurr - rGoal_local) > dr/2:
                 print(abs(rCurr - rGoal_local))
                 (atemp1,atemp2,atemp3) = [self.get_angle(i) for i in range(3)] 
@@ -350,11 +351,4 @@ class DeltaArm:
         #~ print("XYZ: " + str(x) + " : " + str(y) + " : " + str(z))
         self.move_to_point(x,y,z)
 
-'''
-    @staticmethod
-    def compute_triple_inverse_kinematics(x, y, z):
-        a = (DeltaArm.Sb/2) - DeltaArm.fixed_edge
-        b = DeltaArm.Wb - DeltaArm.wp
-        C_zero = x**2 + y**2+z**2 + a**2
-        L_zero = -z + math.sqrt(z**2-C_zero)
-    '''
+
