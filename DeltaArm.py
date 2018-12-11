@@ -33,6 +33,7 @@ class DeltaArm:
     upper_len = 12.5/12.0 #length of the upper arm
     lower_len = 17.8/12.0#length of the lower arm
     end_effector_z_offset = 0 # 5.459/12.0 **work on
+    
 
     #Position constants in steps
 
@@ -53,7 +54,7 @@ class DeltaArm:
         self.motors = [stepper(port=c1, micro_steps = 32, speed=30),
                    stepper(port=c2, micro_steps=32, speed=30),
                     stepper(port=c3, micro_steps=32, speed=30)]
-
+        self.move_speed = 30
       #  self.rotator = stepper(port = 3, micro_steps = 128, speed = 1000)
        # self.solenoid = PCA9685.PCA9685() 
 
@@ -115,26 +116,24 @@ class DeltaArm:
         return
     
     def set_all_to_same_angle(self,ang):
-        _thread.start_new_thread(self.set_single_angle, (0, ang))
-        _thread.start_new_thread(self.set_single_angle, (1, ang))
-        _thread.start_new_thread(self.set_single_angle, (2, ang))
-        #for i in range(3):
-        #    self.set_single_angle(i,ang)
-        #test
+       
+        for i in range(3):
+            self.set_single_angle(i,ang)
+
 
     def set_all_to_different_angle(self,a1,a2,a3):
         angs = [a1,a2,a3]
-        print('angs')
-        print(angs)
+        
         print('testing values')
         for i in range(3):
             
             val = int(self.angle_to_position(i, angs[i]))
             if val > 0:
+                print('cant move, steps > 0')
                 return
         print('all good')
         for i in range(3):
-            self.set_single_angle(i,angs[i])
+            self.set_single_angle(i, angs[i])
     
     def set_single_velocity(self, num, v):
         d = 0 if v < 0 else 1
@@ -203,7 +202,7 @@ class DeltaArm:
 
     @staticmethod
     def inverse_kinematics_in_yz_plane(x0,y0,z0):
-        print('starting inverse_kinematics_in_yz_plane')
+        #print('starting inverse_kinematics_in_yz_plane')
         # parameters
         rf = DeltaArm.upper_len
         re = DeltaArm.lower_len
@@ -237,7 +236,7 @@ class DeltaArm:
 
     @staticmethod    
     def compute_triple_inverse_kinematics(x, y, z):
-        print('starting compute_triple_inverse_kinematics ')
+        #print('starting compute_triple_inverse_kinematics ')
         thetas = []
         for phi in DeltaArm.phi_vals:
             (x0,y0,z0) = DeltaArm.rotate_point_to_yz_plane(x,y,z,phi)
@@ -246,100 +245,113 @@ class DeltaArm:
                 raise ValueError('that point is impossible!')
             thetas.append(theta)
 
-        print('ending compute_triple_inverse_kinematics, returning '
-              + str(thetas[0])+ ' ' + str(thetas[1]) + ' ' + str(thetas[2]))
+        #print('ending compute_triple_inverse_kinematics, returning '
+        #      + str(thetas[0])+ ' ' + str(thetas[1]) + ' ' + str(thetas[2]))
         return (thetas[0], thetas[1], thetas[2])
 
     def move_to_point(self,x,y,z):
-        print('start move arm to point (' + str(x) + (', ') + str(y) + ', ' + str(z) + (')') )
+        #print('start move arm to point (' + str(x) + (', ') + str(y) + ', ' + str(z) + (')') )
         (a1,a2,a3) = DeltaArm.compute_triple_inverse_kinematics(x,y,z)
-        print('end move to point with angles ' + str(a1) + ' ' + str(a2) + ' ' + str(a3) )
+        #print('end move to point with angles ' + str(a1) + ' ' + str(a2) + ' ' + str(a3) )
         self.set_all_to_different_angle(a1,a2,a3)
-    
-    @staticmethod
-    def forward_kinematics(theta1, theta2, theta3):
-        print('start forward kinematics')
-        rf = DeltaArm.upper_len
-        re = DeltaArm.lower_len
-        f = DeltaArm.fixed_edge
-        e = DeltaArm.effector_edge
-        
-        #Finding J' points (centers of intersecting spheres)
-        x1 = 0
-        y1 = (f-e)/(2*math.sqrt(3)) + rf*math.cos(math.radians(theta1))
-        z1 = -rf*math.sin(math.radians(theta1))
-        (x1,y1,z1) = DeltaArm.rotate_point_to_yz_plane(x1,y1,z1,DeltaArm.phi_vals[0])
-        
-        x2 = 0
-        y2 = (f-e)/(2*math.sqrt(3)) + rf*math.cos(math.radians(theta2))
-        z2 = -rf*math.sin(math.radians(theta2))
-        (x2,y2,z2) = DeltaArm.rotate_point_to_yz_plane(x2,y2,z2,DeltaArm.phi_vals[1])
-
-        x3 = 0
-        y3 = (f-e)/(2*math.sqrt(3)) + rf*math.cos(math.radians(theta3))
-        z3 = -rf*math.sin(math.radians(theta3))
-        (x3,y3,z3) = DeltaArm.rotate_point_to_yz_plane(x3,y3,z3,DeltaArm.phi_vals[2])
-
-        #Find intersection of 3 spheres
-        w1 = x1**2 + y1**2 + z1**2
-        w2 = x2**2 + y2**2 + z2**2 
-        w3 = x3**2 + y3**2 + z3**2
-
-        #Coefficients in EQN x = a1*z + b1
-        dnm = (x3 - x1)*(y2 - y1) - (x2 - x1)*(y3 - y1)
-        
-        a1 = ((z2 - z1)*(y3 - y1) - (z3 - z1)*(y2 - y1))
-        b1 = -((w2 - w1)*(y3 - y1) - (w3 - w1)*(y2 - y1)) / 2
- 
-        a2 = -((z2 - z1)*(x3 - x1) - (z3 - z1)*(x2 - x1))
-        b2 = ((w1 - w2)*(x1 - x3) - (w1 - w3)*(x1 - x2)) / 2
-
-        #Coefficients in Quadratic
-        A = dnm**2 + a1**2 + a2**2
-        B = 2*(a1*(b1 - x1*dnm) + a2*(b2 - y1*dnm) - z1*dnm**2)
-        C = (b1 - x1*dnm)**2 + (b2 - y1*dnm)**2 + (z1**2 - re**2)*dnm**2
-
-        #Quadratic EQN
-        disc = B**2 - 4*A*C
-        #discriminant < 0 -> no solution
-        if disc < 0:
-            return (-99,-99,-99) 
-        z = (-B - math.sqrt(disc))/(2*A)
-
-        #Solve for x and y from z
-        x = (a1*z + b1) / dnm
-        y = -(a2*z + b2) / dnm
-
-        #Fudge z for end effector height
-        z = z - DeltaArm.end_effector_z_offset
-
-
-        print('ending forward kinematics: ' + str(x) + ' ' + str(y) + ' ' + str(z) )
-
-        #GG EZ
-        return (x,y,z)
 
     def move_to_point_in_straight_line(self,x,y,z,dr):
+        dt = dr/self.move_speed/2
+        print('start move to point in straight line')
         (a1,a2,a3) = [self.get_angle(i) for i in range(3)] #gets the current angles 
         (x0,y0,z0) = DeltaArm.forward_kinematics(a1,a2,a3) #gets the current XYZ position
         delta = tuple([a-b for (a,b) in zip((x,y,z),(x0,y0,z0))]) #for all points x-x0 **gets change in cartesisan for all points
         print(delta)
-
-        rGoal =  math.sqrt(delta[0]**2 + delta[1]**2 + delta[2]**2
+        rGoal =  math.sqrt(delta[0]**2 + delta[1]**2 + delta[2]**2)
         print(rGoal)
         (xCurr, yCurr, zCurr) = (x0,y0,z0) #where the arm starts
         rCurr = 0 #distance away from starting point
 
         while rCurr < rGoal: #while arm is not add ending point
-            rCurr =+ dr #incirmenting by dr
+            rCurr += dr #incirmenting by dr
             (xCurr,yCurr,zCurr) = tuple([w+q for (w,q) in zip((x0,y0,z0),tuple([a*float(rCurr)/float(rGoal) for a in delta]))])
-            print(xCurr,yCurr,zCurr)
-            self.move_to_point(xCurr,yCurr,zCurr)
-            
-            advance_time = time.time() + dt
-            while time.time() < advance_time:
-                pass
+            print(xCurr, yCurr, zCurr)
+            self.move_to_point(xCurr, yCurr, zCurr)
+
+            #advance_time = time.time() + dt
+            #while time.time() < advance_time:
+            #    pass
+
            
         self.move_to_point(x,y,z)
+
+        print('end move to point in straight line')
+
+    @staticmethod
+    def forward_kinematics(theta1, theta2, theta3):
+        rf = DeltaArm.upper_len
+        re = DeltaArm.lower_len
+        f = DeltaArm.fixed_edge
+        e = DeltaArm.effector_edge
+
+        t = (f - e) * DeltaArm.tan30 / 2
+        dtr = math.pi / float(180.0)
+
+        theta1 *= dtr
+        theta2 *= dtr
+        theta3 *= dtr
+
+        y1 = -(t + rf * math.cos(theta1))
+
+        z1 = -rf * math.sin(theta1)
+
+
+        y2 = (t + rf * math.cos(theta2)) * DeltaArm.sin30
+
+        x2 = y2 * DeltaArm.tan60
+
+        z2 = -rf * math.sin(theta2)
+
+
+        y3 = (t + rf * math.cos(theta3)) * DeltaArm.sin30
+
+        x3 = -y3 * DeltaArm.tan60
+
+        z3 = -rf * math.sin(theta3)
+
+
+        dnm = (y2 - y1) * x3 - (y3 - y1) * x2
+
+
+        w1 = y1 * y1 + z1 * z1
+
+        w2 = x2 * x2 + y2 * y2 + z2 * z2
+
+        w3 = x3 * x3 + y3 * y3 + z3 * z3
+
+        # x = (a1 * z + b1) / dnm
+
+        a1 = (z2 - z1) * (y3 - y1) - (z3 - z1) * (y2 - y1)
+
+        b1 = -((w2 - w1) * (y3 - y1) - (w3 - w1) * (y2 - y1)) / 2.0
+
+        # y = (a2 * z + b2) / dnm
+
+        a2 = -(z2 - z1) * x3 + (z3 - z1) * x2
+
+        b2 = ((w2 - w1) * x3 - (w3 - w1) * x2) / 2.0
+
+        #a * z ^ 2 + b * z + c = 0
+
+        a = a1 * a1 + a2 * a2 + dnm * dnm
+
+        b = 2 * (a1 * b1 + a2 * (b2 - y1 * dnm) - z1 * dnm * dnm)
+
+        c = (b2 - y1 * dnm) * (b2 - y1 * dnm) + b1 * b1 + dnm * dnm * (z1 * z1 - re * re)
+        #discriminant
+
+        d = b * b - float(4.0 * a * c)
+        if (d < 0):
+            return -1 #non-existing point
+
+        z0 = -float(0.5 * (b + math.sqrt(d)) / a)
+        x0 = (a1 * z0 + b1) / dnm
+        y0 = (a2 * z0 + b2) / dnm
+        return (x0,y0,z0)
 
 
