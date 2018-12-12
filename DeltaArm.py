@@ -22,7 +22,8 @@ class DeltaArm:
     #angles of each effector arm relative to coordinate axis
     
     #Will sometimes be changed besed on which ports the motors are plugged into
-    #6 possible combnations so just trt different ones and see which one creates
+    #6 possible combnations so just trt different ones anpu
+ntd see which one creates
     #desired XY plane
     phi_vals = [math.radians(330), math.radians(210), math.radians(90)]
     
@@ -39,6 +40,8 @@ class DeltaArm:
     ub = 3.5522
 
     #Position constants in steps
+pu
+nt
 
     zero_vals = [-1750,-980,-2000]  #number of steps required for an arm to be horizontal
     ninety_vals = [-26750,-26800,-27000]  #number of steps required for an arm to be vertical
@@ -117,7 +120,8 @@ class DeltaArm:
         #test
 
     def set_all_to_different_angle(self,a1,a2,a3):
-        angs = [a1,a2,a3]
+        angs = [a1,a2,a3]pu
+nt
         print('angs')
         print(angs)
         print('testing values')

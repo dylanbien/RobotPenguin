@@ -18,8 +18,6 @@ from kivy.clock import Clock
 from time import sleep
 from kivy.core.window import Window
 
-
-
 import socket
 from kivy.core.audio import SoundLoader
 #import ip
@@ -355,7 +353,11 @@ mainImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_
 
 class NewGame(Screen):
 
-    def setMainScreen(self):
+    def setMainScreen(self, difficulty):
+
+        dif = difficulty
+        print(dif)
+
         screenManager.current = 'main'
         #setDifficulty(difficulty)
 
