@@ -331,7 +331,7 @@ class MainScreen(Screen):
                             size_hint=(0.23, 0.4),
                             font_size=20,
                             pos=(985, 400))
-        instructionLabel = Label(text='Turn and maneuver the penguin to get to the fish as quickly as possible.\n \nSelect the order you want the penguin to turn and move in, then press \'go\'\n \nYou can\'t go through mountains, so you\'ll have to go around them.\n \nWatch out for the bear! If it gets to you before you reach the fish, you lose.\n \nGood luck!',
+        instructionLabel = Label(text='Turn and maneuver the penguin to get to the fish as quickly as possible.\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nYou can\'t go through mountains, so you\'ll have to go around them.\n \nWatch out for the bear! If it gets to you before you reach the fish, you lose.\n \nGood luck!',
                                  pos=(690, 560),
                                  font_size=24.5)
 
@@ -372,7 +372,7 @@ class NewGame(Screen):
                             size_hint=(0.23, 0.4),
                             font_size=20,
                             pos=(985, 400))
-        instructionLabel = Label(text='TTurn and maneuver the penguin to get to the fish as quickly as possible\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! If it gets to you before you reach the fish, you lose\n \nGood luck!',
+        instructionLabel = Label(text='Turn and maneuver the penguin to get to the fish as quickly as possible\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! If it gets to you before you reach the fish, you lose\n \nGood luck!',
                                  pos=(690, 560),
                                  font_size=24.5)
 
