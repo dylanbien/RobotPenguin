@@ -137,8 +137,9 @@ class MainScreen(Screen):
     def setTitleScreen(self):
         screenManager.current = 'title'
 
-    # ////////////////////////////////////////////////////////////////         # //														//
-    # //						    POPUPS						                    //  		#   //															//
+    # ////////////////////////////////////////////////////////////////
+    # //					     POPUPS							    //
+    # ////////////////////////////////////////////////////////////////
 
 
 
@@ -357,7 +358,6 @@ class NewGame(Screen):
 
         dif = difficulty
         print(dif)
-
         screenManager.current = 'main'
         #setDifficulty(difficulty)
 
