@@ -1,12 +1,15 @@
 from kivy.config import Config
 
 Config.set('graphics', 'resizable', False)
+
+import os
+os.environ["DISPLAY"] = ":0.0"
 import string
 import random
 import socket
 import sys
 import math
-#import DeltaArm
+import DeltaArm
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -41,12 +44,12 @@ TransparentId = ''
 #'icons/ICON_Transparent.png'
 
 
-'''
-da = DeltaArm.DeltaArm(0, 1, 2) #creates arm
-da.home_all() #homes it
-current = (0, 0, 0)
+
+arm = DeltaArm.DeltaArm(0, 1, 2) #creates arm
+arm.home_all() #homes it
+current = [0,0, -1.34]
 direction = 0
-'''
+
 
 def reset(dif):
    
@@ -63,11 +66,11 @@ def reset(dif):
     [27, 28,40 ,41],
     [66, 79],
     [43, 44, 57],
-    [81,82, 83, 84],
+    [81,80, 79, 72],
     [33, 34, 46, 47],
     [10, 23, 36],
     [61,62,74,75],
-    [86,87],
+    [66,67],
     [25, 38, 51]#,
     #[52, 65, 78 ],
 
@@ -111,28 +114,28 @@ def reset(dif):
     for actor in main.children[0].children:
         if (actor.id == 'actor' + str(locPenguin)): #places penguin
             print('player is ' + str(locPenguin))
-            actor.source = 'players/ICON_Player_180.jpg'
+            #actor.source = 'players/ICON_Player_180.jpg'
 
         if (actor.id == 'actor' + str(assignedGoal)):  # assigns goal id to actor + obstacle
             print('goal is ' + str((locGoal)))
-            actor.source = 'icons/ICON_Goal.jpg'
+            #actor.source = 'icons/ICON_Goal.jpg'
 
 
     actors = list(main.children[0].children)[::-1]#reverses in correct order
-    for x in range(1, 91):
-        if actors[x].number_as_int() in [79,66,53,40,27,14,1]:  # edge numbers
+    for x in range(1, 81):
+        if actors[x].number_as_int() in [55,46,37,28,19,10,1]:  # edge numbers
             x = x + 1
         G.add_edge(actors[x-1].number_as_int(), actors[x].number_as_int())
 
-    for j in range(1, 65):
-        if actors[j].number_as_int() in [13, 39, 65]:  # edge numbers
-            j = j + 13
-        G.add_edge(actors[j].number_as_int(), actors[j+13].number_as_int())
+    for j in range(1, 45):
+        if actors[j].number_as_int() in [9, 27, 45]:  # edge numbers
+            j = j + 9
+        G.add_edge(actors[j].number_as_int(), actors[j+9].number_as_int())
 
-    for k in range(65,78):
-        G.add_edge(actors[k].number_as_int(), actors[k+13].number_as_int())
+    for k in range(45,72):
+        G.add_edge(actors[k].number_as_int(), actors[k+9].number_as_int())
 
-    print("Test: Finding shortest path from 1 to 29 -  " + str(nx.shortest_path(G, source=1, target=29)))
+    #print("Test: Finding shortest path from 1 to 29 -  " + str(nx.shortest_path(G, source=1, target=29)))
 
 
 
@@ -147,8 +150,8 @@ def reset(dif):
 
                 else:
                     actor.source = 'icons/ICON_Jewel.jpg'
-                actor.remove_node()
-
+                
+    arm.move_to_point(0,0, -1.34)
 
 
 #Combined hardware.py functions
@@ -224,14 +227,20 @@ class MainScreen(Screen):
        
         
         if keycode[1] == 'up':
-            self.playerForward()
-            
+            current[1] = current[1] - .01
+            arm.move_to_point(current[0], current[1], current[2])
         elif keycode[1] == 'down':
-            self.playerBackward()
+            current[1] = current[1] + .01
+            arm.move_to_point(current[0], current[1], current[2])
+           # self.playerBackward()
         elif keycode[1] == 'left':
-            self.playerRotate('left')
+            #.playerRotate('left')
+            current[0] = current[0] - .01
+            arm.move_to_point(current[0], current[1], current[2])
         elif keycode[1] == 'right':
-            self.playerRotate('right')
+            current[0] = current[0] + .01
+            arm.move_to_point(current[0], current[1], current[2])
+           # self.playerRotate('right')
             
     
     def findActor(self, ActorIndex):
@@ -510,13 +519,15 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 # ////////////////////////////////////////////////////////////////
 # //					 CREATE GRID/ACTORS	//
 # ////////////////////////////////////////////////////////////////
+#iomportant for making the grid in the right position
+#base_grid = GridLayout(id='basegrid', cols=3, rows=1)
+
 
 #creates a 9 * 9 grid
-grid = GridLayout(id='grid', cols=13, rows=7, padding=15, spacing=1.5) 
+grid = GridLayout(id='grid', cols=9, rows=9, padding=[340,0,340,0], spacing=1.5) 
 
 #sets the background image
 bg = Image(source='images/BG.jpg', size_hint=[1.1, 2])
-
 for i in range(0, grid.cols * grid.rows): #adds the transparent image to all 81 boxes
     b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
     grid.add_widget(b)
