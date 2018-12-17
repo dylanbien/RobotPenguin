@@ -127,13 +127,13 @@ def execute():  # Work on with server
 
     temp = commands[counter] #begins the first command (after we transition to check server)
 
-    if temp == "forward":
+    if temp == 'forward ':
         s.send_packet(PacketType.move, b"forward")
-    elif temp == "backward":
+    elif temp == 'backward ':
         s.send_packet(PacketType.move, b"backward")
-    elif temp == "left":
+    elif temp == 'left ':
         s.send_packet(PacketType.move, b"left")
-    elif temp == "right":
+    elif temp == 'right ':
         s.send_packet(PacketType.move, b"right")
 
 
