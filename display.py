@@ -27,7 +27,7 @@ G = nx.Graph()
 
 from kivy.uix.widget import Widget
 
-
+from apscheduler.schedulers.background import BackgroundScheduler
 # ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER				//
 # //					 LOAD KIVY FILE							//
@@ -35,7 +35,7 @@ from kivy.uix.widget import Widget
 
 difficulty = 'easy'
 locPenguin = 1 #sets starting location of the penguin
-locGoal = [85,88,91] #location of the fish
+locGoal = [81,81,81] #location of the fish
 
 sm = ScreenManager()
 Window.size = (1920, 1080)
@@ -43,13 +43,17 @@ Window.fullscreen = True
 TransparentId = ''
 #'icons/ICON_Transparent.png'
 
-
+check_server = BackgroundScheduler()
+check_server.add_job(check_server, 'interval', seconds = .001)
 
 arm = DeltaArm.DeltaArm(0, 1, 2) #creates arm
 arm.home_all() #homes it
 current = [0,0, -1.34]
 direction = 0
 
+def check_server():
+    if c.recv_packet() == (PacketType.COMMAND1, b"Hello!"):
+        print ('hi')
 
 def reset(dif):
    
@@ -66,7 +70,7 @@ def reset(dif):
     [27, 28,40 ,41],
     [66, 79],
     [43, 44, 57],
-    [81,80, 79, 72],
+    [80, 79, 72],
     [33, 34, 46, 47],
     [10, 23, 36],
     [61,62,74,75],
@@ -538,8 +542,12 @@ main.add_widget(grid) #adds grid to the scren
 
 sm.add_widget(main)
 
-reset('easy')
+
 
 if __name__ == "__main__":
+    try:
+        check_server.start()
+    except (KeyboardInterrupt, SystemExit):
+        check_server.shutdown()
     MyApp().run()
 
