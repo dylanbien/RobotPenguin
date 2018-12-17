@@ -20,12 +20,14 @@ from kivy.core.window import Window
 
 import socket
 from kivy.core.audio import SoundLoader
-#import ip
-#import hardwareip
 
 commands = []
-history = []
+
 Window.fullscreen = 'auto'
+
+# ////////////////////////////////////////////////////////////////
+# /	            DECLARE queue and clear functions	            //
+# ////////////////////////////////////////////////////////////////
 
 def queue(command):
     if (len(commands) >= 22): return
@@ -40,54 +42,75 @@ def queue(command):
 
     mainImageQueue.add_widget(Image(source= 'direction/' + name + '.jpg'))
 
-
-def execute():  # pause PLEASE
-    global commands
-    for command in commands:
-        send(command)
-        sleep(0.2)
-    commands = []
-    mainImageQueue.clear_widgets()
-    mainImageQueue2.clear_widgets()
-
-'''
-def setDifficulty(difficulty)
-   #
- 
-'''
-
-'''
-def send(command): #needs to be connected with the a server paul is writing
-    #code must be added
-'''
-
-
-def pause():
-    leftLay = FloatLayout(size_hint=(0.5, 0.5))
-    leftPop = Popup(title='IN PROGRESS...',
-                    size_hint=(0.240, 0.73),
-                    auto_dismiss=False,
-                    title_size=30,
-                    title_align='center',
-                    pos_hint={'x': 19.5 / Window.width,
-                              'y': 157 / Window.height},
-                    content=leftLay)
-
-    leftImage = Image(source='cards/CARD_Left.jpg',
-                      keep_ratio=True,
-                      size_hint=(1.5, 1.945),
-                      pos=(-78.95, 174.75))
-    leftLay.add_widget(leftImage)
-
-    leftPop.open()
-    Clock.schedule_once(leftPop.dismiss, 5)
-
-
 def clear():
     global commands
     if (len(commands) == 0): print('nothing to clear'); return
     mainImageQueue.remove_widget(mainImageQueue.children[0])
     del commands[len(commands) - 1]
+
+def clearAll():
+    commands = []  # clears commands
+    mainImageQueue.clear_widgets()  # resets image queue 1
+    mainImageQueue2.clear_widgets()  # resets image queue 2
+# ////////////////////////////////////////////////////////////////
+# /	                     Server Creation**WORK ON    	                //
+# ////////////////////////////////////////////////////////////////
+
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+class PacketType(enum.Enum):
+    NULL = 0
+    difficulty = 1
+    move = 2
+    commandResponse = 3
+
+
+
+#         |Bind IP       |Port |Packet enum
+s = Server("172.17.21.2", 5001, PacketType)
+s.open_server()
+s.wait_for_connection()
+
+def check_server():
+    if c.recv_packet() == (PacketType.COMMAND1, b"Hello!"):
+        print ('hi')
+
+check_server = BackgroundScheduler()
+check_server.add_job(check_server, 'interval', seconds = .001)
+
+
+# ////////////////////////////////////////////////////////////////
+# /	                DECLARE execute functions	                //
+# ////////////////////////////////////////////////////////////////
+
+def execute():  # pause PLEASE
+    global commands
+    counter = 0
+
+    while counter < len(commands):
+        temp = commands[counter]
+
+        if temp == "forward":
+            s.send_packet(PacketType.move, b"forward")
+        elif temp == "backward":
+            s.send_packet(PacketType.move, b"backward")
+        elif temp == "left":
+            s.send_packet(PacketType.move, b"left")
+        elif temp == "right":
+            s.send_packet(PacketType.move, b"right")
+
+
+        if s.recv_packet() == (PacketType.commandResponse, b"continue"):
+            continue
+        elif s.recv_packet() == (PacketType.commandResponse, b"win"):
+            return 'win'
+        elif s.recv_packet() == (PacketType.commandResponse, b"lose"):
+            return 'lose'
+
+        counter += 1
+
+    return 'lose'
 
 
 # ////////////////////////////////////////////////////////////////
@@ -110,6 +133,10 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 def quitAll():
     quit()
 
+# ////////////////////////////////////////////////////////////////
+# //				       Main Screen      		 		    //
+# ////////////////////////////////////////////////////////////////
+
 class MainScreen(Screen):
 
     def exitProgram(self):
@@ -123,8 +150,12 @@ class MainScreen(Screen):
         queue(command)
 
     def executeAction(self):
-        execute()
-
+        end = execute()
+        clearAll()
+        if end == 'win':
+            victoryPopup()
+        if end == lose:
+            defeatPopup()
     def pauseAction(self):
         pause()
 
@@ -137,120 +168,10 @@ class MainScreen(Screen):
     def setTitleScreen(self):
         screenManager.current = 'title'
 
-    # ////////////////////////////////////////////////////////////////
-    # //					     POPUPS							    //
-    # ////////////////////////////////////////////////////////////////
+# ////////////////////////////////////////////////////////////////
+# //				       Main screens POPUPS		 		    //
+# ////////////////////////////////////////////////////////////////
 
-
-
-    def quitPopup(self):  # QUIT POPUP
-        quitLay = FloatLayout(size_hint=(0.5, 0.5))
-        quitPop = Popup(title='QUIT GAME',
-                        size_hint=(0.3, 0.23),
-                        auto_dismiss=True,
-                        title_size=30,
-                        title_align='center',
-                        content=quitLay)
-        yesButton = Button(text='YES',
-                           size_hint=(0.46, 0.8),
-                           font_size=20,
-                           pos=(675, 425))
-        noButton = Button(text='NO',
-                          size_hint=(0.46, 0.8),
-                          font_size=20,
-                          pos=(1065, 425))
-        confirmationLabel = Label(text='Are you sure you want to quit?',
-                                  pos=(725, 487.5),
-                                  font_size=30)
-
-        yesButton.bind(on_release=self.exitProgram)
-        noButton.bind(on_release=quitPop.dismiss)
-
-        quitLay.add_widget(yesButton)
-        quitLay.add_widget(noButton)
-        quitLay.add_widget(confirmationLabel)
-
-        quitPop.open()
-
-    def leftPopup(self):  # LEFT POPUP
-        leftLay = FloatLayout(size_hint=(0.5, 0.5))
-        leftPop = Popup(title='IN PROGRESS...',
-                        size_hint=(0.240, 0.73),
-                        auto_dismiss=False,
-                        title_size=30,
-                        title_align='center',
-                        pos_hint={'x': 19.5 / Window.width,
-                                  'y': 157 / Window.height},
-                        content=leftLay)
-
-        leftImage = Image(source='cards/CARD_Left.jpg',
-                          keep_ratio=True,
-                          size_hint=(1.5, 1.945),
-                          pos=(-78.95, 174.75))
-        leftLay.add_widget(leftImage)
-
-        leftPop.open()
-        Clock.schedule_once(leftPop.dismiss, .1)
-
-    def upPopup(self):  # UP POPUP
-        upLay = FloatLayout(size_hint=(0.5, 0.5))
-        upPop = Popup(title='IN PROGRESS...',
-                      size_hint=(0.240, 0.73),
-                      auto_dismiss=False,
-                      title_size=30,
-                      title_align='center',
-                      pos_hint={'x': 480 / Window.width,
-                                'y': 157.5 / Window.height},
-                      content=upLay)
-
-        upImage = Image(source='cards/CARD_Up.jpg',
-                        keep_ratio=True,
-                        size_hint=(1.5, 1.945),
-                        pos=(381.75, 174.75))
-        upLay.add_widget(upImage)
-
-        upPop.open()
-        Clock.schedule_once(upPop.dismiss, .1)
-
-    def downPopup(self):  # DOWN POPUP
-        downLay = FloatLayout(size_hint=(0.5, 0.5))
-        downPop = Popup(title='IN PROGRESS...',
-                        size_hint=(0.240, 0.73),
-                        auto_dismiss=False,
-                        title_size=30,
-                        title_align='center',
-                        pos_hint={'x': 940.5 / Window.width,
-                                  'y': 157.5 / Window.height},
-                        content=downLay)
-
-        downImage = Image(source='cards/CARD_Down.jpg',
-                          keep_ratio=True,
-                          size_hint=(1.5, 1.945),
-                          pos=(842.5, 174.75))
-        downLay.add_widget(downImage)
-
-        downPop.open()
-        Clock.schedule_once(downPop.dismiss, .1)
-
-    def rightPopup(self):  # RIGHT POPUP
-        rightLay = FloatLayout(size_hint=(0.5, 0.5))
-        rightPop = Popup(title='IN PROGRESS...',
-                         size_hint=(0.240, 0.73),
-                         auto_dismiss=False,
-                         title_size=30,
-                         title_align='center',
-                         pos_hint={'x': 1401.5 / Window.width,
-                                   'y': 157 / Window.height},
-                         content=rightLay)
-
-        rightImage = Image(source='cards/CARD_Right.jpg',
-                           keep_ratio=True,
-                           size_hint=(1.5, 1.945),
-                           pos=(1303.5, 174.75))
-        rightLay.add_widget(rightImage)
-
-        rightPop.open()
-        Clock.schedule_once(rightPop.dismiss, .1)
 
     def victoryPopup(self):  # victory POPUP
         victoryLay = FloatLayout(size_hint=(0.5, 0.5))
@@ -339,18 +260,9 @@ class MainScreen(Screen):
         instruction.add_widget(instructionLabel)
         instructionPop.open()
 
-
-titleImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
-instructionImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
-newGameImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
-mainImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
-mainImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .85})
-
-
-#border = Image(source='images/rectangle.png', allow_stretch=True, keep_ratio=False,
-            #   pos=(Window.width * 0, Window.height * 1.4), size_hint_y=None, height=Window.height * .3,
-             #  size_hint_x=None, width=Window.width * 1.975)
-
+# ////////////////////////////////////////////////////////////////
+# //	       	    	  New Game screen			            //
+# ////////////////////////////////////////////////////////////////
 
 class NewGame(Screen):
 
@@ -384,31 +296,40 @@ class NewGame(Screen):
         instructionPop.open()
 
 
+# ////////////////////////////////////////////////////////////////
+# //	       	    	  Title screen			                //
+# ////////////////////////////////////////////////////////////////
+
+
 class TitleScreen(Screen):
 
     def setInstructionScreen(self):
         screenManager.current = 'instruction'
-        #setDifficulty(difficulty)
+
+# ////////////////////////////////////////////////////////////////
+# //		    	  Instruction screen   			        //
+# ////////////////////////////////////////////////////////////////
 
 class InstructionScreen(Screen):
 
     def setNewScreen(self):
         screenManager.current = 'newGame'
-        #setDifficulty(difficulty)
+
+# ////////////////////////////////////////////////////////////////
+# //		    	  Creates and adds screens			        //
+# ////////////////////////////////////////////////////////////////
+
+mainImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+mainImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .85})
 
 title = TitleScreen(name='title')
-
 instruction = InstructionScreen(name='instruction')
-
 newGame = NewGame(name='newGame')
-
 main = MainScreen(name='main')
 
-title.add_widget(titleImageQueue)
-instruction.add_widget(instructionImageQueue)
+
 main.add_widget(mainImageQueue)
 main.add_widget(mainImageQueue2)
-newGame.add_widget(newGameImageQueue)
 
 screenManager.add_widget(title)
 screenManager.add_widget(instruction)
@@ -416,14 +337,14 @@ screenManager.add_widget(newGame)
 screenManager.add_widget(main)
 
 screenManager.current= 'title'
-#screenManager.current= 'newGame'
-
-#main.add_widget(border)
-
 
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
 # ////////////////////////////////////////////////////////////////
 
 if __name__ == "__main__":
+    try:
+        check_server.start()
+    except (KeyboardInterrupt, SystemExit):
+        check_server.shutdown()
     MyApp().run()

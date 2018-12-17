@@ -28,9 +28,9 @@ G = nx.Graph()
 from kivy.uix.widget import Widget
 
 from apscheduler.schedulers.background import BackgroundScheduler
+
 # ////////////////////////////////////////////////////////////////
-# //			DECLARE APP CLASS AND SCREENMANAGER				//
-# //					 LOAD KIVY FILE							//
+# //	                		Set Up			    			//
 # ////////////////////////////////////////////////////////////////
 
 difficulty = 'easy'
@@ -43,22 +43,32 @@ Window.fullscreen = True
 TransparentId = ''
 #'icons/ICON_Transparent.png'
 
-check_server = BackgroundScheduler()
-check_server.add_job(check_server, 'interval', seconds = .001)
+
 
 arm = DeltaArm.DeltaArm(0, 1, 2) #creates arm
 arm.home_all() #homes it
 current = [0,0, -1.34]
 direction = 0
 
+# ////////////////////////////////////////////////////////////////
+# //	                		Server			    			//
+# ////////////////////////////////////////////////////////////////
 def check_server():
     if c.recv_packet() == (PacketType.COMMAND1, b"Hello!"):
         print ('hi')
 
+check_server = BackgroundScheduler()
+check_server.add_job(check_server, 'interval', seconds = .001)
+
+# ////////////////////////////////////////////////////////////////
+# //	               		Reset Function			    		//
+# ////////////////////////////////////////////////////////////////
+
+
 def reset(dif):
-   
-    
+
     difficulty = dif
+
     print('now is ' + difficulty)
     
     grid.clear_widgets()
@@ -157,34 +167,9 @@ def reset(dif):
                 
     arm.move_to_point(0,0, -1.34)
 
-
-#Combined hardware.py functions
-def obey_paul(data):
-
-#if (date =='easy'):
-    #self.reset('easy')
-#elif(date == 'medium'):
-  #  self.reset('medium')
-#elif (date == 'hard'):
-    #self.reset('hard')
-
-    if (data == 'forward '):
-            
-        main.playerForward()
-
-    elif (data == 'backward '): #recieves backwards
-  
-       main.playerBackward()
-
-    elif (data == 'left '): #receives left
-        main.playerRotate('left')
-
-    elif (data == 'right '): #revieves right
-        main.playerRotate('right')
-
-    else:
-        print('fail')
-        return
+# ////////////////////////////////////////////////////////////////
+# //	               		MyApp creation			    		//
+# ////////////////////////////////////////////////////////////////
     
 class MyApp(App):
     
@@ -195,58 +180,14 @@ class MyApp(App):
     def quitAll():
         quit()
 
-#// DECLARE APP, MAINSCREEN, ACTOR CLASSES/METHODS AND SCREENMANAGER	//
-# # ////////////////////////////////////////////////////////////////////////////
-# # //	D						LOAD KIVY FILE								//
+
+# ////////////////////////////////////////////////////////////////////////////
+# //						    	Main Screen 							//
 # ////////////////////////////////////////////////////////////////////////////
 
-#These handle the visual component of all of the things that happen in the obey() function
-
-# all args are passed in string form. locations are 'actor1', 'actor2', 'actor3', etc. types are 'ICON_Igloo.jpg', 'ICON_Wrench.jpg', etc.]
-
 class MainScreen(Screen):
-   
-   #for keyboard testing
-    def __init__(self, **kwargs):
-        super(MainScreen, self).__init__(**kwargs)
-        self._keyboard = Window.request_keyboard(
-            self._keyboard_closed, self, 'text')
-        if self._keyboard.widget:
-            # If it exists, this widget is a VKeyboard object which you can use
-            # to change the keyboard layout.
-            pass
-        self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
-        # Keycode is composed of an integer + a string
-        # If we hit escape, release the keyboard
-    def _keyboard_closed(self):
-        print('My keyboard have been closed!')
-        self._keyboard.unbind(on_key_down=self._on_keyboard_down)
-        self._keyboard = None
-        
-    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
-        #print('The key', keycode, 'have been pressed')
-       # print(' - text is %r' % text)
-        #print(' - modifiers are %r' % modifiers
-       
-        
-        if keycode[1] == 'up':
-            current[1] = current[1] - .01
-            arm.move_to_point(current[0], current[1], current[2])
-        elif keycode[1] == 'down':
-            current[1] = current[1] + .01
-            arm.move_to_point(current[0], current[1], current[2])
-           # self.playerBackward()
-        elif keycode[1] == 'left':
-            #.playerRotate('left')
-            current[0] = current[0] - .01
-            arm.move_to_point(current[0], current[1], current[2])
-        elif keycode[1] == 'right':
-            current[0] = current[0] + .01
-            arm.move_to_point(current[0], current[1], current[2])
-           # self.playerRotate('right')
-            
-    
+
     def findActor(self, ActorIndex):
         return self.children[0].children[len(self.children[0].children) - ActorIndex]
     
@@ -268,11 +209,10 @@ class MainScreen(Screen):
         for actor in self.children[0].children:
             if (actor.id == location):
                 actor.source = TransparentId
-    
 
-   #the below move the actor
-   #they get called in the obey function
-   #tehy call functions in the actor class
+# ////////////////////////////////////////////////////////////////////////////
+# //						    	Player move 							//
+# ////////////////////////////////////////////////////////////////////////////
 
     def playerForward(self): #just find the location of the player
         print('you have moved the player forwards')
@@ -294,11 +234,10 @@ class MainScreen(Screen):
             if ('Player' in actor.source):
                 actor.rotateDirection(direction)
                 return
-            
-            
-   #done with calls to actor
 
-
+# ////////////////////////////////////////////////////////////////////////////
+# //						    	Hunt Player 							//
+# ////////////////////////////////////////////////////////////////////////////
 
     def huntPlayer(self):
         global difficulty
@@ -328,6 +267,9 @@ class MainScreen(Screen):
                     hunter.goTowards();
                     break
 
+# ////////////////////////////////////////////////////////////////////////////
+# //						    	Actor Class 							//
+# ////////////////////////////////////////////////////////////////////////////
 
 class Actor(ButtonBehavior, Image): #creates an actor class
 
@@ -345,8 +287,10 @@ class Actor(ButtonBehavior, Image): #creates an actor class
 
     def on_press(self): #when button is pressed
         print('pressed' + str(self.id))
-        
-    #below are called above in the main class
+
+# ////////////////////////////////////////////////////////////////////////////
+# //						        	Move Actor 							//
+# ////////////////////////////////////////////////////////////////////////////
 
     def moveForward(self): #find out which image is on the screen
         #there are different images for the player based on the direction they are facing 
@@ -509,22 +453,12 @@ class Actor(ButtonBehavior, Image): #creates an actor class
             return #can't move...you lose
     
 
-    
-    
 
-#needs to be fixed for harder levels
-    def goTowards(self):
-        pass
-               
-
-# Builder.load_file('display.kv')
 Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 
 # ////////////////////////////////////////////////////////////////
-# //					 CREATE GRID/ACTORS	//
+# //					 CREATE GRID/ACTORS                 	//
 # ////////////////////////////////////////////////////////////////
-#iomportant for making the grid in the right position
-#base_grid = GridLayout(id='basegrid', cols=3, rows=1)
 
 
 #creates a 9 * 9 grid
@@ -540,9 +474,13 @@ main = MainScreen(name='main') #creates a main screen
 main.add_widget(bg) #adds background to the screen
 main.add_widget(grid) #adds grid to the scren
 
+main.resetBoard()
+
 sm.add_widget(main)
 
-
+# ////////////////////////////////////////////////////////////////
+# //				  Run main function                     	//
+# ////////////////////////////////////////////////////////////////
 
 if __name__ == "__main__":
     try:
