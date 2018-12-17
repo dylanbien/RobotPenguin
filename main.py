@@ -88,7 +88,13 @@ def check_server(): #impliment from execute
     elif s.recv_packet() == (PacketType.commandResponse, b"continue"): 
         
         counter += 1
+        
+        if counter > (len(commands) - 1):
+            main.clearAll()
+            main.defeatPopup()
+            
         temp = commands[counter]
+        
         print('counter is' + str(counter)
         print ('temp is' + temp)
         
