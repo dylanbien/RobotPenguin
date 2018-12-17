@@ -72,9 +72,17 @@ s = Server("172.17.21.2", 5001, PacketType)
 s.open_server()
 s.wait_for_connection()
 
-def check_server():
-    if c.recv_packet() == (PacketType.COMMAND1, b"Hello!"):
-        print ('hi')
+def check_server(): #impliment from execute
+
+    #impliment
+
+def setDifficulty(difficulty):
+    if difficulty == 'easy':
+        s.send_packet(PacketType.difficulty, b"easy")
+    if difficulty == 'medium':
+        s.send_packet(PacketType.difficulty, b"medium")
+    if difficulty == 'hard':
+        s.send_packet(PacketType.difficulty, b"hard")
 
 check_server = BackgroundScheduler()
 check_server.add_job(check_server, 'interval', seconds = .001)
@@ -84,7 +92,7 @@ check_server.add_job(check_server, 'interval', seconds = .001)
 # /	                DECLARE execute functions	                //
 # ////////////////////////////////////////////////////////////////
 
-def execute():  # pause PLEASE
+def execute():  # Work on with server
     global commands
     counter = 0
 
@@ -271,7 +279,7 @@ class NewGame(Screen):
         dif = difficulty
         print(dif)
         screenManager.current = 'main'
-        #setDifficulty(difficulty)
+        setDifficulty(difficulty)
 
     def instructionPopup(self):  # instruction POPUP
         #instructionLay = FloatLayout(size_hint=(0.5, 0.5))

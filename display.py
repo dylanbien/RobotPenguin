@@ -27,7 +27,6 @@ G = nx.Graph()
 
 from kivy.uix.widget import Widget
 
-from apscheduler.schedulers.background import BackgroundScheduler
 
 # ////////////////////////////////////////////////////////////////
 # //	                		Set Up			    			//
@@ -40,8 +39,7 @@ locGoal = [81,81,81] #location of the fish
 sm = ScreenManager()
 Window.size = (1920, 1080)
 Window.fullscreen = True
-TransparentId = ''
-#'icons/ICON_Transparent.png'
+TransparentId = 'icons/ICON_Transparent.png'
 
 
 
@@ -53,9 +51,37 @@ direction = 0
 # ////////////////////////////////////////////////////////////////
 # //	                		Server			    			//
 # ////////////////////////////////////////////////////////////////
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+class PacketType(enum.Enum):
+    NULL = 0
+    difficulty = 1
+    move = 2
+    commandResponse = 3
+
+#         |Server IP     |Port |Packet enum
+c = Client("172.17.21.2", 5001, PacketType)
+c.connect()
+
 def check_server():
-    if c.recv_packet() == (PacketType.COMMAND1, b"Hello!"):
-        print ('hi')
+
+    if c.recv_packet() == (PacketType.difficulty, b"easy"):
+        reset('easy')
+    elif c.recv_packet() == (PacketType.difficulty, b"medium"):
+        reset('medium')
+    elif c.recv_packet() == (PacketType.difficulty, b"hard"):
+        reset('hard')
+
+    if recv_packet() == (PacketType.move, b"forward"):
+        main.playerForward()
+    elif recv_packet() == (PacketType.move, b"backward"):
+        main.playerBackward()
+    elif recv_packet() == (PacketType.move, b"left"):
+        main.playerRotate('left')
+    elif recv_packet() == (PacketType.move, b"right"):
+        main.playerRotate('right')
+
 
 check_server = BackgroundScheduler()
 check_server.add_job(check_server, 'interval', seconds = .001)
