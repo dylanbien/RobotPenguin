@@ -1,11 +1,10 @@
 # ////////////////////////////////////////////////////////////////
-# //					 IMPORT STATEMENTS						//
+# //					 IMPORT STATEMENTS	                    //
 # ////////////////////////////////////////////////////////////////
 from kivy.config import Config
+
 Config.set('graphics', 'fullscreen', '0')
 from kivy.app import App
-from kivy.uix import togglebutton
-from kivy.uix.widget import Widget
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
@@ -16,275 +15,413 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
-from kivy.graphics import *
 from time import sleep
+from kivy.core.window import Window
+
 import socket
-import sys
-import ip
-import hardwareip
+from kivy.core.audio import SoundLoader
+#import ip
+#import hardwareip
+
 commands = []
 history = []
-		
+Window.fullscreen = 'auto'
+
 def queue(command):
-	if (len(commands) >= 10): return
-	commands.append(command)
-	name = command.replace(' ','')
-	name.upper()
-	imageQueue.add_widget(Image(source = name + '.jpg'))
-	
+    if (len(commands) >= 22): return
 
-def execute(): # pause PLEASE
-	global commands
-	for command in commands:
-		send(command)
-		hardwareSend(command)
-		sleep(0.2)
-	commands = []
-	imageQueue.clear_widgets()
+    commands.append(command)
+    name = command.replace(' ', '')
+    name.upper()
 
-def send(command, retry = 2):
-	history.append(command)
-	# Create a TCP/IP socket
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if (len(commands) >= 12):
+        mainImageQueue2.add_widget(Image(source='direction/' + name + '.jpg'))
+        return
 
-	# Connect the socket to the port where the server is listening
-	server_address = ip.server_address
-	print('main connecting to {} port {}'.format(*server_address))
-	
-	try:
-		# Send data
-		sock.connect(server_address)
-		message = command.encode()
-		print('sending {!r}'.format(message))
-		sock.sendall(message)
-		
-	except OSError:
-		# Retry if retried less than two times
-		if(retry >= 0):
-			send(command, retry - 1)
-		
-	finally:
-		print('please clap')
-		sock.close()
+    mainImageQueue.add_widget(Image(source= 'direction/' + name + '.jpg'))
 
-def hardwareSend(command, retry = 2):
-	# Create a TCP/IP socket
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-	# Connect the socket to the port where the server is listening
-	server_address = hardwareip.server_address
-	print('main connecting to hardware {} port {}'.format(*server_address))
-	
-	try:
-		# Send data
-		sock.connect(server_address)
-		message = command.encode()
-		print('sending to hardware {!r}'.format(message))
-		sock.sendall(message)
-		
-	except OSError:
-		# Retry if retried less than two times
-		if(retry >= 0):
-			hardwareSend(command, retry - 1)
-		
-	finally:
-		print('please clap')
-		sock.close()
-		
+def execute():  # pause PLEASE
+    global commands
+    for command in commands:
+        send(command)
+        sleep(0.2)
+    commands = []
+    mainImageQueue.clear_widgets()
+    mainImageQueue2.clear_widgets()
 
-		
+'''
+def setDifficulty(difficulty)
+   #
+ 
+'''
+
+'''
+def send(command): #needs to be connected with the a server paul is writing
+    #code must be added
+'''
+
+
 def pause():
-	leftLay = FloatLayout(size_hint = (0.5, 0.5))
-	leftPop = Popup(title = 'IN PROGRESS...',
-		size_hint = (0.240, 0.73),
-		auto_dismiss = False,
-		title_size = 30,
-		title_align = 'center',
-		pos_hint = { 'x' : 19.5 / Window.width,
-					 'y' : 157 / Window.height},
-		content = leftLay)
+    leftLay = FloatLayout(size_hint=(0.5, 0.5))
+    leftPop = Popup(title='IN PROGRESS...',
+                    size_hint=(0.240, 0.73),
+                    auto_dismiss=False,
+                    title_size=30,
+                    title_align='center',
+                    pos_hint={'x': 19.5 / Window.width,
+                              'y': 157 / Window.height},
+                    content=leftLay)
 
-	leftImage = Image(source = 'CARD_Left.jpg',
-					  keep_ratio = True,
-					  size_hint = (1.5, 1.945),
-					  pos = (-78.95, 174.75))
-	leftLay.add_widget(leftImage)
+    leftImage = Image(source='cards/CARD_Left.jpg',
+                      keep_ratio=True,
+                      size_hint=(1.5, 1.945),
+                      pos=(-78.95, 174.75))
+    leftLay.add_widget(leftImage)
 
-	leftPop.open()
-	Clock.schedule_once(leftPop.dismiss, 5)
-	
+    leftPop.open()
+    Clock.schedule_once(leftPop.dismiss, 5)
+
+
 def clear():
-	global commands
-	if (len(commands) == 0): print ('nothing to clear'); return
-	imageQueue.remove_widget(imageQueue.children[0])
-	del commands[len(commands) - 1]
+    global commands
+    if (len(commands) == 0): print('nothing to clear'); return
+    mainImageQueue.remove_widget(mainImageQueue.children[0])
+    del commands[len(commands) - 1]
+
 
 # ////////////////////////////////////////////////////////////////
-# //			DECLARE APP CLASS AND SCREENMANAGER				//
-# //					 LOAD KIVY FILE							//
+# //			DECLARE APP CLASS AND SCREENMANAGER	            //
+# //					 LOAD KIVY FILE		                    //
 # ////////////////////////////////////////////////////////////////
 
 
-sm = ScreenManager()
+screenManager = ScreenManager()
 
 class MyApp(App):
-	def build(self):
-		return sm
+    def build(self):
+        return screenManager
+
 
 Builder.load_file('main.kv')
-Window.clearcolor = (0.1, 0.1, 0.1, 1) # (WHITE)
+Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
+
 
 def quitAll():
-	quit()
+    quit()
 
-	
 class MainScreen(Screen):
 
-	def exitProgram(self, obj):
-		App.get_running_app().stop()
-		Window.close()
-	def playerAction(self, command):
-		send(command)
-	def queueAction(self, command):
-		queue(command)
-	def executeAction(self):
-		execute()
-	def pauseAction(self):
-		pause()
-	def clearAction(self):
-		clear()
+    def exitProgram(self):
+        App.get_running_app().stop()
+        Window.close()
 
-# ////////////////////////////////////////////////////////////////
-# //															//
-# //						  POPUPS							//
-# //															//
-# ////////////////////////////////////////////////////////////////
+    def playerAction(self, command):
+        send(command)
 
-	def quitPopup (self): # QUIT POPUP
-		quitLay = FloatLayout(size_hint = (0.5, 0.5))
-		quitPop = Popup(title = 'QUIT GAME',
-			size_hint = (0.3, 0.23),
-			auto_dismiss = True,
-			title_size = 30,
-			title_align = 'center',
-			content = quitLay)
-		yesButton = Button(text = 'YES',
-			size_hint = (0.46, 0.8),
-			font_size = 20,
-			pos = (700, 425))
-		noButton = Button(text = 'NO',
-			size_hint = (0.46, 0.8),
-			font_size = 20,
-			pos = (965, 425))
-		confirmationLabel = Label(text = 'Are you sure you want to quit?',
-			pos = (685, 487.5),
-			font_size = 20)
-		
-		yesButton.bind(on_release = self.exitProgram)
-		noButton.bind(on_release = quitPop.dismiss)
-		
-		quitLay.add_widget(yesButton)
-		quitLay.add_widget(noButton)
-		quitLay.add_widget(confirmationLabel)
+    def queueAction(self, command):
+        queue(command)
 
-		quitPop.open()
-		
-	def leftPopup (self): # LEFT POPUP
-		leftLay = FloatLayout(size_hint = (0.5, 0.5))
-		leftPop = Popup(title = 'IN PROGRESS...',
-			size_hint = (0.240, 0.73),
-			auto_dismiss = False,
-			title_size = 30,
-			title_align = 'center',
-			pos_hint = { 'x' : 19.5 / Window.width,
-						 'y' : 157 / Window.height},
-			content = leftLay)
+    def executeAction(self):
+        execute()
 
-		leftImage = Image(source = 'CARD_Left.jpg',
-						  keep_ratio = True,
-						  size_hint = (1.5, 1.945),
-						  pos = (-78.95, 174.75))
-		leftLay.add_widget(leftImage)
+    def pauseAction(self):
+        pause()
 
-		leftPop.open()
-		Clock.schedule_once(leftPop.dismiss, .1)
-		
+    def clearAction(self):
+        clear()
 
-	def upPopup (self): # UP POPUP
-		upLay = FloatLayout(size_hint = (0.5, 0.5))
-		upPop = Popup(title = 'IN PROGRESS...',
-			size_hint = (0.240, 0.73),
-			auto_dismiss = False,
-			title_size = 30,
-			title_align = 'center',
-			pos_hint = { 'x' : 480 / Window.width,
-						 'y' : 157.5 / Window.height},
-			content = upLay)
+    def setNewGameScreen(self):
+        screenManager.current = 'newGame'
 
-		upImage = Image(source = 'CARD_Up.jpg',
-						  keep_ratio = True,
-						  size_hint = (1.5, 1.945),
-						  pos = (381.75, 174.75))
-		upLay.add_widget(upImage)
+    def setTitleScreen(self):
+        screenManager.current = 'title'
 
-		upPop.open()
-		Clock.schedule_once(upPop.dismiss, .1)
+    # ////////////////////////////////////////////////////////////////         # //														//
+    # //						    POPUPS						                    //  		#   //															//
 
-	def downPopup (self): # DOWN POPUP
-		downLay = FloatLayout(size_hint = (0.5, 0.5))
-		downPop = Popup(title = 'IN PROGRESS...',
-			size_hint = (0.240, 0.73),
-			auto_dismiss = False,
-			title_size = 30,
-			title_align = 'center',
-			pos_hint = { 'x' : 940.5 / Window.width,
-						 'y' : 157.5 / Window.height},
-			content = downLay)
 
-		downImage = Image(source = 'CARD_Down.jpg',
-						  keep_ratio = True,
-						  size_hint = (1.5, 1.945),
-						  pos = (842.5, 174.75))
-		downLay.add_widget(downImage)
 
-		downPop.open()
-		Clock.schedule_once(downPop.dismiss, .1)
+    def quitPopup(self):  # QUIT POPUP
+        quitLay = FloatLayout(size_hint=(0.5, 0.5))
+        quitPop = Popup(title='QUIT GAME',
+                        size_hint=(0.3, 0.23),
+                        auto_dismiss=True,
+                        title_size=30,
+                        title_align='center',
+                        content=quitLay)
+        yesButton = Button(text='YES',
+                           size_hint=(0.46, 0.8),
+                           font_size=20,
+                           pos=(675, 425))
+        noButton = Button(text='NO',
+                          size_hint=(0.46, 0.8),
+                          font_size=20,
+                          pos=(1065, 425))
+        confirmationLabel = Label(text='Are you sure you want to quit?',
+                                  pos=(725, 487.5),
+                                  font_size=30)
 
-	def rightPopup (self): # RIGHT POPUP
-		rightLay = FloatLayout(size_hint = (0.5, 0.5))
-		rightPop = Popup(title = 'IN PROGRESS...',
-			size_hint = (0.240, 0.73),
-			auto_dismiss = False,
-			title_size = 30,
-			title_align = 'center',
-			pos_hint = { 'x' : 1401.5 / Window.width,
-						 'y' : 157 / Window.height},
-			content = rightLay)
+        yesButton.bind(on_release=self.exitProgram)
+        noButton.bind(on_release=quitPop.dismiss)
 
-		rightImage = Image(source = 'CARD_Right.jpg',
-						  keep_ratio = True,
-						  size_hint = (1.5, 1.945),
-						  pos = (1303.5, 174.75))
-		rightLay.add_widget(rightImage)
+        quitLay.add_widget(yesButton)
+        quitLay.add_widget(noButton)
+        quitLay.add_widget(confirmationLabel)
 
-		rightPop.open()
-		Clock.schedule_once(rightPop.dismiss, .1)
-		
-main = MainScreen(name = 'main')
-imageQueue = BoxLayout(padding = 15, size_hint=(.825, None), height = 150, pos_hint={'top': .9875})
-border = Image(source = 'rectangle.png', allow_stretch = True, keep_ratio = False, pos = (Window.width * 0, Window.height * 1.4), size_hint_y = None, height = Window.height * .3, size_hint_x = None, width = Window.width * 1.975)
-				
-#for i in range(10):
-	#queue.add_widget(Image(source='LEFT.jpg'))
+        quitPop.open()
 
-main.add_widget(imageQueue)
-main.add_widget(border)
-sm.add_widget(main)
+    def leftPopup(self):  # LEFT POPUP
+        leftLay = FloatLayout(size_hint=(0.5, 0.5))
+        leftPop = Popup(title='IN PROGRESS...',
+                        size_hint=(0.240, 0.73),
+                        auto_dismiss=False,
+                        title_size=30,
+                        title_align='center',
+                        pos_hint={'x': 19.5 / Window.width,
+                                  'y': 157 / Window.height},
+                        content=leftLay)
 
+        leftImage = Image(source='cards/CARD_Left.jpg',
+                          keep_ratio=True,
+                          size_hint=(1.5, 1.945),
+                          pos=(-78.95, 174.75))
+        leftLay.add_widget(leftImage)
+
+        leftPop.open()
+        Clock.schedule_once(leftPop.dismiss, .1)
+
+    def upPopup(self):  # UP POPUP
+        upLay = FloatLayout(size_hint=(0.5, 0.5))
+        upPop = Popup(title='IN PROGRESS...',
+                      size_hint=(0.240, 0.73),
+                      auto_dismiss=False,
+                      title_size=30,
+                      title_align='center',
+                      pos_hint={'x': 480 / Window.width,
+                                'y': 157.5 / Window.height},
+                      content=upLay)
+
+        upImage = Image(source='cards/CARD_Up.jpg',
+                        keep_ratio=True,
+                        size_hint=(1.5, 1.945),
+                        pos=(381.75, 174.75))
+        upLay.add_widget(upImage)
+
+        upPop.open()
+        Clock.schedule_once(upPop.dismiss, .1)
+
+    def downPopup(self):  # DOWN POPUP
+        downLay = FloatLayout(size_hint=(0.5, 0.5))
+        downPop = Popup(title='IN PROGRESS...',
+                        size_hint=(0.240, 0.73),
+                        auto_dismiss=False,
+                        title_size=30,
+                        title_align='center',
+                        pos_hint={'x': 940.5 / Window.width,
+                                  'y': 157.5 / Window.height},
+                        content=downLay)
+
+        downImage = Image(source='cards/CARD_Down.jpg',
+                          keep_ratio=True,
+                          size_hint=(1.5, 1.945),
+                          pos=(842.5, 174.75))
+        downLay.add_widget(downImage)
+
+        downPop.open()
+        Clock.schedule_once(downPop.dismiss, .1)
+
+    def rightPopup(self):  # RIGHT POPUP
+        rightLay = FloatLayout(size_hint=(0.5, 0.5))
+        rightPop = Popup(title='IN PROGRESS...',
+                         size_hint=(0.240, 0.73),
+                         auto_dismiss=False,
+                         title_size=30,
+                         title_align='center',
+                         pos_hint={'x': 1401.5 / Window.width,
+                                   'y': 157 / Window.height},
+                         content=rightLay)
+
+        rightImage = Image(source='cards/CARD_Right.jpg',
+                           keep_ratio=True,
+                           size_hint=(1.5, 1.945),
+                           pos=(1303.5, 174.75))
+        rightLay.add_widget(rightImage)
+
+        rightPop.open()
+        Clock.schedule_once(rightPop.dismiss, .1)
+
+    def victoryPopup(self):  # victory POPUP
+        victoryLay = FloatLayout(size_hint=(0.5, 0.5))
+        victoryPop = Popup(title='VICTORY',
+                           size_hint=(0.3, 0.23),
+                           auto_dismiss=False,
+                           title_size=30,
+                           title_align='center',
+                           content=victoryLay)
+        victoryImage = Image(source='winner/winner.png',
+                             keep_ratio=True,
+                             size_hint=(1.5*1.15, 1.945*1.15),
+                             pos=(545, 545))
+        playAgainButton = Button(text='Play Again',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(760, 425))
+        quitButton = Button(text='Quit',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(1110, 425))
+
+        playAgainButton.bind(on_release=victoryPop.dismiss)
+        playAgainButton.bind(on_release=MainScreen.setNewGameScreen)
+
+        quitButton.bind(on_release=victoryPop.dismiss)
+        quitButton.bind(on_release=MainScreen.setTitleScreen)
+
+        victoryLay.add_widget(quitButton)
+        victoryLay.add_widget(playAgainButton)
+        victoryLay.add_widget(victoryImage)
+        victoryPop.open()
+
+
+    def defeatPopup(self):  # defeat POPUP
+        defeatLay = FloatLayout(size_hint=(0.5, 0.5))
+        defeatPop = Popup(title='DEFEAT',
+                          size_hint=(0.3, 0.23),
+                          auto_dismiss=False,
+                          title_size=30,
+                          title_align='center',
+                          content=defeatLay)
+        defeatImage = Image(source='loser/loser.png',
+                            keep_ratio=True,
+                            size_hint=(1.5*1.3, 1.945*1.3),
+                            pos=(480, 530))
+        playAgainButton = Button(text='Play Again',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(760, 425))
+        quitButton = Button(text='Quit',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(1110, 425))
+
+        playAgainButton.bind(on_release=defeatPop.dismiss)
+        playAgainButton.bind(on_release=MainScreen.setNewGameScreen)
+
+        quitButton.bind(on_release=defeatPop.dismiss)
+        quitButton.bind(on_release=MainScreen.setTitleScreen)
+
+        defeatLay.add_widget(quitButton)
+        defeatLay.add_widget(playAgainButton)
+        defeatLay.add_widget(defeatImage)
+        defeatPop.open()
+
+    def instructionPopup(self):  # instruction POPUP
+            #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
+            instruction = FloatLayout()
+            instructionPop = Popup(title='Instructions',
+                                   size_hint=(0.3, 0.23),
+                                   auto_dismiss=False,
+                                   title_size=30,
+                                   title_align='center',
+                                   content=instruction)
+            quitButton = Button(text='Dismiss',
+                                size_hint=(0.23, 0.4),
+                                font_size=20,
+                                pos=(1005, 445))
+            instructionLabel = Label(
+                text='the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose',
+                pos=(830, 565),
+                font_size=25)
+
+            quitButton.bind(on_release=instructionPop.dismiss)
+            instruction.add_widget(quitButton)
+            instruction.add_widget(instructionLabel)
+            instructionPop.open()
+
+
+
+titleImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+instructionImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+newGameImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+mainImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
+mainImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .85})
+
+
+#border = Image(source='images/rectangle.png', allow_stretch=True, keep_ratio=False,
+            #   pos=(Window.width * 0, Window.height * 1.4), size_hint_y=None, height=Window.height * .3,
+             #  size_hint_x=None, width=Window.width * 1.975)
+
+
+class NewGame(Screen):
+
+    def setMainScreen(self):
+        screenManager.current = 'main'
+        #setDifficulty(difficulty)
+
+    def instructionPopup(self):  # instruction POPUP
+        #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
+        instruction = FloatLayout()
+        instructionPop = Popup(title='Instructions',
+                               size_hint=(0.3, 0.23),
+                               auto_dismiss=False,
+                               title_size=30,
+                               title_align='center',
+                               content=instruction)
+        quitButton = Button(text='Dismiss',
+                            size_hint=(0.23, 0.4),
+                            font_size=20,
+                            pos=(1005, 445))
+        instructionLabel = Label(text='the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose',
+                                 pos=(830, 565),
+                                 font_size=25)
+
+        quitButton.bind(on_release=instructionPop.dismiss)
+        instruction.add_widget(quitButton)
+        instruction.add_widget(instructionLabel)
+        instructionPop.open()
+
+
+class TitleScreen(Screen):
+
+    def setInstructionScreen(self):
+        screenManager.current = 'instruction'
+        #setDifficulty(difficulty)
+
+class InstructionScreen(Screen):
+
+    def setNewScreen(self):
+        screenManager.current = 'newGame'
+        #setDifficulty(difficulty)
+
+title = TitleScreen(name='title')
+
+instruction = InstructionScreen(name='instruction')
+
+newGame = NewGame(name='newGame')
+
+main = MainScreen(name='main')
+
+title.add_widget(titleImageQueue)
+instruction.add_widget(instructionImageQueue)
+main.add_widget(mainImageQueue)
+main.add_widget(mainImageQueue2)
+newGame.add_widget(newGameImageQueue)
+
+screenManager.add_widget(title)
+screenManager.add_widget(instruction)
+screenManager.add_widget(newGame)
+screenManager.add_widget(main)
+
+screenManager.current= 'title'
+#screenManager.current= 'newGame'
+
+#main.add_widget(border)
 
 
 # ////////////////////////////////////////////////////////////////
 # //						  RUN APP							//
 # ////////////////////////////////////////////////////////////////
 
-MyApp().run()
+if __name__ == "__main__":
+    MyApp().run()

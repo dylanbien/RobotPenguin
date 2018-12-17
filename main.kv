@@ -1,18 +1,104 @@
+<TitleScreen>:
+    name: 'title'
+    FloatLayout:
+        size_hint: None, None
+
+# BUTTONS
+        Button:
+            size_hint: None,None
+            font_size: 65
+            size: root.width * 0.2, root.height * 0.15
+            x: root.width * 0.4
+            y: root.height * 0.35
+            text: 'Start'
+            background_normal: ''
+            background_color: 0.6, 0.6, 1.0, 1.0
+            on_release: root.setInstructionScreen()
+
+        Label:
+            text: 'Robot Penguin'
+            font_size: 175
+            size: root.width * 0.75, root.height * 0.4
+            x: root.width * 0.47
+            y: root.height * 0.65
+
+        Screen:
+            Image:
+                source: 'images/DPEA.jpeg'
+                keep_ratio: True
+                opacity: 1
+                size_hint: 4.3, 7.5
+                x: root.width * 0.825
+                y: root.height * 0.625
+
+<InstructionScreen>:
+    name: 'instruction'
+    FloatLayout:
+        size_hint: None, None
+
+# BUTTONS
+        Button:
+            size_hint: None,None
+            font_size: 65
+            size: root.width * 0.2, root.height * 0.15
+            x: root.width * 0.75
+            y: root.height * 0.085
+            text: 'Ready'
+            background_normal: ''
+            background_color: 0.4, 0.4, 0.4, 1.0
+            on_release: root.setNewScreen()
+
+        Label:
+            text: 'Instructions'
+            font_size: 175
+            size: root.width * 0.75, root.height * 0.4
+            x: root.width * 0.47
+            y: root.height * 0.8
+
+        Label:
+            text: 'the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose'
+            font_size: 45
+            size: root.width * 0.25, root.height * 0.125
+            x: root.width * 0.35
+            y: root.height * 0.5
+
+        Screen:
+            Image:
+                source: 'images/DPEA.jpeg'
+                keep_ratio: True
+                opacity: 1
+                size_hint: 4.3, 7.5
+                x: root.width * 0.825
+                y: root.height * 0.625
+
+
 <MainScreen>:
     name: 'main'
     FloatLayout:
         size_hint: None, None
 
 # BUTTONS
+
+        # BUTTONS
+        Button: #help button
+            text: '?'
+            font_size: 23
+            size_hint: None,None
+            size: root.width * (1.5*0.017), root.width * (1.5*0.015)
+            x: root.width * 0.972
+            y: root.height * 0.875
+            background_color: 0.7, 0.7, 0.7, 1
+            on_release: root.instructionPopup()
+
         Button: # X BUTTON
             text: 'X'
             font_size: 23
             size_hint: None,None
-            size: root.width * 0.017, root.width * 0.015
+            size: root.width * (1.5*0.017), root.width * (1.5*0.015)
             x: root.width * 0.972
             y: root.height * 0.945
             background_color: 0.7, 0.7, 0.7, 1
-            on_release: root.quitPopup()
+            on_release: root.victoryPopup()
 
         Button: # LEFT BUTTON
             text: 'TURN LEFT'
@@ -71,7 +157,7 @@
 # IMAGES
         Screen:
             Image:
-                source: 'CARD_Left.jpg'
+                source: 'cards/CARD_Left.jpg'
                 keep_ratio: True
                 opacity: 1
                 size_hint: 4.3, 7.5
@@ -79,23 +165,94 @@
                 y: root.height * 0.12
                 #on_release: root.callPopup()
             Image:
-                source: 'CARD_Up.jpg'
+                source: 'cards/CARD_Up.jpg'
                 keep_ratio: True
                 opacity: 1
                 size_hint: 4.3, 7.5
                 x: root.width * 0.2575
                 y: root.height * 0.12
             Image:
-                source: 'CARD_Down.jpg'
+                source: 'cards/CARD_Down.jpg'
                 keep_ratio: True
                 opacity: 1
                 size_hint: 4.3, 7.5
                 x: root.width * 0.4975
                 y: root.height * 0.12
             Image:
-                source: 'CARD_Right.jpg'
+                source: 'cards/CARD_Right.jpg'
                 keep_ratio: True
                 opacity: 1
                 size_hint: 4.3, 7.5
                 x: root.width * 0.7375
                 y: root.height * 0.12
+
+<NewGame>:
+    name: 'newGame'
+    FloatLayout:
+        size_hint: None, None
+        
+# BUTTONS
+        Button: #help button
+            text: '?'
+            font_size: 23
+            size_hint: None,None
+            size: root.width * (1.5*0.017), root.width * (1.5*0.015)
+            x: root.width * (1-0.972)
+            y: root.height * 0.945
+            background_color: 0.7, 0.7, 0.7, 1
+            on_release: root.instructionPopup()
+
+        Button: #EASY BUTTON
+            size_hint: None,None
+            font_size: 65
+            size: root.width * 0.2, root.height * 0.15
+            x: root.width * 0.25 - 192
+            y: root.height * 0.30
+            text: 'EASY'
+            background_normal: ''
+            background_color: 0.0, 1.0, 0.0, 0.85
+            on_release: root.setMainScreen()
+
+        Button: #MEDIUM BUTTON
+            size_hint: None,None
+            font_size: 65
+            size: root.width * 0.2, root.height * 0.15
+            x: root.width * 0.5 - 192
+            y: root.height * 0.30
+            outline_width: 500
+            outline_color: 0.0, 0.0, 0.0
+            text: 'MEDIUM'
+            background_normal: ''
+            background_color: 1.0, 1.0, 0.0, 0.925
+            on_release: root.setMainScreen()
+
+
+        Button: #HARD BUTTON
+            size_hint: None,None
+            font_size: 65
+            size: root.width * 0.2, root.height * 0.15
+            x: root.width * 0.75 - 192
+            y: root.height * 0.30
+            text: 'HARD'
+            background_normal: ''
+            background_color: 1.0, 0.0, 0.0, 0.85
+            on_release: root.setMainScreen()
+
+# LABELS
+
+        Label:
+            text: 'New Game'
+            font_size: 175
+            size: root.width * 0.75, root.height * 0.4
+            x: root.width * 0.5
+            y: root.height * 0.8
+
+        Label:
+            text: 'Select a Difficulty'
+            font_size: 75
+            size: root.width * 0.5, root.height * 0.3
+            #halign: 'center'
+            #valign: 'middle'
+            x: root.width * 0.5
+            y: root.height * 0.575
+
