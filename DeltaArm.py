@@ -378,6 +378,7 @@ class DeltaArm:
 
         while rCurr < rGoal:  # while current radius is less than ending radius
             rCurr += dr  # incriments radius by dr
+            #Creates similar triangles and calculates change in x and y
             (xCurr, yCurr, zCurr) = tuple(
                 [w + q for (w, q) in zip((x0, y0, z0), tuple([a * float(rCurr) / float(rGoal) for a in delta]))])
             print('new position is ' + str(xCurr) + ' ' + str(yCurr) + ' ' + str(zCurr))
