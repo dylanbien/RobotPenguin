@@ -73,9 +73,36 @@ s.open_server()
 s.wait_for_connection()
 
 def check_server(): #impliment from execute
-
-    #impliment
-
+    
+    if s.recv_packet() == (PacketType.commandResponse, b"win"):
+        
+        main.clearAll()
+        main.victoryPopup()
+        
+    elif s.recv_packet() == (PacketType.commandResponse, b"lose"):
+        
+        main.clearAll()
+        main.defeatPopup()
+        
+        
+    elif s.recv_packet() == (PacketType.commandResponse, b"continue"): 
+        
+        counter += 1
+        temp = commands[counter]
+        print('counter is' + str(counter)
+        print ('temp is' + temp)
+        
+        if temp == 'forward ':
+            s.send_packet(PacketType.move, b"forward")
+        elif temp == 'backward ':
+            s.send_packet(PacketType.move, b"backward")
+        elif temp == 'left ':
+            s.send_packet(PacketType.move, b"left")
+        elif temp == 'right ':
+            s.send_packet(PacketType.move, b"right")
+   
+            
+       
 def setDifficulty(difficulty):
     if difficulty == 'easy':
         s.send_packet(PacketType.difficulty, b"easy")
@@ -83,7 +110,9 @@ def setDifficulty(difficulty):
         s.send_packet(PacketType.difficulty, b"medium")
     if difficulty == 'hard':
         s.send_packet(PacketType.difficulty, b"hard")
+        temp = commands[counter] #begins the first command (after we transition to check server)
 
+   
 check_server = BackgroundScheduler()
 check_server.add_job(check_server, 'interval', seconds = .001)
 
@@ -93,32 +122,20 @@ check_server.add_job(check_server, 'interval', seconds = .001)
 # ////////////////////////////////////////////////////////////////
 
 def execute():  # Work on with server
-    global commands
+    global counter
     counter = 0
 
-    while counter < len(commands):
-        temp = commands[counter]
+    temp = commands[counter] #begins the first command (after we transition to check server)
 
-        if temp == "forward":
-            s.send_packet(PacketType.move, b"forward")
-        elif temp == "backward":
-            s.send_packet(PacketType.move, b"backward")
-        elif temp == "left":
-            s.send_packet(PacketType.move, b"left")
-        elif temp == "right":
-            s.send_packet(PacketType.move, b"right")
+    if temp == "forward":
+        s.send_packet(PacketType.move, b"forward")
+    elif temp == "backward":
+        s.send_packet(PacketType.move, b"backward")
+    elif temp == "left":
+        s.send_packet(PacketType.move, b"left")
+    elif temp == "right":
+        s.send_packet(PacketType.move, b"right")
 
-
-        if s.recv_packet() == (PacketType.commandResponse, b"continue"):
-            continue
-        elif s.recv_packet() == (PacketType.commandResponse, b"win"):
-            return 'win'
-        elif s.recv_packet() == (PacketType.commandResponse, b"lose"):
-            return 'lose'
-
-        counter += 1
-
-    return 'lose'
 
 
 # ////////////////////////////////////////////////////////////////
@@ -158,12 +175,8 @@ class MainScreen(Screen):
         queue(command)
 
     def executeAction(self):
-        end = execute()
-        clearAll()
-        if end == 'win':
-            victoryPopup()
-        if end == lose:
-            defeatPopup()
+        execute()   
+        
     def pauseAction(self):
         pause()
 
@@ -279,7 +292,7 @@ class NewGame(Screen):
         dif = difficulty
         print(dif)
         screenManager.current = 'main'
-        setDifficulty(difficulty)
+        setDifficulty(dif)
 
     def instructionPopup(self):  # instruction POPUP
         #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
