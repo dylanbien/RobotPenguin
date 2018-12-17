@@ -19,6 +19,7 @@ class MotorConfig:
         return MotorConfig.MotorData(port, angle, zero_value, ninety_value)
 
 
+
 # ////////////////////////////////////////////////////////////////
 # //                   Delta Arm Config Class                   //
 # ////////////////////////////////////////////////////////////////
@@ -26,7 +27,6 @@ class MotorConfig:
 class DeltaArmConfig:
     ArmConstants = namedtuple('ArmConstants',
                               ['upper_length', 'lower_length', 'fixed_edge', 'effector_edge', 'end_effector_z_offset'])
-
     def createConfig(upper_length, lower_length, fixed_edge, effector_edge, end_effector_z_offset):
         return DeltaArmConfig.ArmConstants(upper_length, lower_length, fixed_edge, effector_edge, end_effector_z_offset)
 
@@ -50,6 +50,8 @@ class DeltaArm:
     # ///////////////////////////////////////////////////////////////
     # //                         Init Function                      //
     # ////////////////////////////////////////////////////////////////
+
+
 
     def __init__(self, Motor1, Motor2, Motor3, DeltaArmConfig):
         self.board = Slush.sBoard()
@@ -127,6 +129,7 @@ class DeltaArm:
         angs = [a1, a2, a3]
         print('testing values')  # test to make sure all steps are less than zero, or below the sensor
         for i in range(3):
+            
             val = int(self.angle_to_position(i, angs[i]))
             if val > 0:
                 print('steps > 0: arm would go above sensor')
@@ -169,6 +172,9 @@ class DeltaArm:
         self.motors[1].setAsHome()
         self.motors[2].setAsHome()
 
+
+    
+
     def release(self):
         for m in self.motors:
             m.free()
@@ -185,6 +191,7 @@ class DeltaArm:
                        str(self.motors[num].getPosition()))
 
         return self.motors[num].getPosition()
+
 
     def get_angle(self, num):
 
@@ -237,7 +244,6 @@ class DeltaArm:
         # z is the same
         z = z0
         return (x, y, z)
-
     @staticmethod
     def inverse_kinematics_in_yz_plane(x0, y0, z0):
 
@@ -249,9 +255,8 @@ class DeltaArm:
         f = DeltaArm.fixed_edge
         e = DeltaArm.effector_edge
         z0 = z0 + DeltaArm.end_effector_z_offset
-
+        
         # linear coefficients of EQN z = b*y + a
-
         a = (x0 ** 2 + (y0 - e / (2 * math.sqrt(3))) ** 2 + z0 ** 2 + rf ** 2 - re ** 2 - f ** 2 / 12) / (2 * z0)
         b = (-f / (2 * math.sqrt(3)) - y0 + e / (2 * math.sqrt(3))) / z0
 
@@ -261,7 +266,7 @@ class DeltaArm:
         if disc < 0:
             # disciminate < 0 -> no solution
             return -1
-
+        
         # compute solution w/ lower y value
         y = (-(f / math.sqrt(3) + 2 * a * b) - math.sqrt(disc)) / (2 * (b ** 2 + 1))
         z = b * y + a
@@ -310,8 +315,7 @@ class DeltaArm:
         re = DeltaArm.lower_len
         f = DeltaArm.fixed_edge
         e = DeltaArm.effector_edge
-
-        # Finding J' points (centers of intersecting spheres)
+        #Finding J' points (centers of intersecting spheres)
         x1 = 0
         y1 = (f - e) / (2 * math.sqrt(3)) + rf * math.cos(math.radians(theta1))
         z1 = -rf * math.sin(math.radians(theta1))

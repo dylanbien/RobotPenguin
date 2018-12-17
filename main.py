@@ -137,8 +137,9 @@ class MainScreen(Screen):
     def setTitleScreen(self):
         screenManager.current = 'title'
 
-    # ////////////////////////////////////////////////////////////////         # //														//
-    # //						    POPUPS						                    //  		#   //															//
+    # ////////////////////////////////////////////////////////////////
+    # //					     POPUPS							    //
+    # ////////////////////////////////////////////////////////////////
 
 
 
@@ -317,28 +318,26 @@ class MainScreen(Screen):
         defeatPop.open()
 
     def instructionPopup(self):  # instruction POPUP
-            #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
-            instruction = FloatLayout()
-            instructionPop = Popup(title='Instructions',
-                                   size_hint=(0.3, 0.23),
-                                   auto_dismiss=False,
-                                   title_size=30,
-                                   title_align='center',
-                                   content=instruction)
-            quitButton = Button(text='Dismiss',
-                                size_hint=(0.23, 0.4),
-                                font_size=20,
-                                pos=(1005, 445))
-            instructionLabel = Label(
-                text='the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose',
-                pos=(830, 565),
-                font_size=25)
+        #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
+        instruction = FloatLayout()
+        instructionPop = Popup(title='Instructions',
+                               size_hint=(0.375, 0.26840490797),
+                               auto_dismiss=False,
+                               title_size=30,
+                               title_align='center',
+                               content=instruction)
+        quitButton = Button(text='Dismiss',
+                            size_hint=(0.23, 0.4),
+                            font_size=20,
+                            pos=(985, 400))
+        instructionLabel = Label(text='Turn and maneuver the penguin to get to the fish as quickly as possible.\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nYou can\'t go through mountains, so you\'ll have to go around them.\n \nWatch out for the bear! If it gets to you before you reach the fish, you lose.\n \nGood luck!',
+                                 pos=(690, 560),
+                                 font_size=24.5)
 
-            quitButton.bind(on_release=instructionPop.dismiss)
-            instruction.add_widget(quitButton)
-            instruction.add_widget(instructionLabel)
-            instructionPop.open()
-
+        quitButton.bind(on_release=instructionPop.dismiss)
+        instruction.add_widget(quitButton)
+        instruction.add_widget(instructionLabel)
+        instructionPop.open()
 
 
 titleImageQueue = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_hint={'top': .9875})
@@ -355,7 +354,10 @@ mainImageQueue2 = BoxLayout(padding=15, size_hint=(.825, None), height=150, pos_
 
 class NewGame(Screen):
 
-    def setMainScreen(self):
+    def setMainScreen(self, difficulty):
+
+        dif = difficulty
+        print(dif)
         screenManager.current = 'main'
         #setDifficulty(difficulty)
 
@@ -363,7 +365,7 @@ class NewGame(Screen):
         #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
         instruction = FloatLayout()
         instructionPop = Popup(title='Instructions',
-                               size_hint=(0.3, 0.23),
+                               size_hint=(0.375, 0.26840490797),
                                auto_dismiss=False,
                                title_size=30,
                                title_align='center',
@@ -371,10 +373,10 @@ class NewGame(Screen):
         quitButton = Button(text='Dismiss',
                             size_hint=(0.23, 0.4),
                             font_size=20,
-                            pos=(1005, 445))
-        instructionLabel = Label(text='the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose',
-                                 pos=(830, 565),
-                                 font_size=25)
+                            pos=(985, 400))
+        instructionLabel = Label(text='Turn and maneuver the penguin to get to the fish as quickly as possible\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! If it gets to you before you reach the fish, you lose\n \nGood luck!',
+                                 pos=(690, 560),
+                                 font_size=24.5)
 
         quitButton.bind(on_release=instructionPop.dismiss)
         instruction.add_widget(quitButton)

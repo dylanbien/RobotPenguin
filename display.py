@@ -300,6 +300,18 @@ class MainScreen(Screen):
         global difficulty
         global turn
         print('turn is ' + str(turn) + ', so moving twice will be ' + str(turn % 2 == 0))
+        #getting the bear actor
+        bear = None
+        for b in self.children[0].children:
+            if 'Bear' in b.source:
+                bear = b
+
+
+        if difficulty == 'easy':
+            bear_loc = bear.number_as_int()
+            possible_locs = [(bear_loc+x) for x in [1, -1, 13, -13]]
+            
+
         if (difficulty == 'hard'):
             print('difficulty is hard')
             for hunter in self.children[0].children:
@@ -497,7 +509,8 @@ class Actor(ButtonBehavior, Image): #creates an actor class
     
 
 #needs to be fixed for harder levels
-    #def goTowards(self):  # if anyone wants to fix please feel free
+    def goTowards(self):
+        pass
                
 
 # Builder.load_file('display.kv')

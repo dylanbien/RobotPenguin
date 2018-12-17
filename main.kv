@@ -6,17 +6,19 @@
 # BUTTONS
         Button:
             size_hint: None,None
-            font_size: 65
+            font_size: 55
             size: root.width * 0.2, root.height * 0.15
             x: root.width * 0.4
             y: root.height * 0.35
             text: 'Start'
+            font_name: 'RobotoMono-Regular.ttf'
             background_normal: ''
             background_color: 0.6, 0.6, 1.0, 1.0
             on_release: root.setInstructionScreen()
 
         Label:
             text: 'Robot Penguin'
+            font_name: 'RobotoMono-Regular.ttf'
             font_size: 175
             size: root.width * 0.75, root.height * 0.4
             x: root.width * 0.47
@@ -24,12 +26,30 @@
 
         Screen:
             Image:
-                source: 'images/DPEA.jpeg'
+                source: 'images/DPEA_burned.png'
                 keep_ratio: True
                 opacity: 1
                 size_hint: 4.3, 7.5
                 x: root.width * 0.825
                 y: root.height * 0.625
+            Image:
+                source: 'images/6cbd62c894fd7e5d5db6466753cbd746_burned.png'
+                allow_stretch: True
+                keep_ratio: True
+                size_hint_y: 8
+                size_hint_x: 23.25
+                opacity: 1
+                x: -715
+                y: -350
+            Image:
+                source: 'images/iceberg2.png'
+                allow_stretch: True
+                keep_ratio: True
+                size_hint_y: 8
+                size_hint_x: 23.25
+                opacity: 1
+                x: 515
+                y: -350
 
 <InstructionScreen>:
     name: 'instruction'
@@ -44,27 +64,30 @@
             x: root.width * 0.75
             y: root.height * 0.085
             text: 'Ready'
+            font_name: 'RobotoMono-Regular.ttf'
             background_normal: ''
             background_color: 0.4, 0.4, 0.4, 1.0
             on_release: root.setNewScreen()
 
         Label:
             text: 'Instructions'
+            font_name: 'RobotoMono-Regular.ttf'
             font_size: 175
             size: root.width * 0.75, root.height * 0.4
             x: root.width * 0.47
             y: root.height * 0.8
 
         Label:
-            text: 'the goal of the game is to direct the penguin to the fish\n \nturn and maneuver the penguin to get to the fish as quickly as possible\n \nselect the order you want the penguin to turn and move in, then press \'go\'\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! if it gets to you before you reach the fish, you lose'
+            text: 'The goal of the game is to direct the penguin to the fish.\n \nTurn and maneuver the penguin to get to the fish as quickly as possible.\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nYou can\'t go through mountains, so you\'ll have to go around them.\n \nWatch out for the bear! If it gets to you before you reach the fish, you lose.'
+            font_name: 'RobotoMono-Regular.ttf'
             font_size: 45
             size: root.width * 0.25, root.height * 0.125
-            x: root.width * 0.35
+            x: root.width * 0.475
             y: root.height * 0.5
 
         Screen:
             Image:
-                source: 'images/DPEA.jpeg'
+                source: 'images/DPEA_burned.png'
                 keep_ratio: True
                 opacity: 1
                 size_hint: 4.3, 7.5
@@ -82,6 +105,7 @@
         # BUTTONS
         Button: #help button
             text: '?'
+            font_name: 'RobotoMono-Regular.ttf'
             font_size: 23
             size_hint: None,None
             size: root.width * (1.5*0.017), root.width * (1.5*0.015)
@@ -92,6 +116,7 @@
 
         Button: # X BUTTON
             text: 'X'
+            font_name: 'RobotoMono-Regular.ttf'
             font_size: 23
             size_hint: None,None
             size: root.width * (1.5*0.017), root.width * (1.5*0.015)
@@ -102,6 +127,7 @@
 
         Button: # LEFT BUTTON
             text: 'TURN LEFT'
+            font_name: 'RobotoMono-Regular.ttf'
             size_hint: None,None
             font_size: 35
             size: root.width * 0.2245, root.height * 0.1
@@ -117,6 +143,7 @@
             x: root.width * 0.2575
             y: root.height * 0.04
             text: 'MOVE FORWARD'
+            font_name: 'RobotoMono-Regular.ttf'
             on_release: root.queueAction('forward ')
 
         Button: # DOWN BUTTON
@@ -126,6 +153,7 @@
             x: root.width * 0.4975
             y: root.height * 0.04
             text: 'MOVE BACKWARD'
+            font_name: 'RobotoMono-Regular.ttf'
             on_release: root.queueAction('backward ')
 
         Button: # RIGHT BUTTON
@@ -135,6 +163,7 @@
             x: root.width * 0.7375
             y: root.height * 0.04
             text: 'TURN RIGHT'
+            font_name: 'RobotoMono-Regular.ttf'
             state: 'normal'
             on_release: root.queueAction('right ')
 			
@@ -142,6 +171,7 @@
 			size_hint: None, None
 			size: root.width * 0.05, root.height * 0.1
 			text: 'GO'
+			font_name: 'RobotoMono-Regular.ttf'
 			x: root.width * .9
 			y: root.height * .85
 			on_release: root.executeAction()
@@ -150,6 +180,7 @@
 			size_hint: None, None
 			size: root.width * 0.05, root.height * 0.1
 			text: 'CLEAR'
+			font_name: 'RobotoMono-Regular.ttf'
 			x: root.width * .85
 			y: root.height * .85
 			on_release: root.clearAction()
@@ -194,6 +225,7 @@
 # BUTTONS
         Button: #help button
             text: '?'
+            font_name: 'RobotoMono-Regular.ttf'
             font_size: 23
             size_hint: None,None
             size: root.width * (1.5*0.017), root.width * (1.5*0.015)
@@ -209,9 +241,10 @@
             x: root.width * 0.25 - 192
             y: root.height * 0.30
             text: 'EASY'
+            font_name: 'RobotoMono-Regular.ttf'
             background_normal: ''
-            background_color: 0.0, 1.0, 0.0, 0.85
-            on_release: root.setMainScreen()
+            background_color: 0.0, 1.0, 0.0, 0.825
+            on_release: root.setMainScreen('Easy')
 
         Button: #MEDIUM BUTTON
             size_hint: None,None
@@ -222,9 +255,10 @@
             outline_width: 500
             outline_color: 0.0, 0.0, 0.0
             text: 'MEDIUM'
+            font_name: 'RobotoMono-Regular.ttf'
             background_normal: ''
-            background_color: 1.0, 1.0, 0.0, 0.925
-            on_release: root.setMainScreen()
+            background_color: 1.0, 1.0, 0.0, 0.85
+            on_release: root.setMainScreen('Medium')
 
 
         Button: #HARD BUTTON
@@ -234,14 +268,16 @@
             x: root.width * 0.75 - 192
             y: root.height * 0.30
             text: 'HARD'
+            font_name: 'RobotoMono-Regular.ttf'
             background_normal: ''
-            background_color: 1.0, 0.0, 0.0, 0.85
-            on_release: root.setMainScreen()
+            background_color: 1.0, 0.0, 0.0, 0.825
+            on_release: root.setMainScreen('Hard')
 
 # LABELS
 
         Label:
             text: 'New Game'
+            font_name: 'RobotoMono-Regular.ttf'
             font_size: 175
             size: root.width * 0.75, root.height * 0.4
             x: root.width * 0.5
@@ -249,6 +285,7 @@
 
         Label:
             text: 'Select a Difficulty'
+            font_name: 'RobotoMono-Regular.ttf'
             font_size: 75
             size: root.width * 0.5, root.height * 0.3
             #halign: 'center'
