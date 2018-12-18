@@ -51,7 +51,8 @@ direction = 0
 # ////////////////////////////////////////////////////////////////
 # //	                		Server			    			//
 # ////////////////////////////////////////////////////////////////
-
+import enum
+from dpea_p2p import Client
 from apscheduler.schedulers.background import BackgroundScheduler
 
 class PacketType(enum.Enum):

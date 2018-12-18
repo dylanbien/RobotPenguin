@@ -55,7 +55,8 @@ def clearAll():
 # ////////////////////////////////////////////////////////////////
 # /	                     Server Creation**WORK ON    	                //
 # ////////////////////////////////////////////////////////////////
-
+import enum
+from dpea_p2p import Server
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -95,8 +96,8 @@ def check_server(): #impliment from execute
             
         temp = commands[counter]
         
-        print('counter is' + str(counter)
-        print ('temp is' + temp)
+        #print('counter is' + str(counter)
+        #print ('temp is' + temp)
         
         if temp == 'forward ':
             s.send_packet(PacketType.move, b"forward")
@@ -116,9 +117,7 @@ def setDifficulty(difficulty):
         s.send_packet(PacketType.difficulty, b"medium")
     if difficulty == 'hard':
         s.send_packet(PacketType.difficulty, b"hard")
-        temp = commands[counter] #begins the first command (after we transition to check server)
 
-   
 check_server = BackgroundScheduler()
 check_server.add_job(check_server, 'interval', seconds = .001)
 
