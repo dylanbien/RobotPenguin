@@ -42,9 +42,15 @@ Window.fullscreen = True
 TransparentId = 'icons/ICON_Transparent.png'
 
 
+Motor1 = DeltaArm.MotorConfig.createMotor(0, 120,-1750,-26750)
+Motor2 = DeltaArm.MotorConfig.createMotor(1, 240,-980,-26800)
+Motor3 = DeltaArm.MotorConfig.createMotor(2, 360,-2000,-27000)
+DeltaArmConfig = DeltaArm.DeltaArmConfig.createConfig(1.04167, 1.4833, 0.3133, 0.25617, 0)
 
-arm = DeltaArm.DeltaArm(0, 1, 2) #creates arm
-arm.home_all() #homes it
+arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig)
+
+
+#arm.home_all() #homes it
 current = [0,0, -1.34]
 direction = 0
 
@@ -53,6 +59,7 @@ direction = 0
 # ////////////////////////////////////////////////////////////////
 import enum
 from dpea_p2p import Client
+
 from apscheduler.schedulers.background import BackgroundScheduler
 
 class PacketType(enum.Enum):
@@ -62,30 +69,39 @@ class PacketType(enum.Enum):
     commandResponse = 3
 
 #         |Server IP     |Port |Packet enum
-c = Client("172.17.21.2", 5001, PacketType)
+c = Client("172.17.21.1", 5001, PacketType)
+print('beginning to connect')
 c.connect()
+print('connected')
 
 def check_server():
 
     if c.recv_packet() == (PacketType.difficulty, b"easy"):
+        print('recieved easy')
         reset('easy')
-    elif c.recv_packet() == (PacketType.difficulty, b"medium"):
+    if c.recv_packet() == (PacketType.difficulty, b"medium"):
+        print('recieved medium')
         reset('medium')
-    elif c.recv_packet() == (PacketType.difficulty, b"hard"):
+    if c.recv_packet() == (PacketType.difficulty, b"hard"):
+        print('recieved hrad')
         reset('hard')
 
-    if recv_packet() == (PacketType.move, b"forward"):
+    if c.recv_packet() == (PacketType.move, b"forward"):
+        print('recieved forward')
         main.playerForward()
-    elif recv_packet() == (PacketType.move, b"backward"):
+    if c.recv_packet() == (PacketType.move, b"backward"):
+        print('recieved backward')
         main.playerBackward()
-    elif recv_packet() == (PacketType.move, b"left"):
+    if c.recv_packet() == (PacketType.move, b"left"):
+        print('recieved left')
         main.playerRotate('left')
-    elif recv_packet() == (PacketType.move, b"right"):
+    if c.recv_packet() == (PacketType.move, b"right"):
+        print('recieved right')
         main.playerRotate('right')
 
 
-check_server = BackgroundScheduler()
-check_server.add_job(check_server, 'interval', seconds = .001)
+scheduler = BackgroundScheduler()
+scheduler.add_job(check_server, 'interval', .01)
 
 # ////////////////////////////////////////////////////////////////
 # //	               		Reset Function			    		//
@@ -122,7 +138,10 @@ def reset(dif):
     for i in range(0, grid.cols * grid.rows): #resets all 81 grids to transparent
         b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
         grid.add_widget(b)
-
+        
+    if (difficulty == 'setup'):
+        return
+    
     for temp in allObstacles:
         y = random.randint(0, len(temp)-1) #get random in in each array
         saved = temp[y]
@@ -192,7 +211,7 @@ def reset(dif):
                 else:
                     actor.source = 'icons/ICON_Jewel.jpg'
                 
-    arm.move_to_point(0,0, -1.34)
+    #arm.move_to_point(0,0, -1.34)
 
 # ////////////////////////////////////////////////////////////////
 # //	               		MyApp creation			    		//
@@ -409,6 +428,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         
         if (next % main.children[0].cols == 1):
             print('cant move, at the right wall')
+            c.send_packet(PacketType.commandResponse, b"lose")
             return
         else:
             self.move(next)
@@ -421,6 +441,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         
         if (next % main.children[0].cols == 0):
             print('cant move, at the left wall')
+            s.send_packet(PacketType.move, b"forward")
             return
         else:
             self.move(next)
@@ -433,6 +454,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         
         if (next < 0):
             print('cant move, at the top wall')
+            s.send_packet(PacketType.move, b"forward")
             return
         else:
             self.move(next)
@@ -446,6 +468,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         
         if (next > main.children[0].rows * main.children[0].cols):
             print('cant move, at the bottom wall')
+            s.send_packet(PacketType.move, b"forward")
             return
         else:
             self.move(next)
@@ -458,13 +481,15 @@ class Actor(ButtonBehavior, Image): #creates an actor class
         print(actor.id)
         assert actor.id == "actor" + str(next)
         
-        print(actor.id+ 'pt 2')
         
         if (actor.source == TransparentId):
             print('can move') #if next spot is clear
             temp = self.source
             self.source = actor.source
             actor.source = temp
+            sleep(1)
+            print('sending continue')
+            s.send_packet(PacketType.move, b"continue")
             #arm.move() move the arm based on how its facing...find in source name
             return
             
@@ -472,6 +497,7 @@ class Actor(ButtonBehavior, Image): #creates an actor class
             actor.source = self.source
             self.source = TransparentId
             print('you win')
+            s.send_packet(PacketType.move, b"win")
             return 
                 
                 
@@ -501,7 +527,7 @@ main = MainScreen(name='main') #creates a main screen
 main.add_widget(bg) #adds background to the screen
 main.add_widget(grid) #adds grid to the scren
 
-main.resetBoard()
+reset('easy')
 
 sm.add_widget(main)
 
@@ -511,8 +537,9 @@ sm.add_widget(main)
 
 if __name__ == "__main__":
     try:
-        check_server.start()
+        scheduler.start()
     except (KeyboardInterrupt, SystemExit):
-        check_server.shutdown()
+        scheduler.shutdown()
+        c.close_server()
     MyApp().run()
 
