@@ -69,25 +69,28 @@ class PacketType(enum.Enum):
 
 
 #         |Bind IP       |Port |Packet enum
-s = Server("172.17.21.2", 5001, PacketType)
+s = Server("172.17.21.1", 5001, PacketType)
 s.open_server()
+print('waiting for connection')
 s.wait_for_connection()
+print('connected')
 
 def check_server(): #impliment from execute
-    
+    #global s
+
     if s.recv_packet() == (PacketType.commandResponse, b"win"):
-        
+        print('recieved win')
         main.clearAll()
         main.victoryPopup()
         
     elif s.recv_packet() == (PacketType.commandResponse, b"lose"):
-        
+        print('received lose')
         main.clearAll()
         main.defeatPopup()
         
         
     elif s.recv_packet() == (PacketType.commandResponse, b"continue"): 
-        
+        print('recieved continue')
         counter += 1
         
         if counter > (len(commands) - 1):
@@ -112,14 +115,19 @@ def check_server(): #impliment from execute
        
 def setDifficulty(difficulty):
     if difficulty == 'easy':
+        print('sending easy')
         s.send_packet(PacketType.difficulty, b"easy")
     if difficulty == 'medium':
+        print('sending medium')
         s.send_packet(PacketType.difficulty, b"medium")
     if difficulty == 'hard':
+        print('sending hard')
         s.send_packet(PacketType.difficulty, b"hard")
 
-check_server = BackgroundScheduler()
-check_server.add_job(check_server, 'interval', seconds = .001)
+
+scheduler = BackgroundScheduler()
+
+scheduler.add_job(check_server, 'interval', seconds = .01)
 
 
 # ////////////////////////////////////////////////////////////////
@@ -131,14 +139,18 @@ def execute():  # Work on with server
     counter = 0
 
     temp = commands[counter] #begins the first command (after we transition to check server)
-
+    
     if temp == 'forward ':
+        print('sending forward')
         s.send_packet(PacketType.move, b"forward")
     elif temp == 'backward ':
+        print('sending backward')
         s.send_packet(PacketType.move, b"backward")
     elif temp == 'left ':
+        print('sending left')
         s.send_packet(PacketType.move, b"left")
     elif temp == 'right ':
+        print('sending right')
         s.send_packet(PacketType.move, b"right")
 
 
@@ -365,12 +377,14 @@ screenManager.add_widget(main)
 screenManager.current= 'title'
 
 # ////////////////////////////////////////////////////////////////
-# //						  RUN APP							//
+# //				  RUAPP							//
 # ////////////////////////////////////////////////////////////////
 
 if __name__ == "__main__":
     try:
-        check_server.start()
+        scheduler.start()
     except (KeyboardInterrupt, SystemExit):
-        check_server.shutdown()
+        scheduler.shutdown()
+        s.close_connection()
+        s.close_server()
     MyApp().run()
