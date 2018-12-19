@@ -3,7 +3,7 @@ from kivy.config import Config
 Config.set('graphics', 'resizable', False)
 
 import os
-
+import time
 os.environ["DISPLAY"] = ":0.0"
 import string
 import random
@@ -52,15 +52,15 @@ Server
 import enum
 from dpea_p2p import Client
 
-from apscheduler.schedulers.background import BackgroundScheduler
+import threading
 
 
 class PacketType(enum.Enum):
     NULL = 0
     difficulty = 1
     move = 2
-    commandResponse = 3
-
+    rotate = 3
+    responseCommand = 4
 
 #         |Server IP     |Port |Packet enum
 c = Client("172.17.21.1", 5001, PacketType)
@@ -68,34 +68,33 @@ print('beginning to connect')
 c.connect()
 print('connected')
 
+def handle_difficulty_packet(payload):
+    print("recieved " + payload.decode("ascii"))
+    reset(payload.decode("ascii"))
+    
+def handle_move_packet(payload):
+    print("recieved " + payload.decode("ascii"))
+    main.playerMove(payload.decode("ascii"))
+    
+def handle_rotate_packet(payload):
+    print("recieved " + payload.decode("ascii"))
+    main.playerRotate(payload.decode("ascii"))
 
 def check_server():
-    if c.recv_packet() == (PacketType.difficulty, b"easy"):
-        print('recieved easy')
-        reset('easy')
-    if c.recv_packet() == (PacketType.difficulty, b"medium"):
-        print('recieved medium')
-        reset('medium')
-    if c.recv_packet() == (PacketType.difficulty, b"hard"):
-        print('recieved hrad')
-        reset('hard')
+    handlers = {PacketType.difficulty: handle_difficulty_packet,
+                PacketType.move: handle_move_packet,
+                PacketType.rotate: handle_rotate_packet}
+    packet_type, payload = c.recv_packet()
+    
+    if packet_type in handlers:
+        handlers[packet_type](payload)
+    else:
+        print("got unhandled packet!")
 
-    if c.recv_packet() == (PacketType.move, b"forward"):
-        print('recieved forward')
-        main.playerForward()
-    if c.recv_packet() == (PacketType.move, b"backward"):
-        print('recieved backward')
-        main.playerBackward()
-    if c.recv_packet() == (PacketType.move, b"left"):
-        print('recieved left')
-        main.playerRotate('left')
-    if c.recv_packet() == (PacketType.move, b"right"):
-        print('recieved right')
-        main.playerRotate('right')
-
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(check_server, 'interval', seconds=.01)
+def communication():
+    while True:
+        check_server()
+    
 
 
 # ////////////////////////////////////////////////////////////////
@@ -162,15 +161,6 @@ def reset(dif):
     print('player is ' + str(locPenguin))
     actorPenguin.source = 'players/ICON_Player_180.jpg'
 
-    for actor in main.children[0].children:
-        if (actor.id == 'actor' + str(locPenguin)):  # places penguin
-            print('player is ' + str(locPenguin))
-            # actor.source = 'players/ICON_Player_180.jpg'
-
-        if (actor.id == 'actor' + str(assignedGoal)):  # assigns goal id to actor + obstacle
-            print('goal is ' + str((locGoal)))
-            # actor.source = 'icons/ICON_Goal.jpg'
-
     actors = list(main.children[0].children)[::-1]  # reverses in correct order
     for x in range(1, 81):
         if actors[x].number_as_int() in [55, 46, 37, 28, 19, 10, 1]:  # edge numbers
@@ -192,7 +182,6 @@ def reset(dif):
         for i in assignedObstacleLocations:
 
             if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
-                print('jewel/igloo is ' + str(i))
                 if (i % 2 == 0):
                     actor.source = 'icons/ICON_Igloo.jpg'
 
@@ -247,33 +236,37 @@ class MainScreen(Screen):
                 actor.source = TransparentId
 
 
-"""
-Player Movement
-"""
 
 
-def playerForward(self):  # just find the location of the player
-    print('you have moved the player forwards')
-    for actor in main.children[0].children:  # loops through all actors
-        if ('Player' in actor.source):  # if an actors source has the word plater in it
-            actor.moveForward()  # (players/ICON_Player.jpg) > name of player
-            return
+    def playerMove(self, movement):
+        print('movemnt' + movement)
+        if movement == 'forward':
+            self.playerForward()
+        else:
+            self.playerBackward()
+
+    def playerForward(self) :  # just find the location of the player
+        print('you have moved the player forwards')
+        for actor in main.children[0].children:  # loops through all actors
+            if ('Player' in actor.source):  # if an actors source has the word plater in it
+                actor.moveForward()  # (players/ICON_Player.jpg) > name of player
+                return
 
 
-def playerBackward(self):
-    print('you have moved the player backwards')
-    for actor in self.children[0].children:
-        if ('Player' in actor.source):
-            actor.moveBackward()
-            return
+    def playerBackward(self):
+        print('you have moved the player backwards')
+        for actor in self.children[0].children:
+            if ('Player' in actor.source):
+                actor.moveBackward()
+                return
 
 
-def playerRotate(self, direction):
-    print('you have rotated the player ' + direction)
-    for actor in self.children[0].children:
-        if ('Player' in actor.source):
-            actor.rotateDirection(direction)
-            return
+    def playerRotate(self, direction):
+        print('you have rotated the player ' + direction)
+        for actor in self.children[0].children:
+            if ('Player' in actor.source):
+                actor.rotateDirection(direction)
+                return
 
 
 """
@@ -377,10 +370,16 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             if (actor.id == location and 'Player' in actor.source):
                 if (degrees == 0 or degrees == 360 or degrees % 90 != 0):
                     actor.source = 'players/ICON_Player.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
                 elif (degrees > 360):
                     actor.source = 'players/ICON_Player_' + str(degrees % 360) + '.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
                 else:
                     actor.source = 'players/ICON_Player_' + str(degrees) + '.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
 
     def rotateDirection(self, direction):
         if (sm.current != 'main'): return
@@ -390,10 +389,14 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
         if (direction == 'left' and self.source == 'players/ICON_Player.jpg'):  # if main icon
             self.source = 'players/ICON_Player_270.jpg'
             print('degree = 270')
+            print('sending continue')
+            c.send_packet(PacketType.responseCommand, b"continue")
             return
         elif (direction == 'right' and self.source == 'players/ICON_Player.jpg'):  # if main icon
             self.source = 'players/ICON_Player_90.jpg'
             print('degree = 90')
+            print('sending continue')
+            c.send_packet(PacketType.responseCommand, b"continue")
             return
         else:
             degree = int(self.source.strip(string.ascii_letters + string.punctuation))
@@ -403,15 +406,23 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
                 print('new angle = ' + angle)
                 if (angle == '0'):
                     self.source = 'players/ICON_Player.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
                 else:
                     self.source = 'players/ICON_Player_' + angle + '.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
             else:
                 angle = str(((degree + 90) % 360))
                 print('new angle = ' + angle)
                 if (angle == '0'):
                     self.source = 'players/ICON_Player.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
                 else:
                     self.source = 'players/ICON_Player_' + angle + '.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
 
     def moveRight(self):  # strafe
         if (sm.current != 'main'): return
@@ -434,7 +445,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
         if (next % main.children[0].cols == 0):
             print('cant move, at the left wall')
-            s.send_packet(PacketType.move, b"forward")
+            c.send_packet(PacketType.responseCommand, b"lose")
             return
         else:
             self.move(next)
@@ -447,7 +458,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
         if (next < 0):
             print('cant move, at the top wall')
-            s.send_packet(PacketType.move, b"forward")
+            c.send_packet(PacketType.responseCommand, b"lose")
             return
         else:
             self.move(next)
@@ -460,7 +471,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
         if (next > main.children[0].rows * main.children[0].cols):
             print('cant move, at the bottom wall')
-            s.send_packet(PacketType.move, b"forward")
+            c.send_packet(PacketType.responseCommand, b"lose")
             return
         else:
             self.move(next)
@@ -477,9 +488,8 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             temp = self.source
             self.source = actor.source
             actor.source = temp
-            sleep(1)
             print('sending continue')
-            s.send_packet(PacketType.move, b"continue")
+            c.send_packet(PacketType.responseCommand, b"continue")
             # arm.move() move the arm based on how its facing...find in source name
             return
 
@@ -487,7 +497,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             actor.source = self.source
             self.source = TransparentId
             print('you win')
-            s.send_packet(PacketType.move, b"win")
+            c.send_packet(PacketType.responseCommand, b"win")
             return
 
 
@@ -525,9 +535,11 @@ Run
 """
 
 if __name__ == "__main__":
+    commands = threading.Thread (target=communication)
+    commands.start()
     try:
-        scheduler.start()
-    except (KeyboardInterrupt, SystemExit):
-        scheduler.shutdown()
+        MyApp().run()
+
+    except KeyboardInterrupt:
+        print("here")
         c.close_server()
-    MyApp().run()
