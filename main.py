@@ -3,7 +3,7 @@
 # ////////////////////////////////////////////////////////////////
 from kivy.config import Config
 
-Config.set('graphics', 'fullscreen', '0')
+#Config.set('graphics', 'fullscreen', '0')
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -22,14 +22,15 @@ import socket
 from kivy.core.audio import SoundLoader
 
 commands = []
-
-Window.fullscreen = 'auto'
+counter = 0
+#Window.fullscreen = 'auto'
 
 # ////////////////////////////////////////////////////////////////
 # /	            DECLARE queue and clear functions	            //
 # ////////////////////////////////////////////////////////////////
 
 def queue(command):
+    global commands
     if (len(commands) >= 22): return
 
     commands.append(command)
@@ -49,6 +50,7 @@ def clear():
     del commands[len(commands) - 1]
 
 def clearAll():
+    global commands
     commands = []  # clears commands
     mainImageQueue.clear_widgets()  # resets image queue 1
     mainImageQueue2.clear_widgets()  # resets image queue 2
@@ -58,14 +60,14 @@ def clearAll():
 import enum
 from dpea_p2p import Server
 
-from apscheduler.schedulers.background import BackgroundScheduler
+import threading
 
 class PacketType(enum.Enum):
     NULL = 0
     difficulty = 1
     move = 2
-    commandResponse = 3
-
+    rotate = 3
+    responseCommand = 4
 
 
 #         |Bind IP       |Port |Packet enum
@@ -75,41 +77,61 @@ print('waiting for connection')
 s.wait_for_connection()
 print('connected')
 
-def check_server(): #impliment from execute
-    #global s
+def handle_response_packet(payload):
+    
+    print("recieved " + payload.decode("ascii"))
 
-    if s.recv_packet() == (PacketType.commandResponse, b"win"):
-        print('recieved win')
-        main.clearAll()
+    global counter
+
+    if payload.decode("ascii") == "win":
+        counter = 0
+        clearAll()
         main.victoryPopup()
-        
-    elif s.recv_packet() == (PacketType.commandResponse, b"lose"):
-        print('received lose')
-        main.clearAll()
+
+    elif payload.decode("ascii") == "lose":
+        counter = 0
+        clearAll()
         main.defeatPopup()
-        
-        
-    elif s.recv_packet() == (PacketType.commandResponse, b"continue"): 
-        print('recieved continue')
+
+    elif payload.decode("ascii") == "continue":
+
         counter += 1
-        
+
         if counter > (len(commands) - 1):
-            main.clearAll()
+            print('out of turns')
+            counter = 0
+            clearAll()
             main.defeatPopup()
+            return
             
+
         temp = commands[counter]
-        
-        #print('counter is' + str(counter)
-        #print ('temp is' + temp)
-        
+
+
         if temp == 'forward ':
+            print('sending forward')
             s.send_packet(PacketType.move, b"forward")
+            print('sending backward')
         elif temp == 'backward ':
             s.send_packet(PacketType.move, b"backward")
         elif temp == 'left ':
-            s.send_packet(PacketType.move, b"left")
+            print('sending left')
+            s.send_packet(PacketType.rotate, b"left")
         elif temp == 'right ':
-            s.send_packet(PacketType.move, b"right")
+            print('sending right')
+            s.send_packet(PacketType.rotate, b"right")
+
+def check_server(): #impliment from execute
+
+    handlers = {PacketType.responseCommand: handle_response_packet
+                }
+    packet_type, payload = s.recv_packet()
+
+    if packet_type in handlers:
+        handlers[packet_type](payload)
+    else:
+        print("got unhandled packet!")
+
    
             
        
@@ -124,12 +146,10 @@ def setDifficulty(difficulty):
         print('sending hard')
         s.send_packet(PacketType.difficulty, b"hard")
 
+def runner():
 
-scheduler = BackgroundScheduler()
-
-scheduler.add_job(check_server, 'interval', seconds = .01)
-
-
+    while True:
+        check_server()
 # ////////////////////////////////////////////////////////////////
 # /	                DECLARE execute functions	                //
 # ////////////////////////////////////////////////////////////////
@@ -141,17 +161,17 @@ def execute():  # Work on with server
     temp = commands[counter] #begins the first command (after we transition to check server)
     
     if temp == 'forward ':
-        print('sending forward')
+        print('sending forward: execute')
         s.send_packet(PacketType.move, b"forward")
     elif temp == 'backward ':
-        print('sending backward')
+        print('sending backward: execute')
         s.send_packet(PacketType.move, b"backward")
     elif temp == 'left ':
-        print('sending left')
-        s.send_packet(PacketType.move, b"left")
+        print('sending left: execute')
+        s.send_packet(PacketType.rotate, b"left")
     elif temp == 'right ':
-        print('sending right')
-        s.send_packet(PacketType.move, b"right")
+        print('sending right: execute')
+        s.send_packet(PacketType.rotate, b"right")
 
 
 
@@ -307,7 +327,7 @@ class NewGame(Screen):
     def setMainScreen(self, difficulty):
 
         dif = difficulty
-        print(dif)
+        
         screenManager.current = 'main'
         setDifficulty(dif)
 
@@ -381,10 +401,11 @@ screenManager.current= 'title'
 # ////////////////////////////////////////////////////////////////
 
 if __name__ == "__main__":
+    background = threading.Thread(target=runner)
+    background.start()
     try:
-        scheduler.start()
-    except (KeyboardInterrupt, SystemExit):
-        scheduler.shutdown()
+        MyApp().run()
+    except KeyboardInterrupt:
+        print('here')
         s.close_connection()
         s.close_server()
-    MyApp().run()
