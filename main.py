@@ -221,9 +221,11 @@ class MainScreen(Screen):
         clear()
 
     def setNewGameScreen(self):
+        clearAll()
         screenManager.current = 'newGame'
 
     def setTitleScreen(self):
+        clearAll()
         screenManager.current = 'title'
 
 # ////////////////////////////////////////////////////////////////
