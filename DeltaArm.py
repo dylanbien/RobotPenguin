@@ -127,14 +127,14 @@ class DeltaArm:
 
     def set_all_to_different_angle(self, a1, a2, a3):
         angs = [a1, a2, a3]
-        print('testing values')  # test to make sure all steps are less than zero, or below the sensor
+        DeltaArm.debug('testing values')  # test to make sure all steps are less than zero, or below the sensor
         for i in range(3):
             
             val = int(self.angle_to_position(i, angs[i]))
             if val > 0:
                 print('steps > 0: arm would go above sensor')
                 return
-        print('all steps > 0')
+        DeltaArm.debug('all steps > 0')
 
         for i in range(3):
             self.set_single_angle(i, angs[i])
@@ -371,9 +371,9 @@ class DeltaArm:
         DeltaArm.debug('start move to point in straiht line: ' + str(x) + ' ' + str(y) + ' ' + str(z))
 
         (a1, a2, a3) = [self.get_angle(i) for i in range(3)]  # gets the current angles
-        (x0, y0, z0) = DeltaArm.forward_kinematics(a1, a2, a3)  # gets the current XYZ position
-        delta = tuple([a - b for (a, b) in zip((x, y, z), (
-        x0, y0, z0))])  # array (x-x0, y-y0, z-z0) **gets change in cartesisan for all points
+        (x0, y0, z0) = DeltaArm.forward_kinematics(a1, a2, a3) # gets the current XYZ position
+        print('starting pt: ' + str(x0) + ' ' + str(y0) + ' ' + str(z0) )
+        delta = tuple([a - b for (a, b) in zip((x, y, z), (x0, y0, z0))])  # array (x-x0, y-y0, z-z0) **gets change in cartesisan for all points
         print('change in cartesian: ' + str(delta[0]) + ' ' + str(delta[1]) + ' ' + str(delta[2]))
         rGoal = math.sqrt(delta[0] ** 2 + delta[1] ** 2 + delta[2] ** 2)  # distance between starting and endinng point
         print('distance between starting and ending point is: ' + str(rGoal))
@@ -385,7 +385,7 @@ class DeltaArm:
             #Creates similar triangles and calculates change in x and y
             (xCurr, yCurr, zCurr) = tuple(
                 [w + q for (w, q) in zip((x0, y0, z0), tuple([a * float(rCurr) / float(rGoal) for a in delta]))])
-            print('new position is ' + str(xCurr) + ' ' + str(yCurr) + ' ' + str(zCurr))
+            DeltaArm.debug('new position is ' + str(xCurr) + ' ' + str(yCurr) + ' ' + str(zCurr))
             self.move_to_point(xCurr, yCurr, zCurr)
 
             # advance_time = time.time() + dt

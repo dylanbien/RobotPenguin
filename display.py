@@ -201,18 +201,18 @@ def reset(dif):
     actorPenguin.source = 'players/ICON_Player_180.jpg'
 
     actors = list(main.children[0].children)[::-1]  # reverses in correct order
-    for x in range(1, 81):
-        if actors[x].number_as_int() in [55, 46, 37, 28, 19, 10, 1]:  # edge numbers
-            x = x + 1
-        G.add_edge(actors[x - 1].number_as_int(), actors[x].number_as_int())
+    #for x in range(1, 81):
+        #if actors[x].number_as_int() in [55, 46, 37, 28, 19, 10, 1]:  # edge numbers
+       #     x = x + 1
+       # G.add_edge(actors[x - 1].number_as_int(), actors[x].number_as_int())
 
-    for j in range(1, 45):
-        if actors[j].number_as_int() in [9, 27, 45]:  # edge numbers
-            j = j + 9
-        G.add_edge(actors[j].number_as_int(), actors[j + 9].number_as_int())
+    #for j in range(1, 45):
+       # if actors[j].number_as_int() in [9, 27, 45]:  # edge numbers
+        #    j = j + 9
+       # G.add_edge(actors[j].number_as_int(), actors[j + 9].number_as_int())
 
-    for k in range(45, 72):
-        G.add_edge(actors[k].number_as_int(), actors[k + 9].number_as_int())
+    #for k in range(45, 72):
+       # G.add_edge(actors[k].number_as_int(), actors[k + 9].number_as_int())
 
     # print("Test: Finding shortest path from 1 to 29 -  " + str(nx.shortest_path(G, source=1, target=29)))
 
@@ -601,7 +601,7 @@ Create grid/actors
 """
 
 # creates a 9 * 9 grid
-grid = GridLayout(id='grid', cols=7, rows=7, padding=[380, 100, 380, 100], spacing=1.5)
+grid = GridLayout(id='grid', cols=7, rows=7, padding=[380, 150, 450, 150], spacing=1.5)
 
 # sets the background image
 bg = AsyncImage(source='images/BG.jpg', size_hint=[1.1, 2])
