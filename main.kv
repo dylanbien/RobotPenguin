@@ -85,6 +85,14 @@
             x: root.width * 0.475
             y: root.height * 0.5
 
+        Label:
+            text: 'the fish'
+            font_name: 'RobotoMono-Regular.ttf'
+            font_size: 45
+            size: root.width * 0.25, root.height * 0.125
+            x: root.width * 0.3885
+            y: root.height * 0.07
+
         Screen:
             Image:
                 source: 'images/DPEA_burned.png'
@@ -93,6 +101,14 @@
                 size_hint: 4.3, 7.5
                 x: root.width * 0.825
                 y: root.height * 0.625
+
+            Image:
+                source: 'icons/ICON_Goal.jpg'
+                keep_ratio: True
+                opacity: 1
+                size_hint: 2.65, 3.75
+                x: root.width * 0.35
+                y: root.height * 0.085
 
 
 <MainScreen>:
