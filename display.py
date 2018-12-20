@@ -60,8 +60,18 @@ def wait():
     while not arm.movement_complete():
         pass
 
+count = 0
 
 def move_arm():
+    global count
+    if count %2 == 0:
+        arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
+    else:
+        arm.move_to_point_in_straight_line(0, 0, -1.25, .01)
+    
+    wait()
+    
+    '''
     global nextPos
     global currentPos
 
@@ -80,7 +90,7 @@ def move_arm():
     wait()
 
     currentPos = Cloning(nextPos)
-
+    '''
 
 """
 Server
