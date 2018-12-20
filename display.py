@@ -38,13 +38,13 @@ TransparentId = 'icons/ICON_Transparent.png'
 """
 Arm Info
 """
-x_constant = 
-y_constant = 
+x_constant = .02 #work on
+y_constant = .02
 
 Motor1 = DeltaArm.MotorConfig.createMotor(0, 120, -1750, -26750)
 Motor2 = DeltaArm.MotorConfig.createMotor(1, 240, -980, -26800)
 Motor3 = DeltaArm.MotorConfig.createMotor(2, 360, -2000, -27000)
-DeltaArmConfig = DeltaArm.DeltaArmConfig.createConfig(1.04167, 1.4833, 0.3133, 0.25617, 0)
+DeltaArmConfig = DeltaArm.DeltaArmConfig.createConfig(12.5/12.0, 17.8/12.0, 7.5/12.0, 6.148/12.0, 0)
 
 arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig)
 
@@ -54,10 +54,6 @@ currentPos = (0, 0, -1.34)
 nextPos = (0, 0, -1.34)
 
 #def rotate_arm():
-
-    
-    
-    
 
     
 def move_arm():
@@ -87,6 +83,7 @@ def move_arm():
 """
 Server
 """
+
 import enum
 from dpea_p2p import Client
 
