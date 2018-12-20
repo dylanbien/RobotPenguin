@@ -35,6 +35,12 @@ Window.size = (1920, 1080)
 Window.fullscreen = True
 TransparentId = 'icons/ICON_Transparent.png'
 
+"""
+Arm Info
+"""
+x_constant = 
+y_constant = 
+
 Motor1 = DeltaArm.MotorConfig.createMotor(0, 120, -1750, -26750)
 Motor2 = DeltaArm.MotorConfig.createMotor(1, 240, -980, -26800)
 Motor3 = DeltaArm.MotorConfig.createMotor(2, 360, -2000, -27000)
@@ -42,10 +48,42 @@ DeltaArmConfig = DeltaArm.DeltaArmConfig.createConfig(1.04167, 1.4833, 0.3133, 0
 
 arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig)
 
-# arm.home_all() #homes it
-current = [0, 0, -1.34]
-direction = 0
+arm.home_all()#homes it
+arm.move_to_point_in_straight_line(0,0,-1.34, .01)
+currentPos = (0, 0, -1.34)
+nextPos = (0, 0, -1.34)
 
+#def rotate_arm():
+
+    
+    
+    
+
+    
+def move_arm():
+    
+    global nextPos
+    global currentPos
+    
+    currentPos[2] += .2 #change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01) #move down
+    currentPos[2] -= .2 #change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01) #move up
+    
+    arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01) #move to new position
+    
+    nextPos[2] += .2 #change z value
+    arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01) #move down
+    nextPos[2] += .2
+    arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01) #move up 
+    
+    
+    while arm.movement_complete == True:
+        pass
+    
+    currentPos = nextPos
+    
+    
 """
 Server
 """
@@ -324,6 +362,10 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
     # ////////////////////////////////////////////////////////////////////////////
     # //						        	Move Actor 							//
     # ////////////////////////////////////////////////////////////////////////////
+    
+    """
+    Forward/Backward
+    """
 
     def moveForward(self):  # find out which image is on the screen
         # there are different images for the player based on the direction they are facing
@@ -363,6 +405,115 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             self.moveDown()
             # main.huntPlayer()
             return
+        
+     """
+     Left/Right/Up/Down
+     """
+     def moveRight(self):  # strafe
+        global nextPos
+        
+        if (sm.current != 'main'): return
+
+        next = int(self.id.strip(string.ascii_letters)) + 1
+        print(str(next))
+
+        if (next % main.children[0].cols == 1):
+            print('cant move, at the right wall')
+            c.send_packet(PacketType.commandResponse, b"lose")
+            return
+        else:
+            nextPos[0] += x_constant
+            self.move(next)
+
+    def moveLeft(self):  # strafe
+        global nextPos
+        
+        if (sm.current != 'main'): return
+
+        next = int(self.id.strip(string.ascii_letters)) - 1
+        print(str(next))
+
+        if (next % main.children[0].cols == 0):
+            print('cant move, at the left wall')
+            c.send_packet(PacketType.responseCommand, b"lose")
+            return
+        else:
+            nextPos[0] += x_constant
+            self.move(next)
+
+ """
+ move
+ """
+            
+    def moveUp(self):
+        global nextPos
+        
+        if (sm.current != 'main'): return
+
+        next = int(self.id.strip(string.ascii_letters)) - main.children[0].cols
+        print(next)
+
+        if (next < 0):
+            print('cant move, at the top wall')
+            c.send_packet(PacketType.responseCommand, b"lose")
+            return
+        else:
+            nextPos[1] += y_constant
+            self.move(next)
+
+    def moveDown(self):
+        global nextPos
+        
+        if (sm.current != 'main'): return
+
+        next = int(self.id.strip(string.ascii_letters)) + main.children[0].cols
+        print(next)
+
+        if (next > main.children[0].rows * main.children[0].cols):
+            print('cant move, at the bottom wall')
+            c.send_packet(PacketType.responseCommand, b"lose")
+            return
+        else:
+            nextPos[1] += y_constant
+            self.move(next)
+
+    # gets called in all the directional moves
+    def move(self, next):
+
+        actor = main.findActor(next)  # gets the with id value next
+        print(actor.id)
+        assert actor.id == "actor" + str(next)
+
+        if (actor.source == TransparentId):
+            print('can move')  # if next spot is clear
+            temp = self.source
+            self.source = actor.source
+            actor.source = temp
+            print('sending continue')
+            
+            move_arm()
+            
+            c.send_packet(PacketType.responseCommand, b"continue")
+            return
+
+        elif ('Goal' in actor.source and 'Player' in self.source):  # if you next location is the fish
+            actor.source = self.source
+            self.source = TransparentId
+            print('you win')
+           
+            move_arm()
+            
+            c.send_packet(PacketType.responseCommand, b"win")
+            return
+
+
+        elif ('Player' in self.source and 'Igloo' in actor.source):
+            print('you hit an obstacle')
+            return  # can't move...you lose
+
+# ////////////////////////////////////////////////////////////////////////////
+# //						        	Rotate Actor 				    	//
+# ////////////////////////////////////////////////////////////////////////////
 
     def rotateDegrees(self, location, degrees):
         if (sm.current != 'main'): return
@@ -390,12 +541,18 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             self.source = 'players/ICON_Player_270.jpg'
             print('degree = 270')
             print('sending continue')
+            
+            #rotate_arm() 
+            
             c.send_packet(PacketType.responseCommand, b"continue")
             return
         elif (direction == 'right' and self.source == 'players/ICON_Player.jpg'):  # if main icon
             self.source = 'players/ICON_Player_90.jpg'
             print('degree = 90')
             print('sending continue')
+            
+            #rotate_arm() 
+                
             c.send_packet(PacketType.responseCommand, b"continue")
             return
         else:
@@ -412,6 +569,9 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
                     self.source = 'players/ICON_Player_' + angle + '.jpg'
                     print('sending continue')
                     c.send_packet(PacketType.responseCommand, b"continue")
+                    
+                 #rotate_arm() 
+                
             else:
                 angle = str(((degree + 90) % 360))
                 print('new angle = ' + angle)
@@ -423,88 +583,10 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
                     self.source = 'players/ICON_Player_' + angle + '.jpg'
                     print('sending continue')
                     c.send_packet(PacketType.responseCommand, b"continue")
+                
+                 #rotate_arm() 
 
-    def moveRight(self):  # strafe
-        if (sm.current != 'main'): return
-
-        next = int(self.id.strip(string.ascii_letters)) + 1
-        print(str(next))
-
-        if (next % main.children[0].cols == 1):
-            print('cant move, at the right wall')
-            c.send_packet(PacketType.commandResponse, b"lose")
-            return
-        else:
-            self.move(next)
-
-    def moveLeft(self):  # strafe
-        if (sm.current != 'main'): return
-
-        next = int(self.id.strip(string.ascii_letters)) - 1
-        print(str(next))
-
-        if (next % main.children[0].cols == 0):
-            print('cant move, at the left wall')
-            c.send_packet(PacketType.responseCommand, b"lose")
-            return
-        else:
-            self.move(next)
-
-    def moveUp(self):
-        if (sm.current != 'main'): return
-
-        next = int(self.id.strip(string.ascii_letters)) - main.children[0].cols
-        print(next)
-
-        if (next < 0):
-            print('cant move, at the top wall')
-            c.send_packet(PacketType.responseCommand, b"lose")
-            return
-        else:
-            self.move(next)
-
-    def moveDown(self):
-        if (sm.current != 'main'): return
-
-        next = int(self.id.strip(string.ascii_letters)) + main.children[0].cols
-        print(next)
-
-        if (next > main.children[0].rows * main.children[0].cols):
-            print('cant move, at the bottom wall')
-            c.send_packet(PacketType.responseCommand, b"lose")
-            return
-        else:
-            self.move(next)
-
-    # gets called in all the directional moves
-    def move(self, next):
-
-        actor = main.findActor(next)  # gets the with id value next
-        print(actor.id)
-        assert actor.id == "actor" + str(next)
-
-        if (actor.source == TransparentId):
-            print('can move')  # if next spot is clear
-            temp = self.source
-            self.source = actor.source
-            actor.source = temp
-            print('sending continue')
-            c.send_packet(PacketType.responseCommand, b"continue")
-            # arm.move() move the arm based on how its facing...find in source name
-            return
-
-        elif ('Goal' in actor.source and 'Player' in self.source):  # if you next location is the fish
-            actor.source = self.source
-            self.source = TransparentId
-            print('you win')
-            c.send_packet(PacketType.responseCommand, b"win")
-            return
-
-
-        elif ('Player' in self.source and 'Igloo' in actor.source):
-            print('you hit an obstacle')
-            return  # can't move...you lose
-
+   
 
 Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 
