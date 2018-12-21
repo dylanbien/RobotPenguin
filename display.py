@@ -34,7 +34,7 @@ locGoal = [49, 49, 49]  # location of the fish
 sm = ScreenManager()
 Window.size = (1920, 1080)
 Window.fullscreen = True
-TransparentId = 'icons2/ICON_Transparent.png'
+TransparentId = 'icons/ICON_Transparent.png'
 
 """
 Arm Info
@@ -204,7 +204,7 @@ def reset(dif):
 
     actorGoal = main.findActor(assignedGoal)  # assigns goal id
     print('goal is ' + str((assignedGoal)))
-    actorGoal.source = 'icons2/ICON_Goal.jpg'
+    actorGoal.source = 'icons/ICON_Goal.jpg'
 
     actorPenguin = main.findActor(locPenguin)  # places penguin
     print('player is ' + str(locPenguin))
@@ -232,10 +232,10 @@ def reset(dif):
 
             if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
                 if (i % 2 == 0):
-                    actor.source = 'icons2/ICON_Igloo.jpg'
+                    actor.source = 'icons/ICON_Igloo.jpg'
 
                 else:
-                    actor.source = 'icons2/ICON_Jewel.jpg'
+                    actor.source = 'icons/ICON_Jewel.jpg'
 
     # arm.move_to_point(0,0, -1.34)
 
