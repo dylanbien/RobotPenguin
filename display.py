@@ -154,7 +154,14 @@ def communication():
 # ////////////////////////////////////////////////////////////////
 # //	               		Reset Function			    		//
 # ////////////////////////////////////////////////////////////////
-
+def setUpBoard():
+    grid.clear_widgets()
+    for i in range(0, grid.cols * grid.rows):# resets all 81 grids to transparent
+        if i == 2:
+            b = Actor(id='actor' + str(i + 1), source=' w', size_hint=[1, 1]) 
+        else:
+            b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
+            grid.add_widget(b)  
 
 def reset(dif):
     global difficulty
@@ -163,7 +170,14 @@ def reset(dif):
     print('now is ' + difficulty)
 
     grid.clear_widgets()
-
+    
+    global currentPos
+    global nextPos
+    
+    #arm.home_all()  # homes it
+    #arm.move_to_point_in_straight_line(0, 0, -1.34, .01)
+    #currentPos = [0, 0, -1.34]
+    #nextPos = [0, 0, -1.34]
     # sets possible locations of the obstacles
     allObstacles = [
         [2, 3, 4, 5],
@@ -183,8 +197,6 @@ def reset(dif):
         b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
         grid.add_widget(b)
 
-    if (difficulty == 'setup'):
-        return
 
     for temp in allObstacles:
         y = random.randint(0, len(temp) - 1)  # get random in in each array
@@ -616,7 +628,7 @@ Create grid/actors
 grid = GridLayout(id='grid', cols=7, rows=7, padding=[380, 150, 450, 150], spacing=1.5)
 
 # sets the background image
-bg = AsyncImage(source='images/BG.jpg', size_hint=[1.1, 2])
+bg = AsyncImage(source='images/BG.jpg', size_hint=[1, 1])
 for i in range(0, grid.cols * grid.rows):  # adds the transparent image to all 81 boxes
     b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
     grid.add_widget(b)
@@ -625,7 +637,7 @@ main = MainScreen(name='main')  # creates a main screen
 main.add_widget(bg)  # adds background to the screen
 main.add_widget(grid)  # adds grid to the scren
 
-reset('easy')
+setUpBoard()
 
 sm.add_widget(main)
 
