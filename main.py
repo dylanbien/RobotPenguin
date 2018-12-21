@@ -55,7 +55,7 @@ def clearAll():
     mainImageQueue.clear_widgets()  # resets image queue 1
     mainImageQueue2.clear_widgets()  # resets image queue 2
 # ////////////////////////////////////////////////////////////////
-# /	                     Server Creation**WORK ON    	                //
+# /	                     Server Creation**WORK ON    	        //
 # ////////////////////////////////////////////////////////////////
 import enum
 from dpea_p2p import Server
@@ -367,7 +367,7 @@ class TitleScreen(Screen):
         screenManager.current = 'instruction'
 
 # ////////////////////////////////////////////////////////////////
-# //		    	  Instruction screen   			        //
+# //		    	  Instruction screen   			            //
 # ////////////////////////////////////////////////////////////////
 
 class InstructionScreen(Screen):
@@ -399,7 +399,7 @@ screenManager.add_widget(main)
 screenManager.current= 'title'
 
 # ////////////////////////////////////////////////////////////////
-# //				  RUAPP							//
+# //				  RUN APP							        //
 # ////////////////////////////////////////////////////////////////
 
 if __name__ == "__main__":
