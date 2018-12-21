@@ -154,22 +154,15 @@ def communication():
 # ////////////////////////////////////////////////////////////////
 # //	               		Reset Function			    		//
 # ////////////////////////////////////////////////////////////////
-def setUpBoard():
-    grid.clear_widgets()
-    for i in range(0, grid.cols * grid.rows):# resets all 81 grids to transparent
-        if i == 2:
-            b = Actor(id='actor' + str(i + 1), source=' w', size_hint=[1, 1]) 
-        else:
-            b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
-            grid.add_widget(b)  
 
+            
 def reset(dif):
     global difficulty
     difficulty = dif
 
     print('now is ' + difficulty)
 
-    grid.clear_widgets()
+    
     
     global currentPos
     global nextPos
@@ -192,11 +185,10 @@ def reset(dif):
     ]
 
     assignedObstacleLocations = []
-
-    for i in range(0, grid.cols * grid.rows):  # resets all 81 grids to transparent
-        b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
-        grid.add_widget(b)
-
+    
+    for actor in main.children[0].children:
+            actor.source = TransparentId
+            
 
     for temp in allObstacles:
         y = random.randint(0, len(temp) - 1)  # get random in in each array
@@ -637,7 +629,6 @@ main = MainScreen(name='main')  # creates a main screen
 main.add_widget(bg)  # adds background to the screen
 main.add_widget(grid)  # adds grid to the scren
 
-setUpBoard()
 
 sm.add_widget(main)
 
