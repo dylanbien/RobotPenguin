@@ -11,6 +11,7 @@ arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig)
 def wait():
     while not arm.movement_complete():
         pass
+    print('done movng')
     
 arm.home_all()#homes it
 wait()

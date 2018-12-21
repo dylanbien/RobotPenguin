@@ -51,23 +51,25 @@ arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig)
 
 arm.home_all()  # homes it
 arm.move_to_point_in_straight_line(0, 0, -1.34, .01)
-currentPos = (0, 0, -1.34)
-nextPos = (0, 0, -1.34)
-
-
-# def rotate_arm():
-def wait():
-    while not arm.movement_complete():
-        pass
+currentPos = [0, 0, -1.34]
+nextPos = [0, 0, -1.34]
 
 count = 0
 
+# def rotate_arm():
+def wait():
+    while arm.movement_complete() == False:
+        pass
+    print('done movng') 
+    
+
 def move_arm():
     global count
+    count += 1
     if count %2 == 0:
         arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
     else:
-        arm.move_to_point_in_straight_line(0, 0, -1.25, .01)
+        arm.move_to_point_in_straight_line(-.55, -.35, -1.4, .01)
     
     wait()
     
@@ -531,77 +533,77 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 # //						        	Rotate Actor 				    	//
 # ////////////////////////////////////////////////////////////////////////////
 
-def rotateDegrees(self, location, degrees):
-    if (sm.current != 'main'): return
-    for actor in main.children[0].children:
-        if (actor.id == location and 'Player' in actor.source):
-            if (degrees == 0 or degrees == 360 or degrees % 90 != 0):
-                actor.source = 'players/ICON_Player.jpg'
-                print('sending continue')
-                c.send_packet(PacketType.responseCommand, b"continue")
-            elif (degrees > 360):
-                actor.source = 'players/ICON_Player_' + str(degrees % 360) + '.jpg'
-                print('sending continue')
-                c.send_packet(PacketType.responseCommand, b"continue")
-            else:
-                actor.source = 'players/ICON_Player_' + str(degrees) + '.jpg'
-                print('sending continue')
-                c.send_packet(PacketType.responseCommand, b"continue")
+    def rotateDegrees(self, location, degrees):
+        if (sm.current != 'main'): return
+        for actor in main.children[0].children:
+            if (actor.id == location and 'Player' in actor.source):
+                if (degrees == 0 or degrees == 360 or degrees % 90 != 0):
+                    actor.source = 'players/ICON_Player.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
+                elif (degrees > 360):
+                    actor.source = 'players/ICON_Player_' + str(degrees % 360) + '.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
+                else:
+                    actor.source = 'players/ICON_Player_' + str(degrees) + '.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
 
 
-def rotateDirection(self, direction):
-    if (sm.current != 'main'): return
+    def rotateDirection(self, direction):
+        if (sm.current != 'main'): return
 
-    print('direction = ' + direction)
-    print('source = ' + self.source)
-    if (direction == 'left' and self.source == 'players/ICON_Player.jpg'):  # if main icon
-        self.source = 'players/ICON_Player_270.jpg'
-        print('degree = 270')
-        print('sending continue')
-
-        # rotate_arm()
-
-        c.send_packet(PacketType.responseCommand, b"continue")
-        return
-    elif (direction == 'right' and self.source == 'players/ICON_Player.jpg'):  # if main icon
-        self.source = 'players/ICON_Player_90.jpg'
-        print('degree = 90')
-        print('sending continue')
-
-        # rotate_arm()
-
-        c.send_packet(PacketType.responseCommand, b"continue")
-        return
-    else:
-        degree = int(self.source.strip(string.ascii_letters + string.punctuation))
-        print('degree = ' + str(degree))
-        if (direction == 'left'):
-            angle = str(((degree + 270) % 360))
-            print('new angle = ' + angle)
-            if (angle == '0'):
-                self.source = 'players/ICON_Player.jpg'
-                print('sending continue')
-                c.send_packet(PacketType.responseCommand, b"continue")
-            else:
-                self.source = 'players/ICON_Player_' + angle + '.jpg'
-                print('sending continue')
-                c.send_packet(PacketType.responseCommand, b"continue")
-
+        print('direction = ' + direction)
+        print('source = ' + self.source)
+        if (direction == 'left' and self.source == 'players/ICON_Player.jpg'):  # if main icon
+            self.source = 'players/ICON_Player_270.jpg'
+            print('degree = 270')
+            print('sending continue')
+            move_arm()
             # rotate_arm()
 
+            c.send_packet(PacketType.responseCommand, b"continue")
+            return
+        elif (direction == 'right' and self.source == 'players/ICON_Player.jpg'):  # if main icon
+            self.source = 'players/ICON_Player_90.jpg'
+            print('degree = 90')
+            print('sending continue')
+            move_arm()
+            # rotate_arm()
+
+            c.send_packet(PacketType.responseCommand, b"continue")
+            return
         else:
-            angle = str(((degree + 90) % 360))
-            print('new angle = ' + angle)
-            if (angle == '0'):
-                self.source = 'players/ICON_Player.jpg'
-                print('sending continue')
-                c.send_packet(PacketType.responseCommand, b"continue")
-            else:
-                self.source = 'players/ICON_Player_' + angle + '.jpg'
-                print('sending continue')
-                c.send_packet(PacketType.responseCommand, b"continue")
+            degree = int(self.source.strip(string.ascii_letters + string.punctuation))
+            print('degree = ' + str(degree))
+            if (direction == 'left'):
+                angle = str(((degree + 270) % 360))
+                print('new angle = ' + angle)
+                if (angle == '0'):
+                    self.source = 'players/ICON_Player.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
+                else:
+                    self.source = 'players/ICON_Player_' + angle + '.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
+                move_arm()
+                # rotate_arm()
 
-            # rotate_arm()
+            else:
+                angle = str(((degree + 90) % 360))
+                print('new angle = ' + angle)
+                if (angle == '0'):
+                    self.source = 'players/ICON_Player.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
+                else:
+                    self.source = 'players/ICON_Player_' + angle + '.jpg'
+                    print('sending continue')
+                    c.send_packet(PacketType.responseCommand, b"continue")
+                move_arm()
+                # rotate_arm()
 
 
 Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)

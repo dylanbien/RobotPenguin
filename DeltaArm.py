@@ -180,7 +180,15 @@ class DeltaArm:
             m.free()
 
     def movement_complete(self):
-        return all(not m.isBusy() for m in self.motors)
+        print('motors')
+        print(self.motors[0].isBusy())
+        print(self.motors[1].isBusy())
+        print(self.motors[2].isBusy())
+        
+        if (self.motors[0].isBusy() or  self.motors[1].isBusy() or self.motors[2].isBusy() ):
+           return False
+        else:
+            return True  #none of the motors are busy
 
     # ////////////////////////////////////////////////////////////////
     # //                         Get Functions                      //
