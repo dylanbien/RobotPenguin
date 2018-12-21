@@ -210,9 +210,9 @@ def reset(dif):
 
     actorGoal = main.findActor(assignedGoal)  # assigns goal id
     print('goal is ' + str((assignedGoal)))
-    actorGoal.source = 'icons/ICON_Goal.jpg'
+    actorGoal.source = '/ICON_Goal.jpg'
 
-    actorPenguin = main.findActor(locPenguin)  # places penguin
+    actorPenguin = maiiconsn.findActor(locPenguin)  # places penguin
     print('player is ' + str(locPenguin))
     actorPenguin.source = 'players/ICON_Player_180.jpg'
 
