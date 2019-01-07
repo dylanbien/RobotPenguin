@@ -55,9 +55,12 @@ class DeltaArm:
 
     def __init__(self, Motor1, Motor2, Motor3, DeltaArmConfig):
         self.board = Slush.sBoard()
-        self.motors = [stepper(port=Motor1.port, micro_steps=32, speed=30),
-                       stepper(port=Motor2.port, micro_steps=32, speed=30),
-                       stepper(port=Motor3.port, micro_steps=32, speed=30)]
+        # self.motors = [stepper(port=Motor1.port, micro_steps=32, speed=50),
+        #               stepper(port=Motor2.port, micro_steps=32, speed=50),
+        #               stepper(port=Motor3.port, micro_steps=32, speed=50)]
+        self.motors = [stepper(port=Motor1.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25),
+                       stepper(port=Motor2.port, micro_steps=32, speed=50),
+                       stepper(port=Motor3.port, micro_steps=32, speed=50)]
 
         DeltaArm.phi_vals.append(math.radians(Motor1.angle))
         DeltaArm.phi_vals.append(math.radians(Motor2.angle))
@@ -128,12 +131,16 @@ class DeltaArm:
     def set_all_to_different_angle(self, a1, a2, a3):
         angs = [a1, a2, a3]
         DeltaArm.debug('testing values')  # test to make sure all steps are less than zero, or below the sensor
+   
         for i in range(3):
-            
-            val = int(self.angle_to_position(i, angs[i]))
+            val = self.angle_to_position(i, angs[i])
+            print(str(i) + ': ' + str(val))
             if val > 0:
                 print('steps > 0: arm would go above sensor')
                 return
+            else:
+                print('all good')
+  
         DeltaArm.debug('all steps > 0')
 
         for i in range(3):
@@ -180,10 +187,10 @@ class DeltaArm:
             m.free()
 
     def movement_complete(self):
-        print('motors')
-        print(self.motors[0].isBusy())
-        print(self.motors[1].isBusy())
-        print(self.motors[2].isBusy())
+        #print('motors')
+        #print(self.motors[0].isBusy())
+        #print(self.motors[1].isBusy())
+        #print(self.motors[2].isBusy())
         
         if (self.motors[0].isBusy() or  self.motors[1].isBusy() or self.motors[2].isBusy() ):
            return False
@@ -377,7 +384,7 @@ class DeltaArm:
 
     def move_to_point_in_straight_line(self, x, y, z, dr):
         DeltaArm.debug('start move to point in straiht line: ' + str(x) + ' ' + str(y) + ' ' + str(z))
-
+        print('going to ' + str(x) + ' ' + str(y) + ' ' + str(z) )
         (a1, a2, a3) = [self.get_angle(i) for i in range(3)]  # gets the current angles
         (x0, y0, z0) = DeltaArm.forward_kinematics(a1, a2, a3) # gets the current XYZ position
         print('starting pt: ' + str(x0) + ' ' + str(y0) + ' ' + str(z0) )
@@ -395,9 +402,13 @@ class DeltaArm:
                 [w + q for (w, q) in zip((x0, y0, z0), tuple([a * float(rCurr) / float(rGoal) for a in delta]))])
             DeltaArm.debug('new position is ' + str(xCurr) + ' ' + str(yCurr) + ' ' + str(zCurr))
             self.move_to_point(xCurr, yCurr, zCurr)
+            self.movement_complete()
 
-            # advance_time = time.time() + dt
-        # while time.time() < advance_time:
-        #  pass
+            #advance_time = time.time() + dt
+            #while time.time() < advance_time:
+             #   pass
 
         self.move_to_point(x, y, z)
+        (a1, a2, a3) = [self.get_angle(i) for i in range(3)]  # gets the current angles
+        (x0, y0, z0) = DeltaArm.forward_kinematics(a1, a2, a3) # gets the current XYZ position
+        print('starting pt: ' + str(x0) + ' ' + str(y0) + ' ' + str(z0) )

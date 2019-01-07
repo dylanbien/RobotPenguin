@@ -18,14 +18,17 @@ wait()
 arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
 wait()
 
-print('done goin down')
-print('arm please work :)')
-sleep(2)
-arm.move_to_point_in_straight_line(-.55, -.35, -1.4, .01)
-wait()
-arm.move_to_point_in_straight_line(-.55, .35, -1.4, .01)
+
 sleep(1)
+
+arm.move_to_point_in_straight_line(0, -.7, -1.4, .01)
 wait()
+sleep(1)
+'''
+range# right:.3
+arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
+print('done goin down')
+'''
 ##high point 1.2
 #low point -1.45
 #top left arm.move_to_point_in_straight_line(-.55, -.35, -1.4, .01)
