@@ -15,15 +15,24 @@ def wait():
     
 arm.home_all()#homes it
 wait()
-arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
-wait()
-
-
-sleep(1)
-
-arm.move_to_point_in_straight_line(0, -.7, -1.4, .01)
+arm.move_to_point_in_straight_line(0, 0, -1.5, .01)
 wait()
 sleep(1)
+
+while(True):
+    arm.move_to_point_in_straight_line(-.55, -.4, -1.5, .01)
+    wait()
+    sleep(1)
+    arm.move_to_point_in_straight_line(.4, -.4, -1.5, .01)
+    wait()
+    sleep(1)
+    arm.move_to_point_in_straight_line(.4, .3, -1.5, .01)
+    wait()
+    sleep(1)
+    arm.move_to_point_in_straight_line(-.55, .3, -1.5, .01)
+    wait()
+    sleep(1)
+
 '''
 range# right:.3
 arm.move_to_point_in_straight_line(0, 0, -1.4, .01)

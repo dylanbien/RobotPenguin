@@ -55,13 +55,10 @@ class DeltaArm:
 
     def __init__(self, Motor1, Motor2, Motor3, DeltaArmConfig):
         self.board = Slush.sBoard()
-        # self.motors = [stepper(port=Motor1.port, micro_steps=32, speed=50),
-        #               stepper(port=Motor2.port, micro_steps=32, speed=50),
-        #               stepper(port=Motor3.port, micro_steps=32, speed=50)]
         self.motors = [stepper(port=Motor1.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25),
-                       stepper(port=Motor2.port, micro_steps=32, speed=50),
-                       stepper(port=Motor3.port, micro_steps=32, speed=50)]
-
+                       stepper(port=Motor2.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25),
+                       stepper(port=Motor3.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25)]
+        
         DeltaArm.phi_vals.append(math.radians(Motor1.angle))
         DeltaArm.phi_vals.append(math.radians(Motor2.angle))
         DeltaArm.phi_vals.append(math.radians(Motor3.angle))
@@ -134,12 +131,11 @@ class DeltaArm:
    
         for i in range(3):
             val = self.angle_to_position(i, angs[i])
-            print(str(i) + ': ' + str(val))
+            #print(str(i) + ': ' + str(val))
             if val > 0:
                 print('steps > 0: arm would go above sensor')
                 return
-            else:
-                print('all good')
+            
   
         DeltaArm.debug('all steps > 0')
 
@@ -196,6 +192,10 @@ class DeltaArm:
            return False
         else:
             return True  #none of the motors are busy
+        
+    def wait(self):
+        while not self.movement_complete():
+            pass
 
     # ////////////////////////////////////////////////////////////////
     # //                         Get Functions                      //
