@@ -4,9 +4,10 @@ from pidev import stepper
 from time import sleep
 import Adafruit_PCA9685
                                     
-rotator = stepper(port = 3, speed = 20, micro_steps = 4, run_current=90, accel_current=25)
+rotator = stepper(port = 3, speed = 64, micro_steps = 4, run_current=90, accel_current=25)
 rotator.setMinSpeed(200)
 rotator.setOverCurrent(4800)
+rotator.set_max_speed(500)
 rotator.goUntilPress(0,1,500)
 
 

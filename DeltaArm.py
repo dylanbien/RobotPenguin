@@ -7,7 +7,7 @@ import math
 import time
 from pidev import stepper
 from collections import namedtuple
-
+import Adafruit_PCA9685
 
 # ////////////////////////////////////////////////////////////////
 # //                     Motor Config Class                     //
@@ -25,8 +25,7 @@ class MotorConfig:
 # ////////////////////////////////////////////////////////////////
 
 class DeltaArmConfig:
-    ArmConstants = namedtuple('ArmConstants',
-                              ['upper_length', 'lower_length', 'fixed_edge', 'effector_edge', 'end_effector_z_offset'])
+    ArmConstants = namedtuple('ArmConstants',['upper_length', 'lower_length', 'fixed_edge', 'effector_edge', 'end_effector_z_offset'])
     def createConfig(upper_length, lower_length, fixed_edge, effector_edge, end_effector_z_offset):
         return DeltaArmConfig.ArmConstants(upper_length, lower_length, fixed_edge, effector_edge, end_effector_z_offset)
 
@@ -53,12 +52,23 @@ class DeltaArm:
 
 
 
-    def __init__(self, Motor1, Motor2, Motor3, DeltaArmConfig):
+    
+    #alternate constructor with solenoid + motor
+    def __init__(self, Motor1, Motor2, Motor3, DeltaArmConfig,  Motor4=None):
+        #all values for Motor4 should be Non except for port
         self.board = Slush.sBoard()
         self.motors = [stepper(port=Motor1.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25),
                        stepper(port=Motor2.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25),
                        stepper(port=Motor3.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25)]
-        
+        self.solenoid = Adafruit_PCA9685.PCA9685()
+        if Motor4:
+            self.indeffector_motor = stepper(port=Motor4.port,speed = 20, micro_steps = 4, run_current=90, accel_current = 25)
+            #these values were found through experimentation
+            self.indeffector_motor.setMinSpeed(200)
+            #self.indeffector_motor.setOverCurrent(4800)
+        else:
+            self.indeffector_motor = None
+
         DeltaArm.phi_vals.append(math.radians(Motor1.angle))
         DeltaArm.phi_vals.append(math.radians(Motor2.angle))
         DeltaArm.phi_vals.append(math.radians(Motor3.angle))
@@ -86,16 +96,17 @@ class DeltaArm:
         DeltaArm.lower_len = DeltaArmConfig.lower_length  # length of the bottom arm
         DeltaArm.end_effector_z_offset = DeltaArmConfig.end_effector_z_offset  # distace from lower equilateral triangle to bottom of the arm
 
-        # can be changed in the motor
-        # for m in self.motors:
-        # m.setCurrent(20,100,100,100)
-        # m.setAccel(750)
-        # m.setMaxSpeed(750)
-        # m.setLimitHardStop(0)
-
     def debug(message):
         if DeltaArm.debug == True:
             print(message)
+
+
+    # ////////////////////////////////////////////////////////////////
+    # //                    Indeffector Functions                   //
+    # ////////////////////////////////////////////////////////////////
+    def rotate_degrees(self, deg):
+        target = deg * (DeltaArm.rotator_ninety_pos - DeltaArm.rotator_zero_pos) / 90.0 + DeltaArm.rotator_zero_pos
+        self.rotator.goTo(int(target))
 
     # ////////////////////////////////////////////////////////////////
     # //                    Movement Based On Steps                 //
@@ -128,15 +139,12 @@ class DeltaArm:
     def set_all_to_different_angle(self, a1, a2, a3):
         angs = [a1, a2, a3]
         DeltaArm.debug('testing values')  # test to make sure all steps are less than zero, or below the sensor
-   
         for i in range(3):
-            val = self.angle_to_position(i, angs[i])
-            #print(str(i) + ': ' + str(val))
+            
+            val = int(self.angle_to_position(i, angs[i]))
             if val > 0:
                 print('steps > 0: arm would go above sensor')
                 return
-            
-  
         DeltaArm.debug('all steps > 0')
 
         for i in range(3):
@@ -183,19 +191,7 @@ class DeltaArm:
             m.free()
 
     def movement_complete(self):
-        #print('motors')
-        #print(self.motors[0].isBusy())
-        #print(self.motors[1].isBusy())
-        #print(self.motors[2].isBusy())
-        
-        if (self.motors[0].isBusy() or  self.motors[1].isBusy() or self.motors[2].isBusy() ):
-           return False
-        else:
-            return True  #none of the motors are busy
-        
-    def wait(self):
-        while not self.movement_complete():
-            pass
+        return all(not m.isBusy() for m in self.motors) #false if some motors busy
 
     # ////////////////////////////////////////////////////////////////
     # //                         Get Functions                      //
@@ -384,7 +380,7 @@ class DeltaArm:
 
     def move_to_point_in_straight_line(self, x, y, z, dr):
         DeltaArm.debug('start move to point in straiht line: ' + str(x) + ' ' + str(y) + ' ' + str(z))
-        print('going to ' + str(x) + ' ' + str(y) + ' ' + str(z) )
+
         (a1, a2, a3) = [self.get_angle(i) for i in range(3)]  # gets the current angles
         (x0, y0, z0) = DeltaArm.forward_kinematics(a1, a2, a3) # gets the current XYZ position
         print('starting pt: ' + str(x0) + ' ' + str(y0) + ' ' + str(z0) )
@@ -402,13 +398,9 @@ class DeltaArm:
                 [w + q for (w, q) in zip((x0, y0, z0), tuple([a * float(rCurr) / float(rGoal) for a in delta]))])
             DeltaArm.debug('new position is ' + str(xCurr) + ' ' + str(yCurr) + ' ' + str(zCurr))
             self.move_to_point(xCurr, yCurr, zCurr)
-            self.movement_complete()
 
-            #advance_time = time.time() + dt
-            #while time.time() < advance_time:
-             #   pass
+            # advance_time = time.time() + dt
+        # while time.time() < advance_time:
+        #  pass
 
         self.move_to_point(x, y, z)
-        (a1, a2, a3) = [self.get_angle(i) for i in range(3)]  # gets the current angles
-        (x0, y0, z0) = DeltaArm.forward_kinematics(a1, a2, a3) # gets the current XYZ position
-        print('starting pt: ' + str(x0) + ' ' + str(y0) + ' ' + str(z0) )
