@@ -199,7 +199,7 @@ class DeltaArm:
     def wait(self):
 	    while self.movement_complete() == False:
 	        pass
-        print('done moving')
+            print('done moving')
 
     # ////////////////////////////////////////////////////////////////
     # //                         Get Functions                      //
