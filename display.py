@@ -85,11 +85,6 @@ def rotate_arm(direction):
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     sleep(4)
 
-
-def wait():
-    while arm.wait() == False:
-        pass
-    print('done movng') 
     
 
 def move_arm():
@@ -114,7 +109,7 @@ def move_arm():
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move up
     sleep(1)
 
-    wait()
+    arm.wait()
     currentPos = copy.deepcopy(nextPos)
     #currentPos = [nextPos[0], nextPos[1], nextPos[2]]
     
