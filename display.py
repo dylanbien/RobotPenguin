@@ -85,7 +85,7 @@ def rotate_arm(direction):
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     sleep(4)
 
-    
+    arm.wait()
 
 def move_arm():
    
