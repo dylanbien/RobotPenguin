@@ -622,7 +622,7 @@ Create grid/actors
 """
 
 # creates a 9 * 9 grid
-grid = GridLayout(id='grid', cols=7, rows=7, padding=[380, 150, 450, 150], spacing=1.5)
+grid = GridLayout(id='grid', cols=7, rows=7, padding=[415, 150, 415, 150], spacing=1.5)
 
 # sets the background image
 bg = AsyncImage(source='images/BG.jpg', size_hint=[1, 1])
