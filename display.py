@@ -18,6 +18,7 @@ from kivy.uix.gridlayout import GridLayout
 from time import sleep
 from kivy.uix.behaviors import ButtonBehavior
 import networkx as nx
+import copy
 
 G = nx.Graph()
 
@@ -39,8 +40,8 @@ TransparentId = 'icons/ICON_Transparent.png'
 """
 Arm Info
 """
-x_constant = .02  # work on
-y_constant = .02
+x_constant = .1583  # work on
+y_constant = .1167
 
 Motor1 = DeltaArm.MotorConfig.createMotor(0, 120, -1750, -26750)
 Motor2 = DeltaArm.MotorConfig.createMotor(1, 240, -980, -26800)
@@ -50,50 +51,68 @@ DeltaArmConfig = DeltaArm.DeltaArmConfig.createConfig(12.5 / 12.0, 17.8 / 12.0, 
 arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig)
 
 arm.home_all()  # homes it
-arm.move_to_point_in_straight_line(0, 0, -1.34, .01)
-currentPos = [0, 0, -1.34]
-nextPos = [0, 0, -1.34]
+arm.move_to_point_in_straight_line(0, 0, -1.3, .01)
 
-count = 0
+currentPos = [0, 0, -1.3]
+nextPos = [0, 0, -1.3]
 
-# def rotate_arm():
-def wait():
-    while arm.movement_complete() == False:
-        pass
-    print('done movng') 
-    
 
-def move_arm():
-    global count
-    count += 1
-    if count %2 == 0:
-        arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
-    else:
-        arm.move_to_point_in_straight_line(-.55, -.35, -1.4, .01)
-    
-    wait()
-    
-    '''
+def rotate_arm(direction):
     global nextPos
     global currentPos
 
-    currentPos[2] -= .25  # change z value
+    currentPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
-    currentPos[2] += .25  # change z value
+    sleep(1)
+    currentPos[2] += .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    sleep(1)
+    
+    rotLoc = rotator.getPosition()
+    if direction == left:
+        newLoc = rotLoc + 45
+        rotator.goTo(nowLoc)
+    else:
+        newLoc = rotLoc - 45
+        rotator.goTo(nowLoc)
+    
+    sleep(2)
+   
+    currentPos[2] -= .1  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
+    sleep(4)
+    currentPos[2] += .1  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    sleep(4)
+
+    arm.wait()
+
+def move_arm():
+   
+    global nextPos
+    global currentPos
+
+    currentPos[2] -= .1  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
+    sleep(1)
+    currentPos[2] += .1  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    sleep(1)
 
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move to new position
+    sleep(1)
 
-    nextPos[2] -= .25  # change z value
+    nextPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move down
-    nextPos[2] += .25
+    sleep(1)
+    nextPos[2] += .1
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move up
+    sleep(1)
 
-    wait()
-
-    currentPos = Cloning(nextPos)
-    '''
-
+    arm.wait()
+    currentPos = copy.deepcopy(nextPos)
+    #currentPos = [nextPos[0], nextPos[1], nextPos[2]]
+    
 """
 Server
 """
@@ -161,16 +180,22 @@ def reset(dif):
     difficulty = dif
 
     print('now is ' + difficulty)
-
     
+    arm.home_all()
+    arm.wait()
+    arm.move_to_point_in_straight_line(0, 0, -1.3, .01)
+    arm.wait()
+    sleep(1)
+    arm.move_to_point_in_straight_line(-.55, -.4, -1.3, .01)
+
     
     global currentPos
     global nextPos
     
-    #arm.home_all()  # homes it
-    #arm.move_to_point_in_straight_line(0, 0, -1.34, .01)
-    #currentPos = [0, 0, -1.34]
-    #nextPos = [0, 0, -1.34]
+    
+    currentPos = [-.55, -.4, -1.3]
+    nextPos = [-.55, -.4, -1.3]
+    
     # sets possible locations of the obstacles
     allObstacles = [
         [2, 3, 4, 5],
@@ -210,7 +235,7 @@ def reset(dif):
 
     actorGoal = main.findActor(assignedGoal)  # assigns goal id
     print('goal is ' + str((assignedGoal)))
-    actorGoal.source = '/ICON_Goal.jpg'
+    actorGoal.source = 'icons/ICON_Goal.jpg'
 
     actorPenguin = main.findActor(locPenguin)  # places penguin
     print('player is ' + str(locPenguin))
@@ -456,7 +481,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             c.send_packet(PacketType.responseCommand, b"lose")
             return
         else:
-            nextPos[0] += x_constant
+            nextPos[0] -= x_constant
             self.move(next)
 
 
@@ -478,7 +503,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             c.send_packet(PacketType.responseCommand, b"lose")
             return
         else:
-            nextPos[1] += y_constant
+            nextPos[1] -= y_constant
             self.move(next)
 
 
@@ -564,8 +589,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             self.source = 'players/ICON_Player_270.jpg'
             print('degree = 270')
             print('sending continue')
-            move_arm()
-            # rotate_arm()
+            rotate_arm(direction)
 
             c.send_packet(PacketType.responseCommand, b"continue")
             return
@@ -573,8 +597,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             self.source = 'players/ICON_Player_90.jpg'
             print('degree = 90')
             print('sending continue')
-            move_arm()
-            # rotate_arm()
+            rotate_arm(direction)
 
             c.send_packet(PacketType.responseCommand, b"continue")
             return
@@ -592,8 +615,8 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
                     self.source = 'players/ICON_Player_' + angle + '.jpg'
                     print('sending continue')
                     c.send_packet(PacketType.responseCommand, b"continue")
-                move_arm()
-                # rotate_arm()
+                
+                rotate_arm(direction)
 
             else:
                 angle = str(((degree + 90) % 360))
@@ -606,8 +629,8 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
                     self.source = 'players/ICON_Player_' + angle + '.jpg'
                     print('sending continue')
                     c.send_packet(PacketType.responseCommand, b"continue")
-                move_arm()
-                # rotate_arm()
+                
+                rotate_arm(direction)
 
 
 Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
@@ -617,7 +640,7 @@ Create grid/actors
 """
 
 # creates a 9 * 9 grid
-grid = GridLayout(id='grid', cols=7, rows=7, padding=[380, 150, 450, 150], spacing=1.5)
+grid = GridLayout(id='grid', cols=7, rows=7, padding=[415, 150, 415, 150], spacing=1.5)
 
 # sets the background image
 bg = AsyncImage(source='images/BG.jpg', size_hint=[1, 1])
