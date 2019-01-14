@@ -17,9 +17,12 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from time import sleep
 from kivy.core.window import Window
-
+from kivy.animation import Animation
 import socket
 from kivy.core.audio import SoundLoader
+from threading import Thread
+from kivy.uix.widget import Widget
+from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
 
 commands = []
 counter = 0
@@ -145,6 +148,7 @@ def setDifficulty(difficulty):
     if difficulty == 'hard':
         print('sending hard')
         s.send_packet(PacketType.difficulty, b"hard")
+
 
 def runner():
 
@@ -395,6 +399,7 @@ screenManager.add_widget(title)
 screenManager.add_widget(instruction)
 screenManager.add_widget(newGame)
 screenManager.add_widget(main)
+
 
 screenManager.current= 'title'
 
