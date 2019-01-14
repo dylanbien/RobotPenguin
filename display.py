@@ -57,20 +57,38 @@ currentPos = [0, 0, -1.3]
 nextPos = [0, 0, -1.3]
 
 
-def rotate_arm():
-    pass
+def rotate_arm(direction):
+    global nextPos
+    global currentPos
 
-
-def wait():
-    while arm.wait() == False:
-        pass
-    print('done movng') 
+    currentPos[2] -= .1  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
+    sleep(1)
+    currentPos[2] += .1  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    sleep(1)
     
+    rotLoc = rotator.getPosition()
+    if direction == left:
+        newLoc = rotLoc + 45
+        rotator.goTo(nowLoc)
+    else:
+        newLoc = rotLoc - 45
+        rotator.goTo(nowLoc)
+    
+    sleep(2)
+   
+    currentPos[2] -= .1  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
+    sleep(4)
+    currentPos[2] += .1  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    sleep(4)
+
+    arm.wait()
 
 def move_arm():
    
-    
-    
     global nextPos
     global currentPos
 
@@ -91,7 +109,7 @@ def move_arm():
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move up
     sleep(1)
 
-    wait()
+    arm.wait()
     currentPos = copy.deepcopy(nextPos)
     #currentPos = [nextPos[0], nextPos[1], nextPos[2]]
     
@@ -571,7 +589,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             self.source = 'players/ICON_Player_270.jpg'
             print('degree = 270')
             print('sending continue')
-            rotate_arm()
+            rotate_arm(direction)
 
             c.send_packet(PacketType.responseCommand, b"continue")
             return
@@ -579,7 +597,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             self.source = 'players/ICON_Player_90.jpg'
             print('degree = 90')
             print('sending continue')
-            rotate_arm()
+            rotate_arm(direction)
 
             c.send_packet(PacketType.responseCommand, b"continue")
             return
@@ -598,7 +616,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
                     print('sending continue')
                     c.send_packet(PacketType.responseCommand, b"continue")
                 
-                rotate_arm()
+                rotate_arm(direction)
 
             else:
                 angle = str(((degree + 90) % 360))
@@ -612,7 +630,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
                     print('sending continue')
                     c.send_packet(PacketType.responseCommand, b"continue")
                 
-                rotate_arm()
+                rotate_arm(direction)
 
 
 Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
@@ -622,7 +640,7 @@ Create grid/actors
 """
 
 # creates a 9 * 9 grid
-grid = GridLayout(id='grid', cols=7, rows=7, padding=[380, 150, 450, 150], spacing=1.5)
+grid = GridLayout(id='grid', cols=7, rows=7, padding=[415, 150, 415, 150], spacing=1.5)
 
 # sets the background image
 bg = AsyncImage(source='images/BG.jpg', size_hint=[1, 1])
