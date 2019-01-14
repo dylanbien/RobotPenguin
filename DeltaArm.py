@@ -197,8 +197,8 @@ class DeltaArm:
 	       return True  #none of the motors are busy
 	
     def wait(self):
-	    while self.movement_complete() == False:
-	        pass
+            while self.movement_complete() == False:
+                pass
             print('done moving')
 
     # ////////////////////////////////////////////////////////////////
