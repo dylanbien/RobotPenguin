@@ -89,11 +89,13 @@ def handle_response_packet(payload):
     if payload.decode("ascii") == "win":
         counter = 0
         clearAll()
+        main.RunPopup.dismiss()    
         main.victoryPopup()
 
     elif payload.decode("ascii") == "lose":
         counter = 0
         clearAll()
+        main.RunPopup.dismiss()    
         main.defeatPopup()
 
     elif payload.decode("ascii") == "continue":
@@ -104,6 +106,7 @@ def handle_response_packet(payload):
             print('out of turns')
             counter = 0
             clearAll()
+            main.RunPopup.dismiss()    
             main.defeatPopup()
             return
             
@@ -136,7 +139,8 @@ def check_server(): #impliment from execute
         print("got unhandled packet!")
 
    
-            
+    
+
        
 def setDifficulty(difficulty):
     if difficulty == 'easy':
@@ -149,7 +153,7 @@ def setDifficulty(difficulty):
         print('sending hard')
         s.send_packet(PacketType.difficulty, b"hard")
 
-
+        
 def runner():
 
     while True:
@@ -161,7 +165,9 @@ def runner():
 def execute():  # Work on with server
     global counter
     counter = 0
-
+    
+    main.RunPopup()
+    
     temp = commands[counter] #begins the first command (after we transition to check server)
     
     if temp == 'forward ':
@@ -324,6 +330,44 @@ class MainScreen(Screen):
         instruction.add_widget(instructionLabel)
         instructionPop.open()
 
+    def SetUpPopup(self):  # set up POPUP
+        SetUpLay = FloatLayout(size_hint=(0.5, 0.5))
+        SetUpPop = Popup(title='setup',
+                           size_hint=(0.3, 0.23),
+                           auto_dismiss=False,
+                           title_size=30,
+                           title_align='center',
+                           content=SetUpLay)
+        playAgainButton = Button(text='Play Again',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(760, 425))
+ 
+        SetUpLay.add_widget(playAgainButton)
+       
+        SetUpPop.open()
+        sleep(6)
+        SetUpPop.dismiss()
+        
+    def RunPopup(self):  # set up POPUP
+        
+        RunLay = FloatLayout(size_hint=(0.5, 0.5))
+        RunPop = Popup(title='setup',
+                           size_hint=(0.3, 0.23),
+                           auto_dismiss=False,
+                           title_size=30,
+                           title_align='center',
+                           content=SetUpLay)
+        playAgainButton = Button(text='Play Again',
+                            size_hint=(0.46, 0.8),
+                            font_size=20,
+                            pos=(760, 425))
+ 
+        RunLay.add_widget(playAgainButton)
+        
+        RunPopup.open()
+        
+        
 # ////////////////////////////////////////////////////////////////
 # //	       	    	  New Game screen			            //
 # ////////////////////////////////////////////////////////////////
@@ -336,7 +380,8 @@ class NewGame(Screen):
         
         screenManager.current = 'main'
         setDifficulty(dif)
-
+        main.SetUpPopup()
+        
     def instructionPopup(self):  # instruction POPUP
         #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
         instruction = FloatLayout()
