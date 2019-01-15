@@ -3,7 +3,7 @@
 # ////////////////////////////////////////////////////////////////
 from kivy.config import Config
 
-Config.set('graphics', 'fullscreen', '0')
+#Config.set('graphics', 'fullscreen', '0')
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -26,7 +26,7 @@ from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
 
 commands = []
 counter = 0
-Window.fullscreen = 'auto'
+#Window.fullscreen = 'auto'
 
 # ////////////////////////////////////////////////////////////////
 # /	            DECLARE queue and clear functions	            //
@@ -106,7 +106,7 @@ def handle_response_packet(payload):
             print('out of turns')
             counter = 0
             clearAll()
-            main.RunPopup.dismiss()    
+            main.RunPopupDismiss()
             main.defeatPopup()
             return
             
@@ -152,6 +152,7 @@ def setDifficulty(difficulty):
     if difficulty == 'hard':
         print('sending hard')
         s.send_packet(PacketType.difficulty, b"hard")
+
 
         
 def runner():
@@ -251,7 +252,7 @@ class MainScreen(Screen):
                            title_size=30,
                            title_align='center',
                            content=victoryLay)
-        victoryImage = Image(source='winner/winner.png',
+        victoryImage = Image(source='icons/ICON_Goal.jpg',
                              keep_ratio=True,
                              size_hint=(1.5*1.15, 1.945*1.15),
                              pos=(545, 545))
@@ -284,7 +285,7 @@ class MainScreen(Screen):
                           title_size=30,
                           title_align='center',
                           content=defeatLay)
-        defeatImage = Image(source='loser/loser.png',
+        defeatImage = Image(source='icons/ICON_Goal.jpg',
                             keep_ratio=True,
                             size_hint=(1.5*1.3, 1.945*1.3),
                             pos=(480, 530))
@@ -331,42 +332,38 @@ class MainScreen(Screen):
         instructionPop.open()
 
     def SetUpPopup(self):  # set up POPUP
-        SetUpLay = FloatLayout(size_hint=(0.5, 0.5))
+        global SetUpPop
+        SetUpLay = FloatLayout()
         SetUpPop = Popup(title='setup',
                            size_hint=(0.3, 0.23),
                            auto_dismiss=False,
                            title_size=30,
                            title_align='center',
                            content=SetUpLay)
-        playAgainButton = Button(text='Play Again',
-                            size_hint=(0.46, 0.8),
-                            font_size=20,
-                            pos=(760, 425))
- 
-        SetUpLay.add_widget(playAgainButton)
-       
+
+
         SetUpPop.open()
-        sleep(6)
+
+    def SetUpPopupDismiss(self):
+        global SetUpPop
         SetUpPop.dismiss()
         
     def RunPopup(self):  # set up POPUP
-        
+        global RunPop
         RunLay = FloatLayout(size_hint=(0.5, 0.5))
-        RunPop = Popup(title='setup',
+        RunPop = Popup(title='run',
                            size_hint=(0.3, 0.23),
                            auto_dismiss=False,
                            title_size=30,
                            title_align='center',
-                           content=SetUpLay)
-        playAgainButton = Button(text='Play Again',
-                            size_hint=(0.46, 0.8),
-                            font_size=20,
-                            pos=(760, 425))
- 
-        RunLay.add_widget(playAgainButton)
+                           content=RunLay)
         
-        RunPopup.open()
-        
+        RunPop.open()
+
+    def RunPopupDismiss(self):
+            global RunPop
+
+            RunPop.dismiss()
         
 # ////////////////////////////////////////////////////////////////
 # //	       	    	  New Game screen			            //
@@ -377,10 +374,15 @@ class NewGame(Screen):
     def setMainScreen(self, difficulty):
 
         dif = difficulty
-        
+
         screenManager.current = 'main'
         setDifficulty(dif)
+
         main.SetUpPopup()
+
+
+        #sleep(4)
+        #main.SetUpPopupDismiss()
         
     def instructionPopup(self):  # instruction POPUP
         #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
