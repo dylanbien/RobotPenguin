@@ -241,21 +241,26 @@ def reset(dif):
     print('player is ' + str(locPenguin))
     actorPenguin.source = 'players/ICON_Player_180.jpg'
 
-    actors = list(main.children[0].children)[::-1]  # reverses in correct order
-    #for x in range(1, 81):
-        #if actors[x].number_as_int() in [55, 46, 37, 28, 19, 10, 1]:  # edge numbers
-       #     x = x + 1
-       # G.add_edge(actors[x - 1].number_as_int(), actors[x].number_as_int())
+    rows = [list(range(1, 8)), list(range(8, 15)), list(range(15, 22)), list(range(22, 29)), list(range(29, 36)),
+            list(range(36, 43)), list(range(43, 50))]
+    row_pairs = []
+    for r in rows:
+        for x in range(0, len(r) - 1):
+            row_pairs.append((r[x], r[x + 1]))
 
-    #for j in range(1, 45):
-       # if actors[j].number_as_int() in [9, 27, 45]:  # edge numbers
-        #    j = j + 9
-       # G.add_edge(actors[j].number_as_int(), actors[j + 9].number_as_int())
+    G.add_edges_from(row_pairs)
 
-    #for k in range(45, 72):
-       # G.add_edge(actors[k].number_as_int(), actors[k + 9].number_as_int())
+    print(row_pairs)
+    coloumn_pairs = []
 
-    # print("Test: Finding shortest path from 1 to 29 -  " + str(nx.shortest_path(G, source=1, target=29)))
+    for c in range(1, 8):
+        coloumn = list(range(c, 43 + c, 7))
+        for x in range(0, len(coloumn) - 1):
+            coloumn_pairs.append((coloumn[x], coloumn[x + 1]))
+
+    G.add_edges_from(coloumn_pairs)
+
+    print("Test: Finding shortest path from 1 to 29 -  " + str(nx.shortest_path(G, source=1, target=16)))
 
     for actor in main.children[0].children:
 

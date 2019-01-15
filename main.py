@@ -3,7 +3,7 @@
 # ////////////////////////////////////////////////////////////////
 from kivy.config import Config
 
-Config.set('graphics', 'fullscreen', '0')
+#Config.set('graphics', 'fullscreen', '0')
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -17,13 +17,16 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from time import sleep
 from kivy.core.window import Window
-
+from kivy.animation import Animation
 import socket
 from kivy.core.audio import SoundLoader
+from threading import Thread
+from kivy.uix.widget import Widget
+from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
 
 commands = []
 counter = 0
-Window.fullscreen = 'auto'
+#Window.fullscreen = 'auto'
 
 # ////////////////////////////////////////////////////////////////
 # /	            DECLARE queue and clear functions	            //
@@ -86,11 +89,13 @@ def handle_response_packet(payload):
     if payload.decode("ascii") == "win":
         counter = 0
         clearAll()
+        main.RunPopup.dismiss()    
         main.victoryPopup()
 
     elif payload.decode("ascii") == "lose":
         counter = 0
         clearAll()
+        main.RunPopup.dismiss()    
         main.defeatPopup()
 
     elif payload.decode("ascii") == "continue":
@@ -101,6 +106,7 @@ def handle_response_packet(payload):
             print('out of turns')
             counter = 0
             clearAll()
+            main.RunPopupDismiss()
             main.defeatPopup()
             return
             
@@ -133,7 +139,8 @@ def check_server(): #impliment from execute
         print("got unhandled packet!")
 
    
-            
+    
+
        
 def setDifficulty(difficulty):
     if difficulty == 'easy':
@@ -146,6 +153,8 @@ def setDifficulty(difficulty):
         print('sending hard')
         s.send_packet(PacketType.difficulty, b"hard")
 
+
+        
 def runner():
 
     while True:
@@ -157,7 +166,9 @@ def runner():
 def execute():  # Work on with server
     global counter
     counter = 0
-
+    
+    main.RunPopup()
+    
     temp = commands[counter] #begins the first command (after we transition to check server)
     
     if temp == 'forward ':
@@ -241,7 +252,7 @@ class MainScreen(Screen):
                            title_size=30,
                            title_align='center',
                            content=victoryLay)
-        victoryImage = Image(source='winner/winner.png',
+        victoryImage = Image(source='icons/ICON_Goal.jpg',
                              keep_ratio=True,
                              size_hint=(1.5*1.15, 1.945*1.15),
                              pos=(545, 545))
@@ -274,7 +285,7 @@ class MainScreen(Screen):
                           title_size=30,
                           title_align='center',
                           content=defeatLay)
-        defeatImage = Image(source='loser/loser.png',
+        defeatImage = Image(source='icons/ICON_Goal.jpg',
                             keep_ratio=True,
                             size_hint=(1.5*1.3, 1.945*1.3),
                             pos=(480, 530))
@@ -320,6 +331,40 @@ class MainScreen(Screen):
         instruction.add_widget(instructionLabel)
         instructionPop.open()
 
+    def SetUpPopup(self):  # set up POPUP
+        global SetUpPop
+        SetUpLay = FloatLayout()
+        SetUpPop = Popup(title='setup',
+                           size_hint=(0.3, 0.23),
+                           auto_dismiss=False,
+                           title_size=30,
+                           title_align='center',
+                           content=SetUpLay)
+
+
+        SetUpPop.open()
+
+    def SetUpPopupDismiss(self):
+        global SetUpPop
+        SetUpPop.dismiss()
+        
+    def RunPopup(self):  # set up POPUP
+        global RunPop
+        RunLay = FloatLayout(size_hint=(0.5, 0.5))
+        RunPop = Popup(title='run',
+                           size_hint=(0.3, 0.23),
+                           auto_dismiss=False,
+                           title_size=30,
+                           title_align='center',
+                           content=RunLay)
+        
+        RunPop.open()
+
+    def RunPopupDismiss(self):
+            global RunPop
+
+            RunPop.dismiss()
+        
 # ////////////////////////////////////////////////////////////////
 # //	       	    	  New Game screen			            //
 # ////////////////////////////////////////////////////////////////
@@ -329,10 +374,16 @@ class NewGame(Screen):
     def setMainScreen(self, difficulty):
 
         dif = difficulty
-        
+
         screenManager.current = 'main'
         setDifficulty(dif)
 
+        main.SetUpPopup()
+
+
+        #sleep(4)
+        #main.SetUpPopupDismiss()
+        
     def instructionPopup(self):  # instruction POPUP
         #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
         instruction = FloatLayout()
@@ -395,6 +446,7 @@ screenManager.add_widget(title)
 screenManager.add_widget(instruction)
 screenManager.add_widget(newGame)
 screenManager.add_widget(main)
+
 
 screenManager.current= 'title'
 

@@ -10,16 +10,26 @@ def wait():
     while not arm.movement_complete():
         pass
     print('done ovng')
-
+def Rotwait():
+    while rotator.isBusy() == True:
+        pass
+    sleep(1)
+    print('done rot')
 arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig, None)
 arm.home_all()#homes it
 wait()
-rotator = stepper(port = 3, speed = 64, micro_steps = 2, run_current=70, accel_current=75)
-#rotator.setLimitHardStop(False)
-#rotator.setOverCurrent(4800)
-#rotator.goUntilPress(0,1,4000)
-sleep(5)
 
+rotator = stepper(port = 3, speed = 20, micro_steps = 2, run_current=50, accel_current=55, hold_current=50)
+#rotator.setLimitHardStop(False)
+rotator.setOverCurrent(6000)
+rotator.goUntilPress(0,1,5000)
+Rotwait()
+print(rotator.getPosition())
+rotator.setLimitHardStop(1)
+sleep(2)
+rotator.goTo(200)
+sleep(2)
+print(rotator.getPosition())
 '''
 rotator.setMinSpeed(200)
 
