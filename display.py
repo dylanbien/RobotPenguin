@@ -643,7 +643,7 @@ Create grid/actors
 grid = GridLayout(id='grid', cols=7, rows=7, padding=[415, 150, 415, 150], spacing=1.5)
 
 # sets the background image
-bg = AsyncImage(source='images/BG.jpg', size_hint=[1, 1])
+bg = AsyncImage(source='images/BGnew.jpg', size_hint=[1, 1])
 for i in range(0, grid.cols * grid.rows):  # adds the transparent image to all 81 boxes
     b = Actor(id='actor' + str(i + 1), source=TransparentId, size_hint=[1, 1])
     grid.add_widget(b)
