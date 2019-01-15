@@ -335,35 +335,41 @@ class MainScreen(Screen):
         global SetUpPop
         SetUpLay = FloatLayout()
         SetUpPop = Popup(title='setup',
-                           size_hint=(0.3, 0.23),
-                           auto_dismiss=False,
-                           title_size=30,
-                           title_align='center',
-                           content=SetUpLay)
-
-
+                         size_hint=(0.375, 0.26840490797),
+                         auto_dismiss=False,
+                         title_size=30,
+                         title_align='center',
+                         content=SetUpLay)
+        setUpLabel = Label(text='Please wait while game loads...',
+                           pos=(690, 500),
+                           font_size=24.5)
+        SetUpPop.add_widget(setUpLabel)
         SetUpPop.open()
+        Clock.schedule_once(SetUpPopupDismiss, 5)
 
     def SetUpPopupDismiss(self):
         global SetUpPop
         SetUpPop.dismiss()
         
-    def RunPopup(self):  # set up POPUP
+    def RunPopup(self):  # run up POPUP
         global RunPop
-        RunLay = FloatLayout(size_hint=(0.5, 0.5))
+        RunLay = FloatLayout()
         RunPop = Popup(title='run',
-                           size_hint=(0.3, 0.23),
-                           auto_dismiss=False,
-                           title_size=30,
-                           title_align='center',
-                           content=RunLay)
-        
+                       size_hint=(0.375, 0.26840490797),
+                       auto_dismiss=False,
+                       title_size=30,
+                       title_align='center',
+                       content=RunLay)
+        runLabel = Label(text='Game in progress...',
+                           pos=(690, 500),
+                           font_size=24.5)
+        RunPop.add_widget(runLabel)
         RunPop.open()
+        Clock.schedule_once(RunPopupDismiss, 5)
 
     def RunPopupDismiss(self):
-            global RunPop
-
-            RunPop.dismiss()
+        global RunPop
+        RunPop.dismiss()
         
 # ////////////////////////////////////////////////////////////////
 # //	       	    	  New Game screen			            //
