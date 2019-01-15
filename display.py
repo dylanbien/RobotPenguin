@@ -209,6 +209,7 @@ def reset(dif):
 
     ]
 
+    bearPos = []
     assignedObstacleLocations = []
     
     for actor in main.children[0].children:
@@ -260,7 +261,7 @@ def reset(dif):
 
     G.add_edges_from(coloumn_pairs)
 
-    print("Test: Finding shortest path from 1 to 29 -  " + str(nx.shortest_path(G, source=1, target=16)))
+    print("Test: Finding shortest path from 1 to 29 -  " + str(nx.shortest_path(G, source=1, target=29)))
 
     for actor in main.children[0].children:
 
@@ -269,9 +270,11 @@ def reset(dif):
             if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
                 if (i % 2 == 0):
                     actor.source = 'icons/ICON_Igloo.jpg'
+                    #actor.remove_node()
 
                 else:
                     actor.source = 'icons/ICON_Jewel.jpg'
+    #bear
 
     # arm.move_to_point(0,0, -1.34)
 
@@ -349,6 +352,31 @@ class MainScreen(Screen):
                 actor.rotateDirection(direction)
                 return
 
+    def getAdjacentTiles(self, actor,diagonals=False):
+        transformations = []
+        if diagonals:
+            transformations = [-1, 1, 7, -7, -6, 6, -8, 8] #3x3 grid with the actor in the middle
+        else:
+            transformations = [-1, 1, 7, -7]
+        left_edge = [1+x for x in range(0,43,7)]
+        right_edge = [7+x for x in range(0,43,7)]
+        locations = []
+
+        if actor.number_as_int() in right_edge:
+            for i in transformations:
+                if i not in [1, -6, 8]:
+                    locations.append(actor.number_as_int() + i)
+        elif actor.number_as_int() in left_edge:
+            for j in transformations:
+                if j not in [-1, -8, 6]:
+                    locations.append(actor.number_as_int() + j)
+        else:
+            for k in transformations:
+                locations.append(actor.number_as_int() + k)
+
+        return locations
+
+
 
     """
     Hunt Player
@@ -361,25 +389,49 @@ class MainScreen(Screen):
         print('turn is ' + str(turn) + ', so moving twice will be ' + str(turn % 2 == 0))
         # getting the bear actor
         bear = None
+        player = None
+        fish = None
+        shortest_path_from_bear_to_fish = nx.shortest_path(G, source=bear.number_as_int(), target=fish.number_as_int())
         for b in self.children[0].children:
             if 'Bear' in b.source:
                 bear = b
+            if 'Player' in b.source:
+                player = b
+            if 'Goal' in b.source:
+                fish = b
 
         if difficulty == 'easy':
             bear_loc = bear.number_as_int()
-            possible_locs = [(bear_loc + x) for x in [1, -1, 13, -13]]
+            possible_locs = [loc for (loc in G) in list((bear_loc + x) for x in [1, -1, 7, -7])]
+            bear.move(random.choice(possible_locs))
+
+        if difficulty == 'medium':
+
+            if len(shortest_path_from_bear_to_fish) > 1:
+                bear.move(shortest_path_from_bear_to_fish[0])
+            else:
+                diff = bear.number_as_int() - fish.number_as_int()
+                surrounding_fish_locs = self.getAdjacentTiles(fish)
+                surrounding_bear_locs = self.getAdjacentTiles(bear)
+                common_locations = list(set(surrounding_bear_locs).intersection(surrounding_fish_locs))
+                for loc in common_locations:
+                    if str(loc) in fish.id:
+                        common_locations.remove(loc)
+                bear.move(random.choice(common_locations))
+
 
         if (difficulty == 'hard'):
-            print('difficulty is hard')
-            for hunter in self.children[0].children:
-                if ('Bear' in hunter.source):
-                    hunter.goTowards()
-                    break
-        else:
-            for hunter in self.children[0].children:
-                if 'Bear' in hunter.source:
-                    hunter.goTowards()
-                    break
+            shortest_path_from_bear_to_player = nx.shortest_path(G, source=bear.number_as_int(),
+                                                               target=player.number_as_int())
+            if len(shortest_path_from_bear_to_fish) >= len(shortest_path_from_bear_to_player): #bear is closer to player)
+                bear.move(shortest_path_from_bear_to_player[0])
+            else: #bear is closer to the fish
+                if len(shortest_path_from_bear_to_player) > 1:
+                    bear.move(shortest_path_from_bear_to_fish[0])
+                else:#bear is right next to fish, but won't eat it, so it moves towards the player instead
+                    bear.move(shortest_path_from_bear_to_player[0])
+
+
 
 
 """

@@ -1,6 +1,7 @@
 import DeltaArm
 from time import sleep
 from pidev import stepper
+from Slush.Devices import L6470Registers as LReg
 import Adafruit_PCA9685
 Motor1 = DeltaArm.MotorConfig.createMotor(0, 120, -1750, -26750)
 Motor2 = DeltaArm.MotorConfig.createMotor(1, 240, -980, -26800)
@@ -19,17 +20,24 @@ arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig, None)
 arm.home_all()#homes it
 wait()
 
-rotator = stepper(port = 3, speed = 20, micro_steps = 2, run_current=50, accel_current=55, hold_current=50)
-#rotator.setLimitHardStop(False)
+rotator = stepper(port = 3, speed = 30, micro_steps = 2, run_current=50, accel_current=55, hold_current=50)
+rotator.setParam(LReg.CONFIG, 0x3618)
+
 rotator.setOverCurrent(6000)
 rotator.goUntilPress(0,1,5000)
 Rotwait()
-print(rotator.getPosition())
-rotator.setLimitHardStop(1)
 sleep(2)
-rotator.goTo(200)
-sleep(2)
-print(rotator.getPosition())
+
+sleep(1.5)
+rotator.move(-300)
+sleep(1.5)
+rotator.move(300)
+sleep(1.5)
+rotator.move(-2000)
+sleep(1.5)
+rotator.move(300)
+sleep(1.5)
+
 '''
 rotator.setMinSpeed(200)
 
@@ -46,7 +54,7 @@ print('one')
     
 '''
 #wait()
-#arm.move_to_point_in_straight_line(0, 0, -1.5, .01)
+#arm.move_to_point_in_straight_line(0, 0, -1.35, .01)
 #wait()
 sleep(1)
 #rotator.setMinSpeed(200)
@@ -55,20 +63,19 @@ sleep(1)
 
 
 '''
-while(True):
-    arm.move_to_point_in_straight_line(-.55, -.4, -1.5, .01)
+while(True): 
+    arm.move_to_point_in_straight_line(-.55, -.41, -1.35, .01)
     wait()
     sleep(1)
-    arm.move_to_point_in_straight_line(.4, -.4, -1.5, .01)
+    arm.move_to_point_in_straight_line(.44, -.41, -1.35, .01)
     wait()
     sleep(1)
-    arm.move_to_point_in_straight_line(.4, .3, -1.5, .01)
+    arm.move_to_point_in_straight_line(.44, .3, -1.35, .01)
     wait()
     sleep(1)
-    arm.move_to_point_in_straight_line(-.55, .3, -1.5, .01)
+    arm.move_to_point_in_straight_line(-.55, .3, -1.35, .01)
     wait()
     sleep(1)
-
 '''
 '''
 range# right:.3
