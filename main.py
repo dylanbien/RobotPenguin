@@ -159,6 +159,9 @@ def runner():
 
     while True:
         check_server()
+
+def my_callback(dt):
+    main.SetUpPopupDismiss()
 # ////////////////////////////////////////////////////////////////
 # /	                DECLARE execute functions	                //
 # ////////////////////////////////////////////////////////////////
@@ -343,9 +346,10 @@ class MainScreen(Screen):
         setUpLabel = Label(text='Please wait while game loads...',
                            pos=(690, 500),
                            font_size=24.5)
-        SetUpPop.add_widget(setUpLabel)
+
+        SetUpLay.add_widget(setUpLabel)
         SetUpPop.open()
-        Clock.schedule_once(SetUpPopupDismiss, 5)
+
 
     def SetUpPopupDismiss(self):
         global SetUpPop
@@ -363,9 +367,9 @@ class MainScreen(Screen):
         runLabel = Label(text='Game in progress...',
                            pos=(690, 500),
                            font_size=24.5)
-        RunPop.add_widget(runLabel)
+
+        RunLay.add_widget(runLabel)
         RunPop.open()
-        Clock.schedule_once(RunPopupDismiss, 5)
 
     def RunPopupDismiss(self):
         global RunPop
@@ -383,9 +387,8 @@ class NewGame(Screen):
 
         screenManager.current = 'main'
         setDifficulty(dif)
-
         main.SetUpPopup()
-
+        Clock.schedule_once(my_callback, 13)
 
         #sleep(4)
         #main.SetUpPopupDismiss()
