@@ -56,6 +56,19 @@ arm.move_to_point_in_straight_line(0, 0, -1.3, .01)
 currentPos = [0, 0, -1.3]
 nextPos = [0, 0, -1.3]
 
+from pidev import stepper
+from Slush.Devices import L6470Registers as LReg
+
+rotator = stepper(port = 3, speed = 30, micro_steps = 2, run_current=50, accel_current=55, hold_current=50)
+rotator.setParam(LReg.CONFIG, 0x3618)
+
+rotator.setOverCurrent(6000)
+rotator.goUntilPress(0,1,5000)
+
+def rotatorWait():
+    while rotator.isBusy() == True:
+        pass
+    sleep(1)
 
 def rotate_arm(direction):
     global nextPos
@@ -63,29 +76,37 @@ def rotate_arm(direction):
 
     currentPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
+    arm.wait()
+
     sleep(1)
+
     currentPos[2] += .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    arm.wait()
+
     sleep(1)
     
     rotLoc = rotator.getPosition()
     if direction == left:
-        newLoc = rotLoc + 45
-        rotator.goTo(nowLoc)
+        rotator.move(-200)
     else:
-        newLoc = rotLoc - 45
-        rotator.goTo(nowLoc)
-    
+        rotator.move(200)
+
+    rotatorWait()
+
     sleep(2)
    
     currentPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
-    sleep(4)
-    currentPos[2] += .1  # change z value
-    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    arm.wait()
+
     sleep(4)
 
+    currentPos[2] += .1  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
+
+    sleep(4)
 
 def move_arm():
    
@@ -94,24 +115,36 @@ def move_arm():
 
     currentPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
+    arm.wait()
+
     sleep(1)
+
     currentPos[2] += .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    arm.wait()
+
     sleep(1)
 
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move to new position
+    arm.wait()
+
     sleep(1)
 
     nextPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move down
-    sleep(1)
-    nextPos[2] += .1
-    arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move up
+    arm.wait()
+
     sleep(1)
 
+    nextPos[2] += .1
+    arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move up
     arm.wait()
+
+    sleep(1)
+
     currentPos = copy.deepcopy(nextPos)
-    #currentPos = [nextPos[0], nextPos[1], nextPos[2]]
+
+    sleep(4)
     
 """
 Server
@@ -183,6 +216,7 @@ def reset(dif):
     
     arm.home_all()
     arm.wait()
+    rotator.goUntilPress(0, 1, 5000)
     arm.move_to_point_in_straight_line(0, 0, -1.3, .01)
     arm.wait()
     sleep(1)
