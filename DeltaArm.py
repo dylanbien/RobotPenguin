@@ -57,9 +57,9 @@ class DeltaArm:
     def __init__(self, Motor1, Motor2, Motor3, DeltaArmConfig,  Motor4=None):
         #all values for Motor4 should be Non except for port
         self.board = Slush.sBoard()
-        self.motors = [stepper(port=Motor1.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25),
-                       stepper(port=Motor2.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25),
-                       stepper(port=Motor3.port, micro_steps=32, speed=50, hold_current=25, run_current=25, accel_current=25, deaccel_current=25)]
+        self.motors = [stepper(port=Motor1.port, micro_steps=32, speed=50, hold_current=30, run_current=30, accel_current=30, deaccel_current=30),
+                       stepper(port=Motor2.port, micro_steps=32, speed=50, hold_current=30, run_current=30, accel_current=30, deaccel_current=30),
+                       stepper(port=Motor3.port, micro_steps=32, speed=50, hold_current=30, run_current=30, accel_current=30, deaccel_current=30)]
         self.solenoid = Adafruit_PCA9685.PCA9685()
         if Motor4:
             self.indeffector_motor = stepper(port=Motor4.port,speed = 20, micro_steps = 4, run_current=90, accel_current = 25)
