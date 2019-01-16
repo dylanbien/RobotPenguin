@@ -89,13 +89,13 @@ def handle_response_packet(payload):
     if payload.decode("ascii") == "win":
         counter = 0
         clearAll()
-        main.RunPopup.dismiss()    
+        main.RunPopupDismiss()
         main.victoryPopup()
 
     elif payload.decode("ascii") == "lose":
         counter = 0
         clearAll()
-        main.RunPopup.dismiss()    
+        main.RunPopupDismiss()
         main.defeatPopup()
 
     elif payload.decode("ascii") == "continue":
@@ -117,8 +117,8 @@ def handle_response_packet(payload):
         if temp == 'forward ':
             print('sending forward')
             s.send_packet(PacketType.move, b"forward")
-            print('sending backward')
         elif temp == 'backward ':
+            print('sending backward')
             s.send_packet(PacketType.move, b"backward")
         elif temp == 'left ':
             print('sending left')
@@ -137,9 +137,6 @@ def check_server(): #impliment from execute
         handlers[packet_type](payload)
     else:
         print("got unhandled packet!")
-
-   
-    
 
        
 def setDifficulty(difficulty):
