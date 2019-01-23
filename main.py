@@ -26,7 +26,7 @@ from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
 
 commands = []
 counter = 0
-#Window.fullscreen = 'auto'
+Window.fullscreen = 'auto'
 
 # ////////////////////////////////////////////////////////////////
 # /	            DECLARE queue and clear functions	            //
@@ -385,7 +385,7 @@ class NewGame(Screen):
         screenManager.current = 'main'
         setDifficulty(dif)
         main.SetUpPopup()
-        Clock.schedule_once(my_callback, 13)
+        Clock.schedule_once(my_callback, 18)
 
         #sleep(4)
         #main.SetUpPopupDismiss()
