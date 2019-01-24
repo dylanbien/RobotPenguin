@@ -63,7 +63,9 @@ rotator = stepper(port = 3, speed = 30, micro_steps = 2, run_current=50, accel_c
 rotator.setParam(LReg.CONFIG, 0x3618)
 
 rotator.setOverCurrent(6000)
-rotator.goUntilPress(0,1,5000)
+rotator.goUntilPress(0, 1, 5000)
+
+victory = False
 
 def rotatorWait():
     while rotator.isBusy() == True:
@@ -78,13 +80,13 @@ def rotate_arm(direction):
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
 
-    sleep(.5)
+    sleep(.1)
 
     currentPos[2] += .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
 
-    sleep(.5)
+    sleep(.1)
     
     print('running rotate arm ' + direction)
 
@@ -95,19 +97,19 @@ def rotate_arm(direction):
 
     rotatorWait()
 
-    sleep(.5)
+    sleep(.1)
    
     currentPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
 
-    sleep(.5)
+    sleep(.1)
 
     currentPos[2] += .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
 
-    sleep(1)
+    sleep(.3)
 
 def move_arm():
    
@@ -119,34 +121,34 @@ def move_arm():
     #arm.solenoid_up()
     arm.wait()
 
-    sleep(.5)
+    sleep(.1)
 
     currentPos[2] += .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
     #arm.solenoid_down()
-    sleep(.5)
+    sleep(.1)
 
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move to new position
     arm.wait()
 
-    sleep(.5)
+    sleep(.1)
 
     nextPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move down
     arm.wait()
 
-    sleep(.5)
+    sleep(.1)
 
     nextPos[2] += .1
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move up
     arm.wait()
 
-    sleep(.5)
+    sleep(.1)
 
     currentPos = copy.deepcopy(nextPos)
 
-    sleep(1)
+    sleep(.3)
     
 """
 Server
@@ -216,36 +218,20 @@ def reset(dif):
 
     print('now is ' + difficulty)
     
-    arm.home_all()
-    arm.wait()
-    rotator.goUntilPress(0, 1, 5000)
-    arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
-    arm.solenoid_up()
-    sleep(2)
-    arm.solenoid_down()
-    arm.wait()
-    sleep(1)
-    arm.move_to_point_in_straight_line(-.53, -.45, -1.4, .01)
 
-    
-    global currentPos
-    global nextPos
-    
-    
-    currentPos = [-.55, -.41, -1.4]
-    nextPos = [-.55, -.41, -1.4]
     
     # sets possible locations of the obstacles
     allObstacles = [
-        [2, 3, 4, 5],
-        [15, 16, 24, 25],
+        [2, 3],
+        [11, 12],
+        [15, 16],
+        [25],
         [20, 21],
         [28, 37],
-        [31, 40, 41, 42],
-        [35, 44],
-        [47],
-        
-
+        [31, 40],
+        [39, 41],
+        [44, 45],
+        [46, 33],
     ]
 
     bearPos = []
@@ -315,7 +301,28 @@ def reset(dif):
 
                 else:
                     actor.source = 'icons/ICON_Jewel.jpg'
+                    actor.remove_node()
 
+
+    for node in assignedObstacleLocations:
+        G.remove_node(node)
+
+
+#Begins arm stuff after initializing render
+
+    arm.home_all()
+    arm.wait()
+    rotator.goUntilPress(0, 1, 5000)
+    arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
+    arm.wait()
+    sleep(1)
+    arm.move_to_point_in_straight_line(-.53, -.45, -1.4, .01)
+
+    global currentPos
+    global nextPos
+
+    currentPos = [-.55, -.41, -1.4]
+    nextPos = [-.55, -.41, -1.4]
     # arm.move_to_point(0,0, -1.34)
 
 
@@ -376,7 +383,7 @@ class MainScreen(Screen):
         for actor in main.children[0].children:  # loops through all actors
             if ('Player' in actor.source):
                 # if an actors source has the word plater in it
-                print("hi")
+
                 actor.moveForward()  # (players/ICON_Player.jpg) > name of player
                 return
 
@@ -406,15 +413,16 @@ class MainScreen(Screen):
 
         if actor.number_as_int() in right_edge:
             for i in transformations:
-                if i not in [1, -6, 8]:
+                if i not in [1, -6, 8] and G.has_node(actor.number_as_int() + i):
                     locations.append(actor.number_as_int() + i)
         elif actor.number_as_int() in left_edge:
-            for j in transformations:
+            for j in transformations and G.has_node(actor.number_as_int() + j):
                 if j not in [-1, -8, 6]:
                     locations.append(actor.number_as_int() + j)
         else:
             for k in transformations:
-                locations.append(actor.number_as_int() + k)
+                if G.has_node(actor.number_as_int() + k):
+                    locations.append(actor.number_as_int() + k)
 
         return locations
 
@@ -433,6 +441,9 @@ class MainScreen(Screen):
         bear = None
         player = None
         fish = None
+        if victory:
+            return
+
         for b in self.children[0].children:
             if 'Bear' in b.source:
                 bear = b
@@ -441,40 +452,42 @@ class MainScreen(Screen):
             if 'Goal' in b.source:
                 fish = b
         shortest_path_from_bear_to_fish = nx.shortest_path(G, source=bear.number_as_int(), target=fish.number_as_int())
+
         if difficulty == 'easy':
             bear_loc = bear.number_as_int()
-            possible_locs = list((bear_loc + x) for x in [1, -1, 7, -7])
-            # Filter out invalid locations
-            for loc in possible_locs:
-                if loc not in G:
-                    possible_locs.remove(loc)
-            bear.move(random.choice(possible_locs))
+            possible_locs = self.getAdjacentTiles(bear)
+            bear.eatActor(random.choice(possible_locs))
 
         if difficulty == 'medium':
 
-            if len(shortest_path_from_bear_to_fish) > 1:
-                bear.move(shortest_path_from_bear_to_fish[0])
+            if len(shortest_path_from_bear_to_fish) > 2:
+                print(str(shortest_path_from_bear_to_fish))
+                bear.eatActor(shortest_path_from_bear_to_fish[1])
             else:
-                diff = bear.number_as_int() - fish.number_as_int()
-                surrounding_fish_locs = self.getAdjacentTiles(fish)
+                surrounding_fish_locs = self.getAdjacentTiles(fish, True)
                 surrounding_bear_locs = self.getAdjacentTiles(bear)#check
                 common_locations = list(set(surrounding_bear_locs).intersection(surrounding_fish_locs))
                 for loc in common_locations:
                     if str(loc) in fish.id:
                         common_locations.remove(loc)
-                bear.move(random.choice(common_locations))
+                if player.number_as_int() in surrounding_bear_locs:
+                    bear.eatActor(player.number_as_int())
+                else:
+                    bear.eatActor(random.choice(common_locations))
 
 
         if (difficulty == 'hard'):
             shortest_path_from_bear_to_player = nx.shortest_path(G, source=bear.number_as_int(),
                                                                target=player.number_as_int())
             if len(shortest_path_from_bear_to_fish) >= len(shortest_path_from_bear_to_player): #bear is closer to player)
-                bear.move(shortest_path_from_bear_to_player[0])
+                bear.eatActor(shortest_path_from_bear_to_player[1])
             else: #bear is closer to the fish
-                if len(shortest_path_from_bear_to_player) > 1:
-                    bear.move(shortest_path_from_bear_to_fish[0])
-                else:#bear is right next to fish, but won't eat it, so it moves towards the player instead
-                    bear.move(shortest_path_from_bear_to_player[0])
+                if len(shortest_path_from_bear_to_player) == 2:
+                #bear is right next to fish, but won't eat it, so it
+                # moves towards the player instead
+                    bear.eatActor(shortest_path_from_bear_to_player[1])
+                else:
+                    bear.eatActor(shortest_path_from_bear_to_fish[1])
 
 
 
@@ -489,8 +502,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
     def __init__(self, *args, **kwargs):
         AsyncImage.__init__(self, *args, **kwargs)
         self.number = ''.join(i for i in self.id if i.isdigit())
-        if (('Transparent' in self.source) or ('Player' in self.source)):
-            G.add_node(self.number)
+        G.add_node(self.number)
 
     def remove_node(self):
         G.remove_node(self.number)
@@ -511,7 +523,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
     def moveForward(self):  # find out which image is on the screen
         # there are different images for the player based on the direction they are facing
-        print('fun')
+
         if ('90' in self.source):  # right
             self.moveRight()
             main.huntPlayer()
@@ -533,19 +545,19 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
     def moveBackward(self):
         if ('90' in self.source):
             self.moveLeft()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
         elif ('180' in self.source):
             self.moveUp()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
         elif ('270' in self.source):
             self.moveRight()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
         else:
             self.moveDown()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
 
     """
@@ -621,7 +633,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             c.send_packet(PacketType.responseCommand, b"lose")
             return
         else:
-            print('moving down')
+
             nextPos[1] += y_constant
             self.move(next)
 
@@ -629,7 +641,6 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
     # gets called in all the directional moves
     def move(self, next):
         actor = main.findActor(next)  # gets the with id value next
-        print("starting move")
         if (actor.source == TransparentId):
             # if next spot is clear
             temp = self.source
@@ -642,6 +653,10 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
                 c.send_packet(PacketType.responseCommand, b"continue")
 
             return
+        if ('Bear' in actor.source):
+            self.source = TransparentId
+            c.send_packet(PacketType.responseCommand, b"lose")
+
         elif ('Goal' in actor.source and 'Player' in self.source):  # if you next location is the fish
             actor.source = self.source
             self.source = TransparentId
@@ -649,11 +664,27 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
             move_arm()
 
+            victory = True
             c.send_packet(PacketType.responseCommand, b"win")
             return
         elif ('Player' in self.source and 'Igloo' in actor.source):
             print('you hit an obstacle')
+            c.send_packet(PacketType.responseCommand, b"lose")
             return  # can't move...you lose
+        elif ('Player' in self.source and 'Jewel' in actor.source):
+            print('you hit an obstacle')
+            c.send_packet(PacketType.responseCommand, b"lose")
+            return  # can't move...you lose
+
+    def eatActor(self,next):
+        actor = main.findActor(next)
+        if 'Player' in actor.source:
+            actor.source = TransparentId
+            self.move(next)
+            c.send_packet(PacketType.responseCommand, b"lose")
+            return
+        else:
+            self.move(next)
 
 
 # ////////////////////////////////////////////////////////////////////////////
