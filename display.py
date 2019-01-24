@@ -66,6 +66,13 @@ rotator.setOverCurrent(6000)
 rotator.goUntilPress(0, 1, 5000)
 
 victory = False
+def endGame(result):
+    if result == 'win':
+        c.send_packet(PacketType.responseCommand, b"win")
+        G.clear()
+    elif result == 'lose':
+        c.send_packet(PacketType.responseCommand, b"lose")
+        G.clear()
 
 def rotatorWait():
     while rotator.isBusy() == True:
@@ -217,8 +224,8 @@ def reset(dif):
     difficulty = dif
 
     print('now is ' + difficulty)
-    
 
+    #G.clear()
     
     # sets possible locations of the obstacles
     allObstacles = [
@@ -267,6 +274,9 @@ def reset(dif):
     print('player is ' + str(locPenguin))
     actorPenguin.source = 'players/ICON_Player_180.jpg'
 
+    for x in range(1, 50):
+        G.add_node(x)
+
     rows = [list(range(1, 8)), list(range(8, 15)), list(range(15, 22)), list(range(22, 29)), list(range(29, 36)),
             list(range(36, 43)), list(range(43, 50))]
     row_pairs = []
@@ -297,15 +307,15 @@ def reset(dif):
             if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
                 if (i % 2 == 0):
                     actor.source = 'icons/ICON_Igloo.jpg'
-                    #actor.remove_node()
+                    actor.remove_node()
 
                 else:
                     actor.source = 'icons/ICON_Jewel.jpg'
                     actor.remove_node()
 
 
-    for node in assignedObstacleLocations:
-        G.remove_node(node)
+    #for node in assignedObstacleLocations:
+    #    G.remove_node(node)
 
 
 #Begins arm stuff after initializing render
@@ -316,7 +326,7 @@ def reset(dif):
     arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
     arm.wait()
     sleep(1)
-    arm.move_to_point_in_straight_line(-.53, -.45, -1.4, .01)
+    arm.move_to_point_in_straight_line(-.55, -.41, -1.4, .01)
 
     global currentPos
     global nextPos
@@ -482,9 +492,10 @@ class MainScreen(Screen):
             if len(shortest_path_from_bear_to_fish) >= len(shortest_path_from_bear_to_player): #bear is closer to player)
                 bear.eatActor(shortest_path_from_bear_to_player[1])
             else: #bear is closer to the fish
+                print(str(shortest_path_from_bear_to_player) + " --- ")
                 if len(shortest_path_from_bear_to_player) == 2:
-                #bear is right next to fish, but won't eat it, so it
-                # moves towards the player instead
+                    #bear is right next to the fish, but won't eat it, so it starts to move towards the player
+                    print('--- ' + str(shortest_path_from_bear_to_player))
                     bear.eatActor(shortest_path_from_bear_to_player[1])
                 else:
                     bear.eatActor(shortest_path_from_bear_to_fish[1])
@@ -502,7 +513,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
     def __init__(self, *args, **kwargs):
         AsyncImage.__init__(self, *args, **kwargs)
         self.number = ''.join(i for i in self.id if i.isdigit())
-        G.add_node(self.number)
+        #G.add_node(self.number)
 
     def remove_node(self):
         G.remove_node(self.number)
@@ -592,7 +603,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
         if (next % main.children[0].cols == 0):
             print('cant move, at the left wall')
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
             return
         else:
             nextPos[0] -= x_constant
@@ -613,7 +624,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
         if (next < 0):
             print('cant move, at the top wall')
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
             return
         else:
             nextPos[1] -= y_constant
@@ -630,7 +641,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
         if (next > main.children[0].rows * main.children[0].cols):
             print('cant move, at the bottom wall')
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
             return
         else:
 
@@ -655,7 +666,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             return
         if ('Bear' in actor.source):
             self.source = TransparentId
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
 
         elif ('Goal' in actor.source and 'Player' in self.source):  # if you next location is the fish
             actor.source = self.source
@@ -665,15 +676,15 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             move_arm()
 
             victory = True
-            c.send_packet(PacketType.responseCommand, b"win")
+            endGame('win')
             return
         elif ('Player' in self.source and 'Igloo' in actor.source):
             print('you hit an obstacle')
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
             return  # can't move...you lose
         elif ('Player' in self.source and 'Jewel' in actor.source):
             print('you hit an obstacle')
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
             return  # can't move...you lose
 
     def eatActor(self,next):
@@ -681,7 +692,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
         if 'Player' in actor.source:
             actor.source = TransparentId
             self.move(next)
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
             return
         else:
             self.move(next)
