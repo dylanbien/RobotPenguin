@@ -40,8 +40,8 @@ TransparentId = 'icons/ICON_Transparent.png'
 """
 Arm Info
 """
-x_constant = .1583  # work on
-y_constant = .1167
+x_constant = .165  # work on
+y_constant = .1183
 
 Motor1 = DeltaArm.MotorConfig.createMotor(0, 120, -1750, -26750)
 Motor2 = DeltaArm.MotorConfig.createMotor(1, 240, -980, -26800)
@@ -51,10 +51,10 @@ DeltaArmConfig = DeltaArm.DeltaArmConfig.createConfig(12.5 / 12.0, 17.8 / 12.0, 
 arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig)
 
 arm.home_all()  # homes it
-arm.move_to_point_in_straight_line(0, 0, -1.3, .01)
+arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
 
-currentPos = [0, 0, -1.3]
-nextPos = [0, 0, -1.3]
+currentPos = [0, 0, -1.4]
+nextPos = [0, 0, -1.4]
 
 from pidev import stepper
 from Slush.Devices import L6470Registers as LReg
@@ -63,12 +63,21 @@ rotator = stepper(port = 3, speed = 30, micro_steps = 2, run_current=50, accel_c
 rotator.setParam(LReg.CONFIG, 0x3618)
 
 rotator.setOverCurrent(6000)
-rotator.goUntilPress(0,1,5000)
+rotator.goUntilPress(0, 1, 5000)
+
+victory = False
+def endGame(result):
+    if result == 'win':
+        c.send_packet(PacketType.responseCommand, b"win")
+        G.clear()
+    elif result == 'lose':
+        c.send_packet(PacketType.responseCommand, b"lose")
+        G.clear()
 
 def rotatorWait():
     while rotator.isBusy() == True:
         pass
-    sleep(1)
+    sleep(.5)
 
 def rotate_arm(direction):
     global nextPos
@@ -78,35 +87,36 @@ def rotate_arm(direction):
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
 
-    sleep(1)
+    sleep(.1)
 
     currentPos[2] += .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
 
-    sleep(1)
+    sleep(.1)
     
-    rotLoc = rotator.getPosition()
-    if direction == left:
-        rotator.move(-200)
-    else:
+    print('running rotate arm ' + direction)
+
+    if direction == 'left':
         rotator.move(200)
+    else:
+        rotator.move(-200)
 
     rotatorWait()
 
-    sleep(2)
+    sleep(.1)
    
     currentPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
 
-    sleep(4)
+    sleep(.1)
 
     currentPos[2] += .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
 
-    sleep(4)
+    sleep(.3)
 
 def move_arm():
    
@@ -115,36 +125,37 @@ def move_arm():
 
     currentPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
+    #arm.solenoid_up()
     arm.wait()
 
-    sleep(1)
+    sleep(.1)
 
     currentPos[2] += .1  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
-
-    sleep(1)
+    #arm.solenoid_down()
+    sleep(.1)
 
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move to new position
     arm.wait()
 
-    sleep(1)
+    sleep(.1)
 
     nextPos[2] -= .1  # change z value
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move down
     arm.wait()
 
-    sleep(1)
+    sleep(.1)
 
     nextPos[2] += .1
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move up
     arm.wait()
 
-    sleep(1)
+    sleep(.1)
 
     currentPos = copy.deepcopy(nextPos)
 
-    sleep(4)
+    sleep(.3)
     
 """
 Server
@@ -213,34 +224,21 @@ def reset(dif):
     difficulty = dif
 
     print('now is ' + difficulty)
-    
-    arm.home_all()
-    arm.wait()
-    rotator.goUntilPress(0, 1, 5000)
-    arm.move_to_point_in_straight_line(0, 0, -1.3, .01)
-    arm.wait()
-    sleep(1)
-    arm.move_to_point_in_straight_line(-.55, -.4, -1.3, .01)
 
-    
-    global currentPos
-    global nextPos
-    
-    
-    currentPos = [-.55, -.4, -1.3]
-    nextPos = [-.55, -.4, -1.3]
+    #G.clear()
     
     # sets possible locations of the obstacles
     allObstacles = [
-        [2, 3, 4, 5],
-        [15, 16, 24, 25],
+        [2, 3],
+        [11, 12],
+        [15, 16],
+        [25],
         [20, 21],
         [28, 37],
-        [31, 40, 41, 42],
-        [35, 44],
-        [47],
-        
-
+        [31, 40],
+        [39, 41],
+        [44, 45],
+        [46, 33],
     ]
 
     bearPos = []
@@ -276,6 +274,9 @@ def reset(dif):
     print('player is ' + str(locPenguin))
     actorPenguin.source = 'players/ICON_Player_180.jpg'
 
+    for x in range(1, 50):
+        G.add_node(x)
+
     rows = [list(range(1, 8)), list(range(8, 15)), list(range(15, 22)), list(range(22, 29)), list(range(29, 36)),
             list(range(36, 43)), list(range(43, 50))]
     row_pairs = []
@@ -299,17 +300,39 @@ def reset(dif):
 
     for actor in main.children[0].children:
 
-        for i in assignedObstacleLocations:
+        if '26' in actor.id:
+            actor.source = 'icons/ICON_Bear_2.jpg'
 
+        for i in assignedObstacleLocations:
             if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
                 if (i % 2 == 0):
                     actor.source = 'icons/ICON_Igloo.jpg'
-                    #actor.remove_node()
+                    actor.remove_node()
 
                 else:
                     actor.source = 'icons/ICON_Jewel.jpg'
-    #bear
+                    actor.remove_node()
 
+
+    #for node in assignedObstacleLocations:
+    #    G.remove_node(node)
+
+
+#Begins arm stuff after initializing render
+
+    arm.home_all()
+    arm.wait()
+    rotator.goUntilPress(0, 1, 5000)
+    arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
+    arm.wait()
+    sleep(1)
+    arm.move_to_point_in_straight_line(-.55, -.41, -1.4, .01)
+
+    global currentPos
+    global nextPos
+
+    currentPos = [-.55, -.41, -1.4]
+    nextPos = [-.55, -.41, -1.4]
     # arm.move_to_point(0,0, -1.34)
 
 
@@ -359,7 +382,7 @@ class MainScreen(Screen):
                 actor.source = TransparentId
 
     def playerMove(self, movement):
-        print('movemnt' + movement)
+
         if movement == 'forward':
             self.playerForward()
         else:
@@ -368,7 +391,9 @@ class MainScreen(Screen):
     def playerForward(self):  # just find the location of the player
         print('you have moved the player forwards')
         for actor in main.children[0].children:  # loops through all actors
-            if ('Player' in actor.source):  # if an actors source has the word plater in it
+            if ('Player' in actor.source):
+                # if an actors source has the word plater in it
+
                 actor.moveForward()  # (players/ICON_Player.jpg) > name of player
                 return
 
@@ -398,15 +423,16 @@ class MainScreen(Screen):
 
         if actor.number_as_int() in right_edge:
             for i in transformations:
-                if i not in [1, -6, 8]:
+                if i not in [1, -6, 8] and G.has_node(actor.number_as_int() + i):
                     locations.append(actor.number_as_int() + i)
         elif actor.number_as_int() in left_edge:
-            for j in transformations:
+            for j in transformations and G.has_node(actor.number_as_int() + j):
                 if j not in [-1, -8, 6]:
                     locations.append(actor.number_as_int() + j)
         else:
             for k in transformations:
-                locations.append(actor.number_as_int() + k)
+                if G.has_node(actor.number_as_int() + k):
+                    locations.append(actor.number_as_int() + k)
 
         return locations
 
@@ -420,12 +446,14 @@ class MainScreen(Screen):
     def huntPlayer(self):
         global difficulty
         global turn
-        print('turn is ' + str(turn) + ', so moving twice will be ' + str(turn % 2 == 0))
+        #print('turn is ' + str(turn) + ', so moving twice will be ' + str(turn % 2 == 0))
         # getting the bear actor
         bear = None
         player = None
         fish = None
-        shortest_path_from_bear_to_fish = nx.shortest_path(G, source=bear.number_as_int(), target=fish.number_as_int())
+        if victory:
+            return
+
         for b in self.children[0].children:
             if 'Bear' in b.source:
                 bear = b
@@ -433,37 +461,44 @@ class MainScreen(Screen):
                 player = b
             if 'Goal' in b.source:
                 fish = b
+        shortest_path_from_bear_to_fish = nx.shortest_path(G, source=bear.number_as_int(), target=fish.number_as_int())
 
         if difficulty == 'easy':
             bear_loc = bear.number_as_int()
-            possible_locs = [loc for (loc in G) in list((bear_loc + x) for x in [1, -1, 7, -7])]
-            bear.move(random.choice(possible_locs))
+            possible_locs = self.getAdjacentTiles(bear)
+            bear.eatActor(random.choice(possible_locs))
 
         if difficulty == 'medium':
 
-            if len(shortest_path_from_bear_to_fish) > 1:
-                bear.move(shortest_path_from_bear_to_fish[0])
+            if len(shortest_path_from_bear_to_fish) > 2:
+                print(str(shortest_path_from_bear_to_fish))
+                bear.eatActor(shortest_path_from_bear_to_fish[1])
             else:
-                diff = bear.number_as_int() - fish.number_as_int()
-                surrounding_fish_locs = self.getAdjacentTiles(fish)
-                surrounding_bear_locs = self.getAdjacentTiles(bear)
+                surrounding_fish_locs = self.getAdjacentTiles(fish, True)
+                surrounding_bear_locs = self.getAdjacentTiles(bear)#check
                 common_locations = list(set(surrounding_bear_locs).intersection(surrounding_fish_locs))
                 for loc in common_locations:
                     if str(loc) in fish.id:
                         common_locations.remove(loc)
-                bear.move(random.choice(common_locations))
+                if player.number_as_int() in surrounding_bear_locs:
+                    bear.eatActor(player.number_as_int())
+                else:
+                    bear.eatActor(random.choice(common_locations))
 
 
         if (difficulty == 'hard'):
             shortest_path_from_bear_to_player = nx.shortest_path(G, source=bear.number_as_int(),
                                                                target=player.number_as_int())
             if len(shortest_path_from_bear_to_fish) >= len(shortest_path_from_bear_to_player): #bear is closer to player)
-                bear.move(shortest_path_from_bear_to_player[0])
+                bear.eatActor(shortest_path_from_bear_to_player[1])
             else: #bear is closer to the fish
-                if len(shortest_path_from_bear_to_player) > 1:
-                    bear.move(shortest_path_from_bear_to_fish[0])
-                else:#bear is right next to fish, but won't eat it, so it moves towards the player instead
-                    bear.move(shortest_path_from_bear_to_player[0])
+                print(str(shortest_path_from_bear_to_player) + " --- ")
+                if len(shortest_path_from_bear_to_player) == 2:
+                    #bear is right next to the fish, but won't eat it, so it starts to move towards the player
+                    print('--- ' + str(shortest_path_from_bear_to_player))
+                    bear.eatActor(shortest_path_from_bear_to_player[1])
+                else:
+                    bear.eatActor(shortest_path_from_bear_to_fish[1])
 
 
 
@@ -478,8 +513,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
     def __init__(self, *args, **kwargs):
         AsyncImage.__init__(self, *args, **kwargs)
         self.number = ''.join(i for i in self.id if i.isdigit())
-        if (('Transparent' in self.source) or ('Player' in self.source)):
-            G.add_node(self.number)
+        #G.add_node(self.number)
 
     def remove_node(self):
         G.remove_node(self.number)
@@ -503,38 +537,38 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
         if ('90' in self.source):  # right
             self.moveRight()
-            # main.huntPlayer()
+            main.huntPlayer()
 
             return
         elif ('180' in self.source):  # down
             self.moveDown()
-            # .huntPlayer()
+            main.huntPlayer()
             return
         elif ('270' in self.source):  # left
             self.moveLeft()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
         else:  # up
             self.moveUp()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
 
     def moveBackward(self):
         if ('90' in self.source):
             self.moveLeft()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
         elif ('180' in self.source):
             self.moveUp()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
         elif ('270' in self.source):
             self.moveRight()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
         else:
             self.moveDown()
-            # main.huntPlayer()
+            main.huntPlayer()
             return
 
     """
@@ -548,7 +582,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
         if (sm.current != 'main'): return
 
         next = int(self.id.strip(string.ascii_letters)) + 1
-        print(str(next))
+
 
         if (next % main.children[0].cols == 1):
             print('cant move, at the right wall')
@@ -565,11 +599,11 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
         if (sm.current != 'main'): return
 
         next = int(self.id.strip(string.ascii_letters)) - 1
-        print(str(next))
+
 
         if (next % main.children[0].cols == 0):
             print('cant move, at the left wall')
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
             return
         else:
             nextPos[0] -= x_constant
@@ -587,11 +621,10 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
         if (sm.current != 'main'): return
 
         next = int(self.id.strip(string.ascii_letters)) - main.children[0].cols
-        print(next)
 
         if (next < 0):
             print('cant move, at the top wall')
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
             return
         else:
             nextPos[1] -= y_constant
@@ -604,13 +637,14 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
         if (sm.current != 'main'): return
 
         next = int(self.id.strip(string.ascii_letters)) + main.children[0].cols
-        print(next)
+
 
         if (next > main.children[0].rows * main.children[0].cols):
             print('cant move, at the bottom wall')
-            c.send_packet(PacketType.responseCommand, b"lose")
+            endGame('lose')
             return
         else:
+
             nextPos[1] += y_constant
             self.move(next)
 
@@ -618,20 +652,21 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
     # gets called in all the directional moves
     def move(self, next):
         actor = main.findActor(next)  # gets the with id value next
-        print(actor.id)
-        assert actor.id == "actor" + str(next)
-
         if (actor.source == TransparentId):
-            print('can move')  # if next spot is clear
+            # if next spot is clear
             temp = self.source
             self.source = actor.source
             actor.source = temp
-            print('sending continue')
 
-            move_arm()
+            if 'Player' in actor.source:
+                print('sending continue 1')
+                move_arm()
+                c.send_packet(PacketType.responseCommand, b"continue")
 
-            c.send_packet(PacketType.responseCommand, b"continue")
             return
+        if ('Bear' in actor.source):
+            self.source = TransparentId
+            endGame('lose')
 
         elif ('Goal' in actor.source and 'Player' in self.source):  # if you next location is the fish
             actor.source = self.source
@@ -640,13 +675,27 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
             move_arm()
 
-            c.send_packet(PacketType.responseCommand, b"win")
+            victory = True
+            endGame('win')
             return
-
-
         elif ('Player' in self.source and 'Igloo' in actor.source):
             print('you hit an obstacle')
+            endGame('lose')
             return  # can't move...you lose
+        elif ('Player' in self.source and 'Jewel' in actor.source):
+            print('you hit an obstacle')
+            endGame('lose')
+            return  # can't move...you lose
+
+    def eatActor(self,next):
+        actor = main.findActor(next)
+        if 'Player' in actor.source:
+            actor.source = TransparentId
+            self.move(next)
+            endGame('lose')
+            return
+        else:
+            self.move(next)
 
 
 # ////////////////////////////////////////////////////////////////////////////
@@ -659,66 +708,65 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             if (actor.id == location and 'Player' in actor.source):
                 if (degrees == 0 or degrees == 360 or degrees % 90 != 0):
                     actor.source = 'players/ICON_Player.jpg'
-                    print('sending continue')
+                    print('sending continue 2')
                     c.send_packet(PacketType.responseCommand, b"continue")
                 elif (degrees > 360):
                     actor.source = 'players/ICON_Player_' + str(degrees % 360) + '.jpg'
-                    print('sending continue')
+                    print('sending continue 3')
                     c.send_packet(PacketType.responseCommand, b"continue")
                 else:
                     actor.source = 'players/ICON_Player_' + str(degrees) + '.jpg'
-                    print('sending continue')
+                    print('sending continue 4')
                     c.send_packet(PacketType.responseCommand, b"continue")
 
 
     def rotateDirection(self, direction):
         if (sm.current != 'main'): return
 
-        print('direction = ' + direction)
-        print('source = ' + self.source)
+
+
         if (direction == 'left' and self.source == 'players/ICON_Player.jpg'):  # if main icon
             self.source = 'players/ICON_Player_270.jpg'
-            print('degree = 270')
-            print('sending continue')
+
+            print('sending continue 5')
             rotate_arm(direction)
 
             c.send_packet(PacketType.responseCommand, b"continue")
             return
         elif (direction == 'right' and self.source == 'players/ICON_Player.jpg'):  # if main icon
             self.source = 'players/ICON_Player_90.jpg'
-            print('degree = 90')
-            print('sending continue')
+
+            print('sending continue 6')
             rotate_arm(direction)
 
             c.send_packet(PacketType.responseCommand, b"continue")
             return
         else:
             degree = int(self.source.strip(string.ascii_letters + string.punctuation))
-            print('degree = ' + str(degree))
+
             if (direction == 'left'):
                 angle = str(((degree + 270) % 360))
-                print('new angle = ' + angle)
+
                 if (angle == '0'):
                     self.source = 'players/ICON_Player.jpg'
-                    print('sending continue')
+                    print('sending continue 8')
                     c.send_packet(PacketType.responseCommand, b"continue")
                 else:
                     self.source = 'players/ICON_Player_' + angle + '.jpg'
-                    print('sending continue')
+                    print('sending continue 9')
                     c.send_packet(PacketType.responseCommand, b"continue")
                 
                 rotate_arm(direction)
 
             else:
                 angle = str(((degree + 90) % 360))
-                print('new angle = ' + angle)
                 if (angle == '0'):
                     self.source = 'players/ICON_Player.jpg'
-                    print('sending continue')
+                    print('sending continue 10')
                     c.send_packet(PacketType.responseCommand, b"continue")
                 else:
                     self.source = 'players/ICON_Player_' + angle + '.jpg'
-                    print('sending continue')
+                    print('sending continue 11')
                     c.send_packet(PacketType.responseCommand, b"continue")
                 
                 rotate_arm(direction)

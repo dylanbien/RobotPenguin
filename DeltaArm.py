@@ -108,6 +108,11 @@ class DeltaArm:
         target = deg * (DeltaArm.rotator_ninety_pos - DeltaArm.rotator_zero_pos) / 90.0 + DeltaArm.rotator_zero_pos
         self.rotator.goTo(int(target))
 
+    def solenoid_up(self):
+        self.solenoid.set_pwm(0,1,0)
+
+    def solenoid_down(self):
+        self.solenoid.set_pwm(0,0,0)
     # ////////////////////////////////////////////////////////////////
     # //                    Movement Based On Steps                 //
     # ////////////////////////////////////////////////////////////////
@@ -199,7 +204,7 @@ class DeltaArm:
     def wait(self):
             while self.movement_complete() == False:
                 pass
-            print('done moving')
+           # print('done moving')
 
     # ////////////////////////////////////////////////////////////////
     # //                         Get Functions                      //
@@ -391,11 +396,11 @@ class DeltaArm:
 
         (a1, a2, a3) = [self.get_angle(i) for i in range(3)]  # gets the current angles
         (x0, y0, z0) = DeltaArm.forward_kinematics(a1, a2, a3) # gets the current XYZ position
-        print('starting pt: ' + str(x0) + ' ' + str(y0) + ' ' + str(z0) )
+        DeltaArm.debug('starting pt: ' + str(x0) + ' ' + str(y0) + ' ' + str(z0) )
         delta = tuple([a - b for (a, b) in zip((x, y, z), (x0, y0, z0))])  # array (x-x0, y-y0, z-z0) **gets change in cartesisan for all points
-        print('change in cartesian: ' + str(delta[0]) + ' ' + str(delta[1]) + ' ' + str(delta[2]))
+        DeltaArm.debug('change in cartesian: ' + str(delta[0]) + ' ' + str(delta[1]) + ' ' + str(delta[2]))
         rGoal = math.sqrt(delta[0] ** 2 + delta[1] ** 2 + delta[2] ** 2)  # distance between starting and endinng point
-        print('distance between starting and ending point is: ' + str(rGoal))
+        DeltaArm.debug('distance between starting and ending point is: ' + str(rGoal))
         (xCurr, yCurr, zCurr) = (x0, y0, z0)  # sets current position as starting position
         rCurr = 0  # sets current radius as 0
 
