@@ -3,7 +3,7 @@
 # ////////////////////////////////////////////////////////////////
 from kivy.config import Config
 
-#Config.set('graphics', 'fullscreen', '0')
+
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -26,7 +26,6 @@ from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
 
 commands = []
 counter = 0
-Window.fullscreen = 'auto'
 
 # ////////////////////////////////////////////////////////////////
 # /	            DECLARE queue and clear functions	            //
