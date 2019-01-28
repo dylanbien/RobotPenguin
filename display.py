@@ -15,6 +15,10 @@ from kivy.uix.image import AsyncImage
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
+from kivy.uix.floatlayout import FloatLayout
+from kivy.clock import Clock
+from kivy.uix.popup import Popup
 from time import sleep
 from kivy.uix.behaviors import ButtonBehavior
 import networkx as nx
@@ -67,12 +71,24 @@ rotator.goUntilPress(0, 1, 5000)
 
 victory = False
 def endGame(result):
+
+    global currentPos
+    currentPos[2] -= .15  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
+    arm.wait()
+    arm.solenoid_down()
+    sleep(.5)
+    currentPos[2] += .15  # change z value
+    arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    arm.wait()
+    sleep(.5)
     if result == 'win':
         c.send_packet(PacketType.responseCommand, b"win")
-        G.clear()
     elif result == 'lose':
         c.send_packet(PacketType.responseCommand, b"lose")
-        G.clear()
+
+
+    #G.clear()
 
 def rotatorWait():
     while rotator.isBusy() == True:
@@ -83,13 +99,13 @@ def rotate_arm(direction):
     global nextPos
     global currentPos
 
-    currentPos[2] -= .1  # change z value
+    currentPos[2] -= .16  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
 
     sleep(.1)
 
-    currentPos[2] += .1  # change z value
+    currentPos[2] += .16  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
 
@@ -106,14 +122,16 @@ def rotate_arm(direction):
 
     sleep(.1)
    
-    currentPos[2] -= .1  # change z value
+    currentPos[2] -= .16  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
+    arm.solenoid_up()
 
     sleep(.1)
 
-    currentPos[2] += .1  # change z value
+    currentPos[2] += .16  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
+    arm.solenoid_down()
     arm.wait()
 
     sleep(.3)
@@ -123,39 +141,40 @@ def move_arm():
     global nextPos
     global currentPos
 
-    currentPos[2] -= .1  # change z value
+    currentPos[2] -= .16  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
-    #arm.solenoid_up()
     arm.wait()
+    arm.solenoid_down()
 
-    sleep(.1)
+    sleep(.5)
 
-    currentPos[2] += .1  # change z value
+    currentPos[2] += .16  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
-    #arm.solenoid_down()
-    sleep(.1)
+    sleep(.5)
 
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move to new position
     arm.wait()
 
-    sleep(.1)
+    sleep(.5)
 
-    nextPos[2] -= .1  # change z value
+    nextPos[2] -= .16  # change z value
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move down
     arm.wait()
+    arm.solenoid_up()
 
-    sleep(.1)
+    sleep(.5)
 
-    nextPos[2] += .1
+    nextPos[2] += .16
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move up
+    arm.solenoid_down()
     arm.wait()
 
-    sleep(.1)
+    sleep(.5)
 
     currentPos = copy.deepcopy(nextPos)
 
-    sleep(.3)
+    sleep(1)
     
 """
 Server
@@ -218,14 +237,21 @@ def communication():
 # //	               		Reset Function			    		//
 # ////////////////////////////////////////////////////////////////
 
-            
+def my_callback(dt):
+    main.RefreshPopupDismiss()
+
 def reset(dif):
+
+    main.RefreshPopup()
+    Clock.schedule_once(my_callback, 2)
+
+
     global difficulty
     difficulty = dif
 
     print('now is ' + difficulty)
 
-    #G.clear()
+
     
     # sets possible locations of the obstacles
     allObstacles = [
@@ -274,8 +300,13 @@ def reset(dif):
     print('player is ' + str(locPenguin))
     actorPenguin.source = 'players/ICON_Player_180.jpg'
 
+    if len(G.nodes()) > 0:
+        G.clear()
+
+
     for x in range(1, 50):
         G.add_node(x)
+
 
     rows = [list(range(1, 8)), list(range(8, 15)), list(range(15, 22)), list(range(22, 29)), list(range(29, 36)),
             list(range(36, 43)), list(range(43, 50))]
@@ -298,41 +329,47 @@ def reset(dif):
 
     print("Test: Finding shortest path from 1 to 29 -  " + str(nx.shortest_path(G, source=1, target=29)))
 
-    for actor in main.children[0].children:
+    print("--- " + str(G.nodes()))
 
-        if '26' in actor.id:
-            actor.source = 'icons/ICON_Bear_2.jpg'
-
-        for i in assignedObstacleLocations:
-            if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
-                if (i % 2 == 0):
-                    actor.source = 'icons/ICON_Igloo.jpg'
-                    actor.remove_node()
-
-                else:
-                    actor.source = 'icons/ICON_Jewel.jpg'
-                    actor.remove_node()
+    bear = main.findActor(26)
+    bear.source = 'icons/ICON_Bear_2.jpg'
 
 
-    #for node in assignedObstacleLocations:
-    #    G.remove_node(node)
+    for i in assignedObstacleLocations:
+        actor = main.findActor(i)
+        if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
+            if (i % 2 == 0):
+                actor.source = 'icons/ICON_Igloo.jpg'
 
+            else:
+                actor.source = 'icons/ICON_Jewel.jpg'
+        G.remove_node(i)
+
+    grid.canvas.ask_update()
 
 #Begins arm stuff after initializing render
 
     arm.home_all()
     arm.wait()
     rotator.goUntilPress(0, 1, 5000)
-    arm.move_to_point_in_straight_line(0, 0, -1.4, .01)
+    arm.move_to_point_in_straight_line(0, 0, -1.37, .01)
     arm.wait()
     sleep(1)
-    arm.move_to_point_in_straight_line(-.55, -.41, -1.4, .01)
+    arm.move_to_point_in_straight_line(-.55, -.41, -1.52, .01)
+    arm.wait()
+    arm.solenoid_up()
+    time.sleep(0.2)
+    arm.move_to_point_in_straight_line(-.55, -.41, -1.37, .01)
+    arm.wait()
+    arm.solenoid_down()
+
+
 
     global currentPos
     global nextPos
 
-    currentPos = [-.55, -.41, -1.4]
-    nextPos = [-.55, -.41, -1.4]
+    currentPos = [-.55, -.41, -1.37]
+    nextPos = [-.55, -.41, -1.37]
     # arm.move_to_point(0,0, -1.34)
 
 
@@ -358,6 +395,21 @@ MainScreen Class Creation
 
 
 class MainScreen(Screen):
+
+    def RefreshPopup(self):
+        global RefreshPop
+        RefreshLay = FloatLayout()
+        RefreshPop = Popup(title='refreshing',
+                         size_hint=(0.375, 0.26840490797),
+                         auto_dismiss=False,
+                         title_size=30,
+                         title_align='center',
+                         content=RefreshLay)
+        RefreshPop.open()
+
+    def RefreshPopupDismiss(self):
+        global RefreshPop
+        RefreshPop.dismiss()
 
     def findActor(self, ActorIndex):
         return self.children[0].children[len(self.children[0].children) - ActorIndex]
@@ -657,6 +709,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
             temp = self.source
             self.source = actor.source
             actor.source = temp
+            grid.canvas.ask_update()
 
             if 'Player' in actor.source:
                 print('sending continue 1')
