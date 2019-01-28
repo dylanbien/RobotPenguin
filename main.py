@@ -340,7 +340,7 @@ class MainScreen(Screen):
                          title_align='center',
                          content=SetUpLay)
         setUpLabel = Label(text='Please wait while game loads...',
-                           pos=(690, 500),
+                           pos=(690, 575),
                            font_size=24.5)
 
         SetUpLay.add_widget(setUpLabel)
@@ -361,7 +361,7 @@ class MainScreen(Screen):
                        title_align='center',
                        content=RunLay)
         runLabel = Label(text='Game in progress...',
-                           pos=(690, 500),
+                           pos=(690, 575),
                            font_size=24.5)
 
         RunLay.add_widget(runLabel)
