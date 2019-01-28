@@ -19,7 +19,7 @@ def Rotwait():
 arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig, None)
 arm.home_all()#homes it
 wait()
-
+'''
 rotator = stepper(port = 3, speed = 30, micro_steps = 2, run_current=50, accel_current=55, hold_current=50)
 rotator.setParam(LReg.CONFIG, 0x3618)
 
@@ -37,7 +37,7 @@ rotator.move(-2000)
 sleep(1.5)
 rotator.move(300)
 sleep(1.5)
-
+'''
 '''
 rotator.setMinSpeed(200)
 
@@ -54,29 +54,29 @@ print('one')
     
 '''
 #wait()
-#arm.move_to_point_in_straight_line(0, 0, -1.35, .01)
-#wait()
+arm.move_to_point_in_straight_line(0, 0, -1.5, .01)
+wait()
 sleep(1)
 #rotator.setMinSpeed(200)
 #rotator.setMaxSpeed(500)
 #rotator.goUntilPress(0,1,500)
 
 
-'''
+
 while(True): 
-    arm.move_to_point_in_straight_line(-.55, -.41, -1.35, .01)
+    arm.move_to_point_in_straight_line(-.4, -.38, -1.5, .01)
     wait()
     sleep(1)
-    arm.move_to_point_in_straight_line(.44, -.41, -1.35, .01)
+    arm.move_to_point_in_straight_line(.3, -.38, -1.5, .01)
     wait()
     sleep(1)
-    arm.move_to_point_in_straight_line(.44, .3, -1.35, .01)
+    arm.move_to_point_in_straight_line(.3, .3, -1.5, .01)
     wait()
     sleep(1)
-    arm.move_to_point_in_straight_line(-.55, .3, -1.35, .01)
+    arm.move_to_point_in_straight_line(-.4, .3, -1.5, .01)
     wait()
     sleep(1)
-'''
+
 '''
 range# right:.3
 arm.move_to_point_in_straight_line(0, 0, -1.4, .01)

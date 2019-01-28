@@ -14,8 +14,8 @@ DeltaArmConfig = DeltaArm.DeltaArmConfig.createConfig(12.5/12.0, 17.8/12.0, 7.5/
 #    print('done ovng')
 
 arm = DeltaArm.DeltaArm(Motor1, Motor2, Motor3, DeltaArmConfig, None)
-#arm.home_all()#homes it
-#wait()
+arm.home_all()
+arm.wait()
 arm.solenoid_up()
 sleep(2)
 arm.solenoid_down()
