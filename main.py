@@ -3,7 +3,6 @@
 # ////////////////////////////////////////////////////////////////
 from kivy.config import Config
 
-
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -27,6 +26,7 @@ from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
 commands = []
 counter = 0
 
+
 # ////////////////////////////////////////////////////////////////
 # /	            DECLARE queue and clear functions	            //
 # ////////////////////////////////////////////////////////////////
@@ -43,7 +43,8 @@ def queue(command):
         mainImageQueue2.add_widget(Image(source='direction/' + name + '.jpg'))
         return
 
-    mainImageQueue.add_widget(Image(source= 'direction/' + name + '.jpg'))
+    mainImageQueue.add_widget(Image(source='direction/' + name + '.jpg'))
+
 
 def clear():
     global commands
@@ -51,11 +52,14 @@ def clear():
     mainImageQueue.remove_widget(mainImageQueue.children[0])
     del commands[len(commands) - 1]
 
+
 def clearAll():
     global commands
     commands = []  # clears commands
     mainImageQueue.clear_widgets()  # resets image queue 1
     mainImageQueue2.clear_widgets()  # resets image queue 2
+
+
 # ////////////////////////////////////////////////////////////////
 # /	                     Server Creation**WORK ON    	        //
 # ////////////////////////////////////////////////////////////////
@@ -63,6 +67,7 @@ import enum
 from dpea_p2p import Server
 
 import threading
+
 
 class PacketType(enum.Enum):
     NULL = 0
@@ -79,8 +84,8 @@ print('waiting for connection')
 s.wait_for_connection()
 print('connected')
 
+
 def handle_response_packet(payload):
-    
     print("recieved " + payload.decode("ascii"))
 
     global counter
@@ -103,15 +108,14 @@ def handle_response_packet(payload):
 
         if counter > (len(commands) - 1):
             print('out of turns')
+            s.send_packet(PacketType.move, b"outTurn")
             counter = 0
             clearAll()
             main.RunPopupDismiss()
             main.defeatPopup()
             return
-            
 
         temp = commands[counter]
-
 
         if temp == 'forward ':
             print('sending forward')
@@ -126,7 +130,8 @@ def handle_response_packet(payload):
             print('sending right')
             s.send_packet(PacketType.rotate, b"right")
 
-def check_server(): #impliment from execute
+
+def check_server():  # impliment from execute
 
     handlers = {PacketType.responseCommand: handle_response_packet
                 }
@@ -137,7 +142,7 @@ def check_server(): #impliment from execute
     else:
         print("got unhandled packet!")
 
-       
+
 def setDifficulty(difficulty):
     if difficulty == 'easy':
         print('sending easy')
@@ -150,14 +155,15 @@ def setDifficulty(difficulty):
         s.send_packet(PacketType.difficulty, b"hard")
 
 
-        
 def runner():
-
     while True:
         check_server()
 
+
 def my_callback(dt):
     main.SetUpPopupDismiss()
+
+
 # ////////////////////////////////////////////////////////////////
 # /	                DECLARE execute functions	                //
 # ////////////////////////////////////////////////////////////////
@@ -165,11 +171,11 @@ def my_callback(dt):
 def execute():  # Work on with server
     global counter
     counter = 0
-    
+
     main.RunPopup()
-    
-    temp = commands[counter] #begins the first command (after we transition to check server)
-    
+
+    temp = commands[counter]  # begins the first command (after we transition to check server)
+
     if temp == 'forward ':
         print('sending forward: execute')
         s.send_packet(PacketType.move, b"forward")
@@ -184,7 +190,6 @@ def execute():  # Work on with server
         s.send_packet(PacketType.rotate, b"right")
 
 
-
 # ////////////////////////////////////////////////////////////////
 # //			DECLARE APP CLASS AND SCREENMANAGER	            //
 # //					 LOAD KIVY FILE		                    //
@@ -192,6 +197,7 @@ def execute():  # Work on with server
 
 
 screenManager = ScreenManager()
+
 
 class MyApp(App):
     def build(self):
@@ -204,6 +210,7 @@ Window.clearcolor = (0.1, 0.1, 0.1, 1)  # (WHITE)
 
 def quitAll():
     quit()
+
 
 # ////////////////////////////////////////////////////////////////
 # //				       Main Screen      		 		    //
@@ -222,8 +229,8 @@ class MainScreen(Screen):
         queue(command)
 
     def executeAction(self):
-        execute()   
-        
+        execute()
+
     def pauseAction(self):
         pause()
 
@@ -238,10 +245,9 @@ class MainScreen(Screen):
         clearAll()
         screenManager.current = 'title'
 
-# ////////////////////////////////////////////////////////////////
-# //				       Main screens POPUPS		 		    //
-# ////////////////////////////////////////////////////////////////
-
+    # ////////////////////////////////////////////////////////////////
+    # //				       Main screens POPUPS		 		    //
+    # ////////////////////////////////////////////////////////////////
 
     def victoryPopup(self):  # victory POPUP
         victoryLay = FloatLayout(size_hint=(0.5, 0.5))
@@ -253,12 +259,12 @@ class MainScreen(Screen):
                            content=victoryLay)
         victoryImage = Image(source='icons/ICON_Goal.jpg',
                              keep_ratio=True,
-                             size_hint=(1.5*1.15, 1.945*1.15),
+                             size_hint=(1.5 * 1.15, 1.945 * 1.15),
                              pos=(545, 545))
         playAgainButton = Button(text='Play Again',
-                            size_hint=(0.46, 0.8),
-                            font_size=20,
-                            pos=(760, 425))
+                                 size_hint=(0.46, 0.8),
+                                 font_size=20,
+                                 pos=(760, 425))
         quitButton = Button(text='Quit',
                             size_hint=(0.46, 0.8),
                             font_size=20,
@@ -275,7 +281,6 @@ class MainScreen(Screen):
         victoryLay.add_widget(victoryImage)
         victoryPop.open()
 
-
     def defeatPopup(self):  # defeat POPUP
         defeatLay = FloatLayout(size_hint=(0.5, 0.5))
         defeatPop = Popup(title='DEFEAT',
@@ -286,12 +291,12 @@ class MainScreen(Screen):
                           content=defeatLay)
         defeatImage = Image(source='icons/ICON_Goal.jpg',
                             keep_ratio=True,
-                            size_hint=(1.5*1.3, 1.945*1.3),
+                            size_hint=(1.5 * 1.3, 1.945 * 1.3),
                             pos=(480, 530))
         playAgainButton = Button(text='Play Again',
-                            size_hint=(0.46, 0.8),
-                            font_size=20,
-                            pos=(760, 425))
+                                 size_hint=(0.46, 0.8),
+                                 font_size=20,
+                                 pos=(760, 425))
         quitButton = Button(text='Quit',
                             size_hint=(0.46, 0.8),
                             font_size=20,
@@ -309,7 +314,7 @@ class MainScreen(Screen):
         defeatPop.open()
 
     def instructionPopup(self):  # instruction POPUP
-        #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
+        # instructionLay = FloatLayout(size_hint=(0.5, 0.5))
         instruction = FloatLayout()
         instructionPop = Popup(title='Instructions',
                                size_hint=(0.375, 0.26840490797),
@@ -321,9 +326,10 @@ class MainScreen(Screen):
                             size_hint=(0.23, 0.4),
                             font_size=20,
                             pos=(985, 400))
-        instructionLabel = Label(text='Turn and maneuver the penguin to get to the fish as quickly as possible.\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nYou can\'t go through mountains, so you\'ll have to go around them.\n \nWatch out for the bear! If it gets to you before you reach the fish, you lose.\n \nGood luck!',
-                                 pos=(690, 560),
-                                 font_size=24.5)
+        instructionLabel = Label(
+            text='Turn and maneuver the penguin to get to the fish as quickly as possible.\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nYou can\'t go through mountains, so you\'ll have to go around them.\n \nWatch out for the bear! If it gets to you before you reach the fish, you lose.\n \nGood luck!',
+            pos=(690, 560),
+            font_size=24.5)
 
         quitButton.bind(on_release=instructionPop.dismiss)
         instruction.add_widget(quitButton)
@@ -340,17 +346,16 @@ class MainScreen(Screen):
                          title_align='center',
                          content=SetUpLay)
         setUpLabel = Label(text='Please wait while game loads...',
-                           pos=(690, 575),
+                           pos=(690, 550),
                            font_size=24.5)
 
         SetUpLay.add_widget(setUpLabel)
         SetUpPop.open()
 
-
     def SetUpPopupDismiss(self):
         global SetUpPop
         SetUpPop.dismiss()
-        
+
     def RunPopup(self):  # run up POPUP
         global RunPop
         RunLay = FloatLayout()
@@ -361,8 +366,8 @@ class MainScreen(Screen):
                        title_align='center',
                        content=RunLay)
         runLabel = Label(text='Game in progress...',
-                           pos=(690, 575),
-                           font_size=24.5)
+                         pos=(690, 550),
+                         font_size=24.5)
 
         RunLay.add_widget(runLabel)
         RunPop.open()
@@ -370,7 +375,8 @@ class MainScreen(Screen):
     def RunPopupDismiss(self):
         global RunPop
         RunPop.dismiss()
-        
+
+
 # ////////////////////////////////////////////////////////////////
 # //	       	    	  New Game screen			            //
 # ////////////////////////////////////////////////////////////////
@@ -378,7 +384,6 @@ class MainScreen(Screen):
 class NewGame(Screen):
 
     def setMainScreen(self, difficulty):
-
         dif = difficulty
 
         screenManager.current = 'main'
@@ -386,11 +391,11 @@ class NewGame(Screen):
         main.SetUpPopup()
         Clock.schedule_once(my_callback, 18)
 
-        #sleep(4)
-        #main.SetUpPopupDismiss()
-        
+        # sleep(4)
+        # main.SetUpPopupDismiss()
+
     def instructionPopup(self):  # instruction POPUP
-        #instructionLay = FloatLayout(size_hint=(0.5, 0.5))
+        # instructionLay = FloatLayout(size_hint=(0.5, 0.5))
         instruction = FloatLayout()
         instructionPop = Popup(title='Instructions',
                                size_hint=(0.375, 0.26840490797),
@@ -402,9 +407,10 @@ class NewGame(Screen):
                             size_hint=(0.23, 0.4),
                             font_size=20,
                             pos=(985, 400))
-        instructionLabel = Label(text='Turn and maneuver the penguin to get to the fish as quickly as possible\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! If it gets to you before you reach the fish, you lose\n \nGood luck!',
-                                 pos=(690, 560),
-                                 font_size=24.5)
+        instructionLabel = Label(
+            text='Turn and maneuver the penguin to get to the fish as quickly as possible\n \nSelect the order you want the penguin to turn and move in, then press \'go\'.\n \nyou can\'t go through mountains, so you\'ll have to go around them\n \nwatch out for the bear! If it gets to you before you reach the fish, you lose\n \nGood luck!',
+            pos=(690, 560),
+            font_size=24.5)
 
         quitButton.bind(on_release=instructionPop.dismiss)
         instruction.add_widget(quitButton)
@@ -422,6 +428,7 @@ class TitleScreen(Screen):
     def setInstructionScreen(self):
         screenManager.current = 'instruction'
 
+
 # ////////////////////////////////////////////////////////////////
 # //		    	  Instruction screen   			            //
 # ////////////////////////////////////////////////////////////////
@@ -430,6 +437,7 @@ class InstructionScreen(Screen):
 
     def setNewScreen(self):
         screenManager.current = 'newGame'
+
 
 # ////////////////////////////////////////////////////////////////
 # //		    	  Creates and adds screens			        //
@@ -443,7 +451,6 @@ instruction = InstructionScreen(name='instruction')
 newGame = NewGame(name='newGame')
 main = MainScreen(name='main')
 
-
 main.add_widget(mainImageQueue)
 main.add_widget(mainImageQueue2)
 
@@ -452,8 +459,7 @@ screenManager.add_widget(instruction)
 screenManager.add_widget(newGame)
 screenManager.add_widget(main)
 
-
-screenManager.current= 'title'
+screenManager.current = 'title'
 
 # ////////////////////////////////////////////////////////////////
 # //				  RUN APP							        //
