@@ -137,3 +137,50 @@ def locationRandomizer():
 
             else:
                 actor.source = 'icons/ICON_Jewel.jpg'
+    '''
+easyObstacles = [
+[6, 9, 20, 21, 23, 25, 30, 32, 33, 34, 43, 45],
+[7, 9, 29, 30, 32, 33, 37, 42, 45, 47],
+[2, 7, 15, 16, 18, 20, 27, 34, 37, 45, 48],
+[5, 9, 10, 31, 33, 35, 43, 46],
+[7, 9, 18, 25, 30, 32, 42, 43, 47],
+[17, 27, 28, 39, 46]
+]
+mediumObstacles = [
+[5, 9, 10, 12, 19, 20, 23, 24, 27, 32, 34, 35, 37, 39, 4],
+[6, 11, 13, 25, 27, 28, 32, 40, 45],
+[6, 9, 13, 29, 31, 33, 40],
+[6, 9, 27, 28, 32, 40, 43],
+[2, 7, 14, 15, 16, 17, 18, 19, 28, 33, 34, 35],
+[5, 10, 13, 16, 18, 24, 29, 32, 33, 37, 46]
+]
+hardObstacles = [
+[4, 9, 13, 18, 19, 20, 22, 24, 32, 37, 39, 41],
+[7, 9, 18, 25, 30, 32, 42, 43, 47],
+[5, 8, 9, 12, 19, 31, 32, 33, 34, 35],
+[2, 14, 15, 17, 19, 32, 34, 41, 44],
+[5, 9, 11, 13, 23, 27, 29, 33, 37, 39],
+[2, 10, 15, 18, 23, 30, 38, 41]
+]
+
+def obLoc():
+    for index in range(len(assignedObstacleLocations)):
+        # print("=== " + str(start) + " " + str(value))
+        value = assignedObstacleLocations[index]
+        for i in range(start, value):
+            output += "o  "
+            if i % 7 == 0:
+                print(output)
+                output = ""
+        output += "x  "
+        if value % 7 == 0:
+            print(output)
+            output = ""
+        start = value + 1
+        lastValue = value
+    for index in range(lastValue, 48):
+        output += "o  "
+    output += "f"
+    print(output)
+print('obstacles at')
+print(assignedObstacleLocations)
