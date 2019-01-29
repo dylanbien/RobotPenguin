@@ -3,7 +3,7 @@
 # ////////////////////////////////////////////////////////////////
 from kivy.config import Config
 
-#Config.set('graphics', 'fullscreen', '0')
+
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.popup import Popup
@@ -26,7 +26,6 @@ from kivy.properties import ObjectProperty, AliasProperty, NumericProperty
 
 commands = []
 counter = 0
-Window.fullscreen = 'auto'
 
 # ////////////////////////////////////////////////////////////////
 # /	            DECLARE queue and clear functions	            //
@@ -341,7 +340,11 @@ class MainScreen(Screen):
                          title_align='center',
                          content=SetUpLay)
         setUpLabel = Label(text='Please wait while game loads...',
-                           pos=(690, 500),
+<<<<<<< HEAD
+                           pos=(690, 600),
+=======
+                           pos=(690, 575),
+>>>>>>> surfacedev
                            font_size=24.5)
 
         SetUpLay.add_widget(setUpLabel)
@@ -362,7 +365,11 @@ class MainScreen(Screen):
                        title_align='center',
                        content=RunLay)
         runLabel = Label(text='Game in progress...',
-                           pos=(690, 500),
+<<<<<<< HEAD
+                           pos=(690, 600),
+=======
+                           pos=(690, 575),
+>>>>>>> surfacedev
                            font_size=24.5)
 
         RunLay.add_widget(runLabel)
