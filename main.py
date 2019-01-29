@@ -367,7 +367,8 @@ class MainScreen(Screen):
                        content=RunLay)
         runLabel = Label(text='Game in progress...',
                          pos=(690, 550),
-                         font_size=24.5)
+                         font_size=24.5) )
+
 
         RunLay.add_widget(runLabel)
         RunPop.open()
