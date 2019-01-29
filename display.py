@@ -34,8 +34,6 @@ Setup
 """
 
 difficulty = 'easy'
-locPenguin = 1  # sets starting location of the penguin
-locGoal = [49, 49, 49]  # location of the fish
 chasing_player = False
 cheat_code = 1
 
@@ -47,8 +45,8 @@ TransparentId = 'icons/ICON_Transparent.png'
 """
 Arm Info
 """
-x_constant = .165  # work on
-y_constant = .1183
+x_constant = .1166
+y_constant = .113
 
 Motor1 = DeltaArm.MotorConfig.createMotor(0, 120, -1750, -26750)
 Motor2 = DeltaArm.MotorConfig.createMotor(1, 240, -980, -26800)
@@ -74,22 +72,25 @@ rotator.goUntilPress(0, 1, 5000)
 
 victory = False
 def endGame(result):
-
     global currentPos
-    currentPos[2] -= .15  # change z value
+    print(currentPos)
+    arm.wait()
+    currentPos[2] -= .178  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
     arm.solenoid_down()
     sleep(.5)
-    currentPos[2] += .15  # change z value
+    currentPos[2] += .178  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
     sleep(.5)
+
     if result == 'win':
         c.send_packet(PacketType.responseCommand, b"win")
     elif result == 'lose':
         c.send_packet(PacketType.responseCommand, b"lose")
-
+    if result == 'noTurns':
+        return
 
     #G.clear()
 
@@ -102,13 +103,13 @@ def rotate_arm(direction):
     global nextPos
     global currentPos
 
-    currentPos[2] -= .16  # change z value
+    currentPos[2] -= .178 # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
 
     sleep(.1)
 
-    currentPos[2] += .16  # change z value
+    currentPos[2] += .178  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
 
@@ -127,14 +128,14 @@ def rotate_arm(direction):
 
     sleep(.1)
 
-    currentPos[2] -= .16  # change z value
+    currentPos[2] -= .178  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
     arm.solenoid_up()
 
     sleep(.1)
 
-    currentPos[2] += .16  # change z value
+    currentPos[2] += .178 # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.solenoid_down()
     arm.wait()
@@ -146,14 +147,14 @@ def move_arm():
     global nextPos
     global currentPos
 
-    currentPos[2] -= .16  # change z value
+    currentPos[2] -= .178  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move down
     arm.wait()
     arm.solenoid_down()
 
     sleep(.5)
 
-    currentPos[2] += .16  # change z value
+    currentPos[2] += .178  # change z value
     arm.move_to_point_in_straight_line(currentPos[0], currentPos[1], currentPos[2], .01)  # move up
     arm.wait()
     sleep(.5)
@@ -163,14 +164,14 @@ def move_arm():
 
     sleep(.5)
 
-    nextPos[2] -= .16  # change z value
+    nextPos[2] -= .178  # change z value
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move down
     arm.wait()
     arm.solenoid_up()
 
     sleep(.5)
 
-    nextPos[2] += .16
+    nextPos[2] += .178
     arm.move_to_point_in_straight_line(nextPos[0], nextPos[1], nextPos[2], .01)  # move up
     arm.solenoid_down()
     arm.wait()
@@ -213,6 +214,9 @@ def handle_difficulty_packet(payload):
 
 def handle_move_packet(payload):
     print("recieved " + payload.decode("ascii"))
+    if payload.decode("ascii") == 'outTurn':
+        endGame('noTurn')
+        return
     main.playerMove(payload.decode("ascii"))
 
 
@@ -250,6 +254,7 @@ def reset(dif):
     main.RefreshPopup()
     Clock.schedule_once(my_callback, 2)
 
+    grid.do_layout()
 
     global difficulty
     difficulty = dif
@@ -257,7 +262,6 @@ def reset(dif):
     print('now is ' + difficulty)
 
 
-    
     # sets possible locations of the obstacles
     easyObstacles = [
         [6, 9, 20, 21, 23, 25, 30, 32, 33, 34, 43, 45],
@@ -270,19 +274,17 @@ def reset(dif):
 
     ]
     mediumObstacles = [
-        [5, 9, 10, 12, 19, 20, 23, 24, 27, 32, 34, 35, 37, 39, 4],
+        [5, 9, 10, 12, 19, 20, 23, 24, 27, 32, 34, 35, 37, 39, 48],
         [6, 11, 13, 25, 27, 28, 32, 40, 45],
         [6, 9, 13, 29, 31, 33, 40],
         [6, 9, 27, 28, 32, 40, 43],
         [2, 7, 14, 15, 16, 17, 18, 19, 28, 33, 34, 35],
         [5, 10, 13, 16, 18, 24, 29, 32, 33, 37, 46]
 
-
-
     ]
     hardObstacles = [
         [4, 9, 13, 18, 19, 20, 22, 24, 32, 37, 39, 41],
-        [7, 9, 18, 25, 30, 32, 42, 43, 47],
+        [7, 9, 18, 25, 30, 32, 34, 42, 43, 47],
         [5, 8, 9, 12, 19, 31, 32, 33, 34, 35],
         [2, 14, 15, 17, 19, 32, 34, 41, 44],
         [5, 9, 11, 13, 23, 27, 29, 33, 37, 39],
@@ -290,32 +292,13 @@ def reset(dif):
 
     ]
 
-    bearPos = []
-    assignedObstacleLocations = []
-    
-    for actor in main.children[0].children:
-            actor.source = TransparentId
+    main.resetBoard()
 
-    time.sleep(1)
+    main.addActor(1, 'players/ICON_Player_180.jpg')
+    print('player is ' + str(1))
 
-
-    assignedGoal = 0
-    not_obstacles = [i for i in main.children[0].children if (i.number_as_int() not in assignedObstacleLocations)]
-
-    if (dif == 'easy'):
-        assignedGoal = locGoal[0]
-    elif (dif == 'medium'):
-        assignedGoal = locGoal[1]
-    elif (dif == 'hard'):
-        assignedGoal = locGoal[2]
-
-    actorGoal = main.findActor(assignedGoal)  # assigns goal id
-    print('goal is ' + str((assignedGoal)))
-    actorGoal.source = 'icons/ICON_Goal.jpg'
-
-    actorPenguin = main.findActor(locPenguin)  # places penguin
-    print('player is ' + str(locPenguin))
-    actorPenguin.source = 'players/ICON_Player_180.jpg'
+    main.addActor(49, 'icons/ICON_Goal.jpg')
+    print('player is ' + str(1))
 
     if len(G.nodes()) > 0:
         G.clear()
@@ -330,13 +313,12 @@ def reset(dif):
         print('obstacles at')
         print(temp)
         for i in temp:
-            actor = main.findActor(i)
-            if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
-                if (i % 2 == 0):
-                    actor.source = 'icons/ICON_Igloo.jpg'
 
-                else:
-                    actor.source = 'icons/ICON_Jewel.jpg'
+            if (i % 2 == 0):
+                 main.addActor(i, 'icons/ICON_Igloo.jpg')
+
+            else:
+                 main.addActor(i, 'icons/ICON_Jewel.jpg')
             G.remove_node(i)
 
 
@@ -346,13 +328,12 @@ def reset(dif):
         print('obstacles at')
         print(temp)
         for i in temp:
-            actor = main.findActor(i)
-            if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
-                if (i % 2 == 0):
-                    actor.source = 'icons/ICON_Igloo.jpg'
 
-                else:
-                    actor.source = 'icons/ICON_Jewel.jpg'
+            if (i % 2 == 0):
+                main.addActor(i, 'icons/ICON_Igloo.jpg')
+
+            else:
+                main.addActor(i, 'icons/ICON_Jewel.jpg')
             G.remove_node(i)
 
     if (dif == 'hard'):
@@ -361,13 +342,12 @@ def reset(dif):
         print('obstacles at')
         print(temp)
         for i in temp:
-            actor = main.findActor(i)
-            if (actor.id == 'actor' + str(i)):  # assigns jewels id to actor + obstacle
-                if (i % 2 == 0):
-                    actor.source = 'icons/ICON_Igloo.jpg'
 
-                else:
-                    actor.source = 'icons/ICON_Jewel.jpg'
+            if (i % 2 == 0):
+                main.addActor(i, 'icons/ICON_Igloo.jpg')
+
+            else:
+                main.addActor(i, 'icons/ICON_Jewel.jpg')
             G.remove_node(i)
 
 
@@ -395,28 +375,22 @@ def reset(dif):
 
     #print("--- " + str(G.nodes()))
 
-    bear = main.findActor(26)
-    bear.source = 'icons/ICON_Bear_2.jpg'
+    main.addActor(26, 'icons/ICON_Bear_2.jpg')
 
-
-
-
-
-    grid.canvas.ask_update()
 
 #Begins arm stuff after initializing render
 
     arm.home_all()
     arm.wait()
     rotator.goUntilPress(0, 1, 5000)
-    arm.move_to_point_in_straight_line(0, 0, -1.37, .01)
+    arm.move_to_point_in_straight_line(0, 0, -1.52, .01)
     arm.wait()
     sleep(1)
-    arm.move_to_point_in_straight_line(-.55, -.41, -1.52, .01)
+    arm.move_to_point_in_straight_line(-.385, -.3705, -1.52, .01)
     arm.wait()
     arm.solenoid_up()
     time.sleep(0.2)
-    arm.move_to_point_in_straight_line(-.55, -.41, -1.37, .01)
+    arm.move_to_point_in_straight_line(-.385, -.3705, -1.37, .01)
     arm.wait()
     arm.solenoid_down()
 
@@ -425,8 +399,8 @@ def reset(dif):
     global currentPos
     global nextPos
 
-    currentPos = [-.55, -.41, -1.37]
-    nextPos = [-.55, -.41, -1.37]
+    currentPos = [-.385, -.3705, -1.37]
+    nextPos = [-.385, -.3705, -1.37]
     # arm.move_to_point(0,0, -1.34)
 
 
@@ -481,8 +455,10 @@ class MainScreen(Screen):
             actor.source = TransparentId
 
     def addActor(self, location, type):
+        temp = "actor" + str(location)
+        print(temp)
         for actor in self.children[0].children:
-            if (actor.id == location):
+            if (actor.id == temp):
                 actor.source = type
 
     def removeActor(self, location):
@@ -575,7 +551,7 @@ class MainScreen(Screen):
         if fish == None:
             return
         shortest_path_from_bear_to_fish = nx.shortest_path(G, source=bear.number_as_int(), target=fish.number_as_int())
-
+        print('shortest path from bear to fish: ' + shortest_path_from_bear_to_fish)
         if difficulty == 'easy':
             #bear_loc = bear.number_as_int()
             possible_locs = self.getAdjacentTiles(bear)
@@ -584,7 +560,7 @@ class MainScreen(Screen):
         if difficulty == 'medium':
 
             if len(shortest_path_from_bear_to_fish) > 2:
-                print(str(shortest_path_from_bear_to_fish))
+                #print(str(shortest_path_from_bear_to_fish))
                 bear.eatActor(shortest_path_from_bear_to_fish[1])
             else:
                 surrounding_fish_locs = self.getAdjacentTiles(fish, True)
@@ -605,7 +581,7 @@ class MainScreen(Screen):
 
         if (difficulty == 'hard'):
             shortest_path_from_bear_to_player = nx.shortest_path(G, source=bear.number_as_int(),
-                                                               target=player.number_as_int())
+                                                                target=player.number_as_int())
 
             if chasing_player:
                 if player == None:
@@ -616,10 +592,11 @@ class MainScreen(Screen):
             if len(shortest_path_from_bear_to_fish) >= len(shortest_path_from_bear_to_player): #bear is closer to player)
                 bear.eatActor(shortest_path_from_bear_to_player[1])
             else: #bear is closer to the fish
-                print(str(shortest_path_from_bear_to_player) + " --- ")
-                if len(shortest_path_from_bear_to_player) == 2:
+               # print(str(shortest_path_from_bear_to_player) + " --- ")
+                if len(shortest_path_from_bear_to_fish) == 2:
                     #bear is right next to the fish, but won't eat it, so it starts to move towards the player
-                    print('--- ' + str(shortest_path_from_bear_to_player))
+                    #print('--- ' + str(shortest_path_from_bear_to_player))
+                    chasing_player = True
                     bear.eatActor(shortest_path_from_bear_to_player[1])
                 else:
                     bear.eatActor(shortest_path_from_bear_to_fish[1])
@@ -699,7 +676,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
         cheat_code += 1
         if cheat_code == 4:
-            self.cheatCode()
+            webbrowser.open('https://www.youtube.com/watch?v=TFIHfiDT1mU')
     """
     Left/Right/Up/Down
     """
@@ -715,7 +692,7 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
         if (next % main.children[0].cols == 1):
             print('cant move, at the right wall')
-            c.send_packet(PacketType.commandResponse, b"lose")
+            endGame('lose')
             return
         else:
             nextPos[0] += x_constant
@@ -742,9 +719,6 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
     """
     move
     """
-
-    def cheatCode(self):
-        webbrowser.open('https://www.youtube.com/watch?v=TFIHfiDT1mU')
     def moveUp(self):
         global nextPos
 
@@ -853,8 +827,6 @@ class Actor(ButtonBehavior, AsyncImage):  # creates an actor class
 
     def rotateDirection(self, direction):
         if (sm.current != 'main'): return
-
-
 
         if (direction == 'left' and self.source == 'players/ICON_Player.jpg'):  # if main icon
             self.source = 'players/ICON_Player_270.jpg'
